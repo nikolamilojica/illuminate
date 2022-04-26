@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "illuminate"
+version = "0.1.0"
+description = ""
+authors = ["Nikola Milojica <nikola.milojica@protonmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+bandit = "^1.7.4"
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
