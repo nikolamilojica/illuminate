@@ -1,3 +1,5 @@
+import os
+
 import click
 
 from illuminate import __version__
@@ -15,6 +17,14 @@ def cli(ctx):
 def manage(ctx):
     """Framework manager"""
     pass
+
+
+@manage.command("setup")
+@click.argument("name", required=True)
+@click.argument("path", default=os.getcwd(), required=False)
+@click.pass_context
+def setup(ctx, name, path, *args, **kwargs):
+    """Creates project structure with example files"""
 
 
 if __name__ == "__main__":
