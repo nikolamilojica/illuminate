@@ -8,6 +8,8 @@ authors = ["Nikola Milojica <nikola.milojica@protonmail.com>"]
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
+black = "^22.3.0"
+bandit = "^1.7.4"
 pytest = "^5.2"
 
 [build-system]
