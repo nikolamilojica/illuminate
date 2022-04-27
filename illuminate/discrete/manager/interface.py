@@ -1,6 +1,7 @@
 class Interface(object):
     """Interface for manager class"""
 
-    def setup(self):
+    @classmethod
+    def setup(cls, name, path):
         """Create project directory and populates it with project files"""
         raise NotImplementedError
