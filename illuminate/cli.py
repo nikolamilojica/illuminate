@@ -3,6 +3,7 @@ import os
 import click
 
 from illuminate import __version__
+from illuminate.manager.manager import Manager
 
 
 @click.group()
@@ -25,6 +26,8 @@ def manage(ctx):
 @click.pass_context
 def setup(ctx, name, path, *args, **kwargs):
     """Creates project structure with example files"""
+    kwargs["context"] = ctx
+    Manager.setup(name, path, *args, **kwargs)
 
 
 if __name__ == "__main__":
