@@ -15,16 +15,15 @@ class Manager(Interface, metaclass=Singleton):
     def setup(cls, name, path, *args, **kwargs):
         """Create project directory and populates it with project files"""
 
-        path = os.path.join(path, name)
-        if os.path.exists(path):
-            raise BasicManagerException
-
-        os.mkdir(path)
-        sep = "/"
+        if path != ".":
+            path = os.path.join(path, name)
+            if os.path.exists(path):
+                raise BasicManagerException
+            os.mkdir(path)
 
         for name, content in FILES.items():
             file_path = os.path.join(path, name)
-            if sep in name:
-                os.makedirs(sep.join(file_path.split(sep)[:-1]), exist_ok=True)
+            if os.sep in name:
+                os.makedirs(os.sep.join(file_path.split(os.sep)[:-1]), exist_ok=True)
             with open(file_path, "w") as file:
                 file.write(f"{content.strip()}\n")
