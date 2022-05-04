@@ -8,6 +8,13 @@ from illuminate.exceptions.manager import BasicManagerException
 from illuminate.manager.manager import Manager
 
 
+class TestManager:
+    def test_singleton_behaviour_successfully(self):
+        manager_1 = Manager("premier-league", "/opt/premier-league")
+        manager_2 = Manager("bundesliga", "/opt/bundesliga")
+        assert manager_1 == manager_2
+
+
 class TestManagerSetup:
     SETUP_NAME = "premier-league"
     SETUP_DIRECTORY = "/tmp"
