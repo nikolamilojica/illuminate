@@ -10,6 +10,11 @@ from illuminate.manager.manager import Manager
 
 class TestManager:
     def test_singleton_behaviour_successfully(self):
+        """
+        Given: None
+        When: Creating instance of Manager class twice with different arguments
+        Expected: Instances are the same
+        """
         manager_1 = Manager("premier-league", "/opt/premier-league")
         manager_2 = Manager("bundesliga", "/opt/bundesliga")
         assert manager_1 == manager_2
