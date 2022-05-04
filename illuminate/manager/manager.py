@@ -3,11 +3,13 @@ import os
 from illuminate.common.project_templates import FILES
 from illuminate.discrete.manager.interface import Interface
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.meta.singleton import Singleton
 
 
-class Manager(Interface):
-    def __init__(self, *args, **kwargs):
-        pass
+class Manager(Interface, metaclass=Singleton):
+    def __init__(self, name=None, path=None, *args, **kwargs):
+        self.name = name
+        self.path = path
 
     @classmethod
     def setup(cls, name, path, *args, **kwargs):
