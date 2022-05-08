@@ -21,9 +21,9 @@ class Manager(Interface, metaclass=Singleton):
                 raise BasicManagerException
             os.mkdir(path)
 
-        for name, content in FILES.items():
-            file_path = os.path.join(path, name)
-            if os.sep in name:
+        for _name, content in FILES.items():
+            file_path = os.path.join(path, _name)
+            if os.sep in _name:
                 os.makedirs(os.sep.join(file_path.split(os.sep)[:-1]), exist_ok=True)
             with open(file_path, "w") as file:
-                file.write(f"{content.strip()}\n")
+                file.write(f"{content.format(name=name).strip()}\n")
