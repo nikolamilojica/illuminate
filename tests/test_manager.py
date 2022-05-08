@@ -27,7 +27,7 @@ class TestManagerSetup:
         Helper method for asserting project structure
         :param name: name of the project: str
         :param path: path of the project: str
-        :param cwd: check in same folder: bool
+        :param cwd: assert in same folder: bool
         :return: None
         """
         project_path = os.path.join(path, name) if not cwd else path
