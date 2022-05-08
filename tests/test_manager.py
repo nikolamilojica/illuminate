@@ -1,5 +1,5 @@
 import os
-import shutil
+import tempfile
 
 import pytest
 
@@ -21,33 +21,48 @@ class TestManager:
 
 
 class TestManagerSetup:
-    SETUP_NAME = "premier-league"
-    SETUP_DIRECTORY = "/tmp"
-    SETUP_DIRECTORY_PATH = os.path.join(SETUP_DIRECTORY, SETUP_NAME)
+    @staticmethod
+    def assert_project_structure(name, path, cwd=False):
+        """
+        Helper method for asserting project structure
+        :param name: name of the project: str
+        :param path: path of the project: str
+        :param cwd: assert in same folder: bool
+        :return: None
+        """
+        project_path = os.path.join(path, name) if not cwd else path
+        assert os.path.exists(project_path)
+        for _name, content in FILES.items():
+            test_file_path = os.path.join(project_path, _name)
+            assert os.path.exists(test_file_path)
+            with open(test_file_path, "r") as file:
+                assert content.format(name=name).strip() == file.read().strip()
 
-    @pytest.fixture
-    def clean_files(self):
-        yield
-        shutil.rmtree(self.SETUP_DIRECTORY_PATH)
-
-    @pytest.fixture(scope='session')
     def test_setup_successfully(self):
         """
         Given: No directory or file exists with the same name as project
         When: Setting up new project
         Expected: Creates directories and files needed for framework
         """
-        Manager.setup(self.SETUP_NAME, self.SETUP_DIRECTORY)
-        assert os.path.exists(self.SETUP_DIRECTORY_PATH)
-        for name, content in FILES.items():
-            test_file_path = os.path.join(self.SETUP_DIRECTORY_PATH, name)
-            assert os.path.exists(test_file_path)
-            with open(test_file_path, "r") as file:
-                assert content.strip() == file.read().strip()
+        with tempfile.TemporaryDirectory() as path:
+            name = "bundesliga"
+            Manager.setup(name, path)
+            self.assert_project_structure(name, path)
 
-    @pytest.mark.usefixtures('test_setup_successfully')
+    def test_setup_in_current_folder_successfully(self):
+        """
+        Given: Current working directory is target for project files
+        When: Setting up new project
+        Expected: Creates directories and files needed for framework
+        """
+        with tempfile.TemporaryDirectory() as path:
+            os.chdir(path)
+            name = "bundesliga"
+            Manager.setup(name, ".")
+            self.assert_project_structure(name, path, cwd=True)
+
     @pytest.mark.xfail(raises=BasicManagerException)
-    def test_setup_unsuccessfully_directory_or_file_exists(self, clean_files):
+    def test_setup_unsuccessfully_directory_or_file_exists(self):
         """
         Given: Directory of file exists with the same name as project
         When: Setting up new project
@@ -55,4 +70,6 @@ class TestManagerSetup:
         NOTE: This test will clean files from test_setup_successfully
         """
         with pytest.raises(BasicManagerException) as error:
-            Manager.setup(self.SETUP_NAME, self.SETUP_DIRECTORY)
+            with tempfile.TemporaryDirectory() as path:
+                Manager.setup("premier-league", path)
+                Manager.setup("premier-league", path)
