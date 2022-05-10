@@ -139,8 +139,8 @@ NAME = "{name}"
 
 FILES = {
     "__init__.py": _EMPTY,
+    "docker-compose.yaml": _DOCKER_COMPOSE,
     "settings.py": _ILLUMINATE_SETTINGS,
-    "docker/docker-compose.yaml": _DOCKER_COMPOSE,
     "exporters/__init__.py": _EMPTY,
     "exporters/example.py": _EMPTY,
     "mapping/example.csv": _EMPTY,
