@@ -2,7 +2,7 @@ class Interface(object):
     """Interface for manager class"""
 
     @classmethod
-    def db(cls, action, path, revision, selector):
+    def db(cls, action, path, revision, selector, url):
         """Creates/changes db schema with Alembic framework"""
         raise NotImplementedError
 

@@ -15,7 +15,7 @@ class Manager(Interface, metaclass=Singleton):
         self.path = path
 
     @classmethod
-    def db(cls, action, path, revision, selector, *args, **kwargs):
+    def db(cls, action, path, revision, selector, url=None, *args, **kwargs):
         """Creates/changes db schema with Alembic framework"""
 
         try:
@@ -24,12 +24,15 @@ class Manager(Interface, metaclass=Singleton):
             raise BasicManagerException
 
         db = settings.DB[selector]
-        dns = f"{db['type']}://{db['user']}:{db['pass']}@{db['host']}/{settings.NAME}"
+        db["db"] = settings.NAME
+        if not url:
+            # TODO: URL from settings
+            url = "{type}://{user}:{pass}@{host}/{db}".format(**db)
         migrations = os.path.join(path, "migrations")
 
         config = Config()
         config.set_main_option("script_location", migrations)
-        config.set_main_option("sqlalchemy.url", dns)
+        config.set_main_option("sqlalchemy.url", url)
         #  TODO: logging, try/except with Alembic/SQLAlchemy exceptions
 
         if action == "revision":

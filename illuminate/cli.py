@@ -28,12 +28,13 @@ def manage(ctx):
     type=click.Choice(("upgrade", "revision"), case_sensitive=False),
 )
 @click.argument("revision", default="head", required=True)
+@click.argument("url", default=None, required=False)
 @click.argument("path", default=os.getcwd(), required=False)
 @click.pass_context
-def db(ctx, action, path, revision, selector, *args, **kwargs):
+def db(ctx, action, path, revision, selector, url, *args, **kwargs):
     """Prepare db for ETL"""
     kwargs["context"] = ctx
-    Manager.db(action, path, revision, selector, *args, **kwargs)
+    Manager.db(action, path, revision, selector, url, *args, **kwargs)
 
 
 @manage.command("setup")
