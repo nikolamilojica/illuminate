@@ -82,7 +82,8 @@ def downgrade():
 _DOCKER_COMPOSE = """
 version: '3.8'
 services:
-  postgres:
+  pg:
+    container_name: pg
     image: postgres:latest
     restart: always
     environment:
@@ -93,6 +94,15 @@ services:
       - '5432:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=root@example.com
+      - PGADMIN_DEFAULT_PASSWORD=$ILLUMINATE_PGADMIN_PASSWORD
+    ports:
+      - "8080:80"
 volumes:
   postgres:
     driver: local
@@ -104,17 +114,17 @@ _EMPTY = """
 
 _FIXTURE_EXAMPLE = """
 [
-    {
+    {{
     "name": "model",
     "data": [
-        {
+        {{
             "field": "Alice"
-        },
-        {
+        }},
+        {{
             "field": "Bob"
-        }
+        }}
     ]
-    }
+    }}
 ]
 """
 
