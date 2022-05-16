@@ -102,6 +102,22 @@ volumes:
 _EMPTY = """
 """
 
+_FIXTURE_EXAMPLE = """
+[
+    {
+    "name": "model",
+    "data": [
+        {
+            "field": "Alice"
+        },
+        {
+            "field": "Bob"
+        }
+    ]
+    }
+]
+"""
+
 _ILLUMINATE_MODEL = """
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declarative_base
@@ -143,7 +159,7 @@ FILES = {
     "settings.py": _ILLUMINATE_SETTINGS,
     "exporters/__init__.py": _EMPTY,
     "exporters/example.py": _EMPTY,
-    "mapping/example.csv": _EMPTY,
+    "fixtures/example.json": _FIXTURE_EXAMPLE,
     "models/__init__.py": _EMPTY,
     "models/example.py": _ILLUMINATE_MODEL,
     "migrations/env.py": _ALEMBIC_ENV_PY,
