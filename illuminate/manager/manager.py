@@ -1,7 +1,13 @@
+import json
 import os
+from glob import glob
+from pydoc import locate
 
 from alembic import command
 from alembic.config import Config
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
+from sqlalchemy import create_engine
 
 from illuminate.common.project_templates import FILES
 from illuminate.discrete.manager.interface import Interface
@@ -35,7 +41,22 @@ class Manager(Interface, metaclass=Singleton):
         config.set_main_option("sqlalchemy.url", url)
         #  TODO: logging, try/except with Alembic/SQLAlchemy exceptions
 
-        if action == "revision":
+        if action == "populate":
+            #  TODO: consider using function/method
+            eng = create_engine(url)
+            ctx = MigrationContext.configure(eng.connect())
+            ops = Operations(ctx)
+            table_data = {}
+            for _file in glob('fixtures/*.json', recursive=True):
+                with open(_file, 'r') as file:
+                    content = json.load(file)
+                    for table in content:
+                        table_data.update({table["name"]: table["data"]})
+            models = [locate(i) for i in settings.MODELS]
+            for model in models:
+                if model.__tablename__ in table_data:
+                    ops.bulk_insert(model.__table__, table_data[model.__tablename__])
+        elif action == "revision":
             command.revision(
                 config,
                 message=settings.NAME,
