@@ -25,7 +25,7 @@ def manage(ctx):
 @click.argument(
     "action",
     required=True,
-    type=click.Choice(("upgrade", "revision"), case_sensitive=False),
+    type=click.Choice(("populate", "revision", "upgrade"), case_sensitive=False),
 )
 @click.argument("revision", default="head", required=True)
 @click.argument("url", default=None, required=False)
