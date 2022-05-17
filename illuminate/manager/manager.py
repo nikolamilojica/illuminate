@@ -16,60 +16,81 @@ from illuminate.meta.singleton import Singleton
 
 
 class Manager(Interface, metaclass=Singleton):
+    @staticmethod
+    def create_alembic_config(path, url):
+        """Creates config object needed to perform Alembic commands"""
+        config = Config()
+        config.set_main_option("script_location", os.path.join(path, "migrations"))
+        config.set_main_option("sqlalchemy.url", url)
+        return config
+
+    @staticmethod
+    def db_url_from_settings(selector, settings):
+        """Creates db url from data in settings.py module"""
+        db = settings.DB[selector]
+        db["db"] = settings.NAME
+        return "{type}://{user}:{pass}@{host}/{db}".format(**db)
+
+    @staticmethod
+    def obtain_project_settings():
+        """Tries to import project settings.py module and returns it"""
+        try:
+            import settings
+            return settings
+        except ImportError:
+            raise BasicManagerException
+
     def __init__(self, name=None, path=None, *args, **kwargs):
         self.name = name
         self.path = path
 
-    @classmethod
-    def db(cls, action, path, revision, selector, url=None, *args, **kwargs):
-        """Creates/changes db schema with Alembic framework"""
-
-        try:
-            import settings
-        except ImportError:
-            raise BasicManagerException
-
-        db = settings.DB[selector]
-        db["db"] = settings.NAME
+    @staticmethod
+    def db_populate(fixtures, selector, url=None, *args, **kwargs):
+        """Populates db with Alembic framework"""
+        settings = Manager.obtain_project_settings()
         if not url:
-            # TODO: URL from settings
-            url = "{type}://{user}:{pass}@{host}/{db}".format(**db)
-        migrations = os.path.join(path, "migrations")
+            url = Manager.db_url_from_settings(selector, settings)
+        engine = create_engine(url)
+        context = MigrationContext.configure(engine.connect())
+        op = Operations(context)
+        table_data = {}
+        files = fixtures if fixtures else glob('fixtures/*.json', recursive=True)
+        for _file in files:
+            with open(_file, 'r') as file:
+                content = json.load(file)
+                for table in content:
+                    table_data.update({table["name"]: table["data"]})
+        models = [locate(i) for i in settings.MODELS]
+        for model in models:
+            if model.__tablename__ in table_data:
+                # TODO: log insert process
+                op.bulk_insert(model.__table__, table_data[model.__tablename__])
 
-        config = Config()
-        config.set_main_option("script_location", migrations)
-        config.set_main_option("sqlalchemy.url", url)
-        #  TODO: logging, try/except with Alembic/SQLAlchemy exceptions
+    @staticmethod
+    def db_revision(path, revision, selector, url=None, *args, **kwargs):
+        """Creates db revision with Alembic framework"""
+        settings = Manager.obtain_project_settings()
+        if not url:
+            url = Manager.db_url_from_settings(selector, settings)
+        config = Manager.create_alembic_config(path, url)
+        command.revision(
+            config,
+            message=settings.NAME,
+            autogenerate=True,
+            head=revision,
+        )
 
-        if action == "populate":
-            #  TODO: consider using function/method
-            eng = create_engine(url)
-            ctx = MigrationContext.configure(eng.connect())
-            ops = Operations(ctx)
-            table_data = {}
-            for _file in glob('fixtures/*.json', recursive=True):
-                with open(_file, 'r') as file:
-                    content = json.load(file)
-                    for table in content:
-                        table_data.update({table["name"]: table["data"]})
-            models = [locate(i) for i in settings.MODELS]
-            for model in models:
-                if model.__tablename__ in table_data:
-                    ops.bulk_insert(model.__table__, table_data[model.__tablename__])
-        elif action == "revision":
-            command.revision(
-                config,
-                message=settings.NAME,
-                autogenerate=True,
-                head=revision,
-            )
-        elif action == "upgrade":
-            command.upgrade(config, revision)
-        else:
-            raise BasicManagerException
+    @staticmethod
+    def db_upgrade(path, revision, selector, url=None, *args, **kwargs):
+        """Performs db migration with Alembic framework"""
+        settings = Manager.obtain_project_settings()
+        if not url:
+            url = Manager.db_url_from_settings(selector, settings)
+        config = Manager.create_alembic_config(path, url)
+        command.upgrade(config, revision)
 
-    @classmethod
-    def setup(cls, name, path, *args, **kwargs):
+    @staticmethod
+    def setup(name, path, *args, **kwargs):
         """Create project directory and populates it with project files"""
 
         if path != ".":
