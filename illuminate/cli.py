@@ -20,21 +20,46 @@ def manage(ctx):
     pass
 
 
-@manage.command("db")
+@manage.group("db")
+@click.pass_context
+def db(ctx):
+    """Prepares relational db for ETL operations"""
+    pass
+
+
+@db.command("populate")
 @click.option("--selector", default="main", required=False)
-@click.argument(
-    "action",
-    required=True,
-    type=click.Choice(("populate", "revision", "upgrade"), case_sensitive=False),
-)
-@click.argument("revision", default="head", required=True)
+@click.option("--fixtures", multiple=True, required=False, type=click.Path(exists=True))
+@click.argument("url", default=None, required=False)
+@click.pass_context
+def db_populate(ctx, selector, url, *args, **kwargs):
+    """Populate db with fixtures"""
+    kwargs["context"] = ctx
+    Manager.db_populate(kwargs.pop("fixtures"), selector, url, *args, **kwargs)
+
+
+@db.command("revision")
+@click.option("--selector", default="main", required=False)
+@click.option("--revision", default="head", required=True)
 @click.argument("url", default=None, required=False)
 @click.argument("path", default=os.getcwd(), required=False)
 @click.pass_context
-def db(ctx, action, path, revision, selector, url, *args, **kwargs):
-    """Prepare db for ETL"""
+def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
+    """Creates revision files"""
     kwargs["context"] = ctx
-    Manager.db(action, path, revision, selector, url, *args, **kwargs)
+    Manager.db_revision(path, revision, selector, url, *args, **kwargs)
+
+
+@db.command("upgrade")
+@click.option("--selector", default="main", required=False)
+@click.option("--revision", default="head", required=True)
+@click.argument("url", default=None, required=False)
+@click.argument("path", default=os.getcwd(), required=False)
+@click.pass_context
+def db_upgrade(ctx, path, revision, selector, url, *args, **kwargs):
+    """Performs migration based on revision files"""
+    kwargs["context"] = ctx
+    Manager.db_upgrade(path, revision, selector, url, *args, **kwargs)
 
 
 @manage.command("setup")
