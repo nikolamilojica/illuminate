@@ -27,6 +27,13 @@ def db(ctx):
     pass
 
 
+@manage.group("project")
+@click.pass_context
+def project(ctx):
+    """Performs project operations"""
+    pass
+
+
 @db.command("populate")
 @click.option("--selector", default="main", required=False)
 @click.option("--fixtures", multiple=True, required=False, type=click.Path(exists=True))
@@ -62,14 +69,14 @@ def db_upgrade(ctx, path, revision, selector, url, *args, **kwargs):
     Manager.db_upgrade(path, revision, selector, url, *args, **kwargs)
 
 
-@manage.command("setup")
+@project.command("setup")
 @click.argument("name", required=True, type=str)
 @click.argument("path", default=os.getcwd(), required=False)
 @click.pass_context
 def setup(ctx, name, path, *args, **kwargs):
     """Creates project structure with example files"""
     kwargs["context"] = ctx
-    Manager.setup(name, path, *args, **kwargs)
+    Manager.project_setup(name, path, *args, **kwargs)
 
 
 if __name__ == "__main__":
