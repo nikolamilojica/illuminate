@@ -4,42 +4,18 @@ from glob import glob
 from pydoc import locate
 
 from alembic import command
-from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from sqlalchemy import create_engine
 
 from illuminate.common.project_templates import FILES
-from illuminate.discrete.manager.interface import Interface
+from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
 
 
 class Manager(Interface, metaclass=Singleton):
-    @staticmethod
-    def create_alembic_config(path, url):
-        """Creates config object needed to perform Alembic commands"""
-        config = Config()
-        config.set_main_option("script_location", os.path.join(path, "migrations"))
-        config.set_main_option("sqlalchemy.url", url)
-        return config
-
-    @staticmethod
-    def db_url_from_settings(selector, settings):
-        """Creates db url from data in settings.py module"""
-        db = settings.DB[selector]
-        db["db"] = settings.NAME
-        return "{type}://{user}:{pass}@{host}/{db}".format(**db)
-
-    @staticmethod
-    def obtain_project_settings():
-        """Tries to import project settings.py module and returns it"""
-        try:
-            import settings
-            return settings
-        except ImportError:
-            raise BasicManagerException
-
     def __init__(self, name=None, path=None, *args, **kwargs):
         self.name = name
         self.path = path
@@ -47,16 +23,16 @@ class Manager(Interface, metaclass=Singleton):
     @staticmethod
     def db_populate(fixtures, selector, url=None, *args, **kwargs):
         """Populates db with Alembic framework"""
-        settings = Manager.obtain_project_settings()
+        settings = Assistant.import_settings()
         if not url:
-            url = Manager.db_url_from_settings(selector, settings)
+            url = Assistant.create_db_url(selector, settings)
         engine = create_engine(url)
         context = MigrationContext.configure(engine.connect())
         op = Operations(context)
         table_data = {}
-        files = fixtures if fixtures else glob('fixtures/*.json', recursive=True)
+        files = fixtures if fixtures else glob("fixtures/*.json", recursive=True)
         for _file in files:
-            with open(_file, 'r') as file:
+            with open(_file, "r") as file:
                 content = json.load(file)
                 for table in content:
                     table_data.update({table["name"]: table["data"]})
@@ -69,10 +45,10 @@ class Manager(Interface, metaclass=Singleton):
     @staticmethod
     def db_revision(path, revision, selector, url=None, *args, **kwargs):
         """Creates db revision with Alembic framework"""
-        settings = Manager.obtain_project_settings()
+        settings = Assistant.import_settings()
         if not url:
-            url = Manager.db_url_from_settings(selector, settings)
-        config = Manager.create_alembic_config(path, url)
+            url = Assistant.create_db_url(selector, settings)
+        config = Assistant.create_alembic_config(path, url)
         command.revision(
             config,
             message=settings.NAME,
@@ -83,14 +59,14 @@ class Manager(Interface, metaclass=Singleton):
     @staticmethod
     def db_upgrade(path, revision, selector, url=None, *args, **kwargs):
         """Performs db migration with Alembic framework"""
-        settings = Manager.obtain_project_settings()
+        settings = Assistant.import_settings()
         if not url:
-            url = Manager.db_url_from_settings(selector, settings)
-        config = Manager.create_alembic_config(path, url)
+            url = Assistant.create_db_url(selector, settings)
+        config = Assistant.create_alembic_config(path, url)
         command.upgrade(config, revision)
 
     @staticmethod
-    def setup(name, path, *args, **kwargs):
+    def project_setup(name, path, *args, **kwargs):
         """Create project directory and populates it with project files"""
 
         if path != ".":

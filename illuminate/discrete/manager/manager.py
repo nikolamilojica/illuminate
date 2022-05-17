@@ -17,6 +17,6 @@ class Interface(object):
         raise NotImplementedError
 
     @staticmethod
-    def setup(name, path):
+    def project_setup(name, path):
         """Create project directory and populates it with project files"""
         raise NotImplementedError
