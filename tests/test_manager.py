@@ -8,7 +8,7 @@ from illuminate.exceptions.manager import BasicManagerException
 from illuminate.manager.manager import Manager
 
 
-class TestManager:
+class TestManagerClassInstance:
     def test_singleton_behaviour_successfully(self):
         """
         Given: None
@@ -20,7 +20,7 @@ class TestManager:
         assert manager_1 == manager_2
 
 
-class TestManagerSetup:
+class TestManagerProjectCommandGroup:
     @staticmethod
     def assert_project_structure(name, path, cwd=False):
         """
@@ -46,7 +46,7 @@ class TestManagerSetup:
         """
         with tempfile.TemporaryDirectory() as path:
             name = "bundesliga"
-            Manager.setup(name, path)
+            Manager.project_setup(name, path)
             self.assert_project_structure(name, path)
 
     def test_setup_in_current_folder_successfully(self):
@@ -58,7 +58,7 @@ class TestManagerSetup:
         with tempfile.TemporaryDirectory() as path:
             os.chdir(path)
             name = "bundesliga"
-            Manager.setup(name, ".")
+            Manager.project_setup(name, ".")
             self.assert_project_structure(name, path, cwd=True)
 
     @pytest.mark.xfail(raises=BasicManagerException)
@@ -70,6 +70,7 @@ class TestManagerSetup:
         NOTE: This test will clean files from test_setup_successfully
         """
         with pytest.raises(BasicManagerException) as error:
+            name = "bundesliga"
             with tempfile.TemporaryDirectory() as path:
-                Manager.setup("premier-league", path)
-                Manager.setup("premier-league", path)
+                Manager.project_setup(name, path)
+                Manager.project_setup(name, path)
