@@ -6,7 +6,7 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from bundesliga.settings import MODELS
+from {name}.settings import MODELS
 
 config = context.config
 
