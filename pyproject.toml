@@ -6,7 +6,10 @@ authors = ["Nikola Milojica <nikola.milojica@protonmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+alembic = "^1.7.7"
 click = "^8.1.2"
+SQLAlchemy = "^1.4.36"
+psycopg2 = "^2.9.3"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
