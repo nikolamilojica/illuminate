@@ -1,7 +1,13 @@
 import os
+import shutil
+import sys
 import tempfile
+from contextlib import contextmanager
+from os import walk
 
 import pytest
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.orm import sessionmaker
 
 from illuminate.common.project_templates import FILES
 from illuminate.exceptions.manager import BasicManagerException
@@ -18,6 +24,128 @@ class TestManagerClassInstance:
         manager_1 = Manager("premier-league", "/opt/premier-league")
         manager_2 = Manager("bundesliga", "/opt/bundesliga")
         assert manager_1 == manager_2
+
+
+class TestManagerDBCommandGroup:
+    RUNTIME_PERSISTENT_FOLDER = "/tmp/persistent"
+    RUNTIME_PERSISTENT_DB_URL = f"sqlite:///{RUNTIME_PERSISTENT_FOLDER}/tmp.db"
+
+    @classmethod
+    def setup_class(cls):
+        """
+        Test class setup method
+        :return: None
+        """
+        os.mkdir(cls.RUNTIME_PERSISTENT_FOLDER)
+
+    @classmethod
+    def teardown_class(cls):
+        """
+        Test class teardown method
+        :return: None
+        """
+        shutil.rmtree(cls.RUNTIME_PERSISTENT_FOLDER)
+
+    @contextmanager
+    def force_python_path(self, path):
+        """
+        Put directory path to PYTHONPATH temporarily and use it as cwd
+        :param path: directory path: str
+        :yields: _GeneratorContextManager
+        """
+        sys.path.append(path)
+        os.chdir(path)
+        yield
+        sys.path.remove(path)
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_revision_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Creating revision of a db with Alembic
+        Expected: Exception is raised
+        """
+        with pytest.raises(BasicManagerException) as error:
+            with tempfile.TemporaryDirectory() as path:
+                with self.force_python_path(path):
+                    Manager.db_revision(path, "head", "main", "sqlite://")
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_upgrade_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Running db upgrade with Alembic
+        Expected: Exception is raised
+        """
+        with pytest.raises(BasicManagerException) as error:
+            with tempfile.TemporaryDirectory() as path:
+                with self.force_python_path(path):
+                    Manager.db_upgrade(path, "head", "main", "sqlite://")
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_populate_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Running db populate
+        Expected: Exception is raised
+        """
+        with pytest.raises(BasicManagerException) as error:
+            with tempfile.TemporaryDirectory() as path:
+                with self.force_python_path(path):
+                    Manager.db_upgrade(path, "head", "main", "sqlite://")
+
+    def test_revision_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Creating revision of a db with Alembic
+        Expected: File migrations/versions/<REV_ID>_<PROJECT_NAME>.py exists
+        """
+        path = self.RUNTIME_PERSISTENT_FOLDER
+        with self.force_python_path(path):
+            name = "bundesliga"
+            Manager.project_setup(name, ".")
+            Manager.db_revision(path, "head", "main", "sqlite://")
+        versions = os.path.join(path, "migrations/versions/")
+        assert os.path.isdir(versions)
+        for file in next(walk(versions), (None, None, []))[2]:
+            if name in file:
+                assert True
+                return
+        assert False
+
+    def test_upgrade_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running db upgrade with Alembic
+        Expected: Modify db schema to match model definitions
+        """
+        path = self.RUNTIME_PERSISTENT_FOLDER
+        url = self.RUNTIME_PERSISTENT_DB_URL
+        engine = create_engine(url)
+        with self.force_python_path(path):
+            Manager.db_upgrade(path, "head", "main", url)
+        data = inspect(engine)
+        assert "model" in data.get_table_names()
+
+    def test_populate_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running db populate
+        Expected: Populate db with data in fixture files
+        """
+        path = self.RUNTIME_PERSISTENT_FOLDER
+        url = self.RUNTIME_PERSISTENT_DB_URL
+        engine = create_engine(url)
+        with self.force_python_path(path):
+            from models.example import Model
+
+            Manager.db_populate(["fixtures/example.json"], "main", url)
+        session = sessionmaker(engine)()
+        session.query(Model).all()
+        query = session.query(Model).all()
+        assert len(query) == 2
+        assert query[0].field == "Alice"
+        assert query[1].field == "Bob"
 
 
 class TestManagerProjectCommandGroup:
