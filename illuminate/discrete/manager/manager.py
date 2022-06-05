@@ -20,3 +20,7 @@ class Interface(object):
     def project_setup(name, path):
         """Create project directory and populates it with project files"""
         raise NotImplementedError
+
+    def observe_start(self):
+        """Start producer/consumer ETL process based on project files"""
+        raise NotImplementedError
