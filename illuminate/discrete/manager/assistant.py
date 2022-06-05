@@ -15,3 +15,8 @@ class Interface(object):
     def import_settings():
         """Tries to import project settings.py module and returns it"""
         raise NotImplementedError
+
+    @staticmethod
+    def provide_context():
+        """Provides context for the current runtime"""
+        raise NotImplementedError

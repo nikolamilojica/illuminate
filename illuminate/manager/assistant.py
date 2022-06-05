@@ -1,4 +1,7 @@
+import importlib.util
+import inspect
 import os
+import sys
 
 from alembic.config import Config
 
@@ -31,3 +34,37 @@ class Assistant(Interface):
             return settings
         except ImportError:
             raise BasicManagerException
+
+    @staticmethod
+    def provide_context():
+        """Provides context for the current runtime"""
+        settings = Assistant.import_settings()
+        context = {
+            "exporters": [],
+            "name": settings.NAME,
+            "observers": [],
+            "path": os.getcwd(),
+            "settings": settings,
+        }
+
+        for folder in ("exporters", "observers"):
+            directory = os.path.join(os.getcwd(), folder)
+            files = [
+                f
+                for f in next(os.walk(directory))[2]
+                if f.endswith(".py") and not f.startswith("__init__")
+            ]
+            for file in files:
+                _module = f"{folder}.{file}"
+                spec = importlib.util.spec_from_file_location(
+                    _module, os.path.join(directory, file)
+                )
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[_module] = module
+                spec.loader.exec_module(module)
+
+                for name, cls in inspect.getmembers(module, inspect.isclass):
+                    if name.startswith(folder.capitalize()[:-1]):
+                        context[folder].append(cls)
+
+        return context
