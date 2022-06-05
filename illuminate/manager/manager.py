@@ -122,8 +122,8 @@ class Manager(Interface, metaclass=Singleton):
         async def execute(observers):
             for observer in observers:
                 instance = observer()
-                for request in instance.initial_requests:
-                    await extract(request)
+                for observation in instance.initial_observations:
+                    await extract(observation)
 
         async def extractor():
             async for item in eq:
