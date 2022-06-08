@@ -13,8 +13,8 @@ SQLAlchemy = "^1.4.36"
 tornado = "^6.1"
 
 [tool.poetry.dev-dependencies]
-black = "^22.3.0"
 bandit = "^1.7.4"
+black = "^22.3.0"
 beautifulsoup4 = "^4.11.1"
 pytest = "^5.2"
 
