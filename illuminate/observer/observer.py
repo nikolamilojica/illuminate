@@ -7,6 +7,6 @@ class Observer(Interface):
     def __init__(self):
         self.initial_observations = []
 
-    def start(self, response, *args, **kwargs):
-        """ETL entry point after initial observation"""
+    def observe(self, response, *args, **kwargs):
+        """Extract instances of observation class or reschedule extraction"""
         raise BasicManagerException
