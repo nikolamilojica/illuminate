@@ -21,14 +21,14 @@ class TestManagerClassInstance:
         When: Creating instance of Manager class twice with different arguments
         Expected: Instances are the same
         """
-        manager_1 = Manager("premier-league", "/opt/premier-league")
-        manager_2 = Manager("bundesliga", "/opt/bundesliga")
+        manager_1 = Manager("example1", "/opt/example1")
+        manager_2 = Manager("example2", "/opt/example2")
         assert manager_1 == manager_2
 
 
 class TestManagerDBCommandGroup:
-    RUNTIME_PERSISTENT_FOLDER = "/tmp/persistent"
-    RUNTIME_PERSISTENT_DB_URL = f"sqlite:///{RUNTIME_PERSISTENT_FOLDER}/tmp.db"
+    RUNTIME_PERSISTENT_FOLDER = "/tmp/example"
+    RUNTIME_PERSISTENT_DB_URL = f"sqlite:///{RUNTIME_PERSISTENT_FOLDER}/example.db"
 
     @classmethod
     def setup_class(cls):
@@ -102,7 +102,7 @@ class TestManagerDBCommandGroup:
         """
         path = self.RUNTIME_PERSISTENT_FOLDER
         with self.force_python_path(path):
-            name = "bundesliga"
+            name = "example"
             Manager.project_setup(name, ".")
             Manager.db_revision(path, "head", "main", "sqlite://")
         versions = os.path.join(path, "migrations/versions/")
@@ -125,7 +125,7 @@ class TestManagerDBCommandGroup:
         with self.force_python_path(path):
             Manager.db_upgrade(path, "head", "main", url)
         data = inspect(engine)
-        assert "model" in data.get_table_names()
+        assert "example" in data.get_table_names()
 
     def test_populate_successfully(self):
         """
@@ -137,15 +137,17 @@ class TestManagerDBCommandGroup:
         url = self.RUNTIME_PERSISTENT_DB_URL
         engine = create_engine(url)
         with self.force_python_path(path):
-            from models.example import Model
+            from models.example import ModelExample
 
             Manager.db_populate(["fixtures/example.json"], "main", url)
         session = sessionmaker(engine)()
-        session.query(Model).all()
-        query = session.query(Model).all()
+        session.query(ModelExample).all()
+        query = session.query(ModelExample).all()
         assert len(query) == 2
-        assert query[0].field == "Alice"
-        assert query[1].field == "Bob"
+        assert query[0].url == "https://example.mock/category/product/1"
+        assert query[1].url == "https://example.mock/category/product/2"
+        assert query[0].title == "Product 1"
+        assert query[1].title == "Product 2"
 
 
 class TestManagerProjectCommandGroup:
@@ -173,7 +175,7 @@ class TestManagerProjectCommandGroup:
         Expected: Creates directories and files needed for framework
         """
         with tempfile.TemporaryDirectory() as path:
-            name = "bundesliga"
+            name = "example"
             Manager.project_setup(name, path)
             self.assert_project_structure(name, path)
 
@@ -185,7 +187,7 @@ class TestManagerProjectCommandGroup:
         """
         with tempfile.TemporaryDirectory() as path:
             os.chdir(path)
-            name = "bundesliga"
+            name = "example"
             Manager.project_setup(name, ".")
             self.assert_project_structure(name, path, cwd=True)
 
@@ -198,7 +200,7 @@ class TestManagerProjectCommandGroup:
         NOTE: This test will clean files from test_setup_successfully
         """
         with pytest.raises(BasicManagerException) as error:
-            name = "bundesliga"
+            name = "example"
             with tempfile.TemporaryDirectory() as path:
                 Manager.project_setup(name, path)
                 Manager.project_setup(name, path)
