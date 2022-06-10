@@ -40,6 +40,7 @@ class Assistant(Interface):
         """Provides context for the current runtime"""
         settings = Assistant.import_settings()
         context = {
+            "adapters": [],
             "exporters": [],
             "name": settings.NAME,
             "observers": [],
@@ -47,7 +48,7 @@ class Assistant(Interface):
             "settings": settings,
         }
 
-        for folder in ("exporters", "observers"):
+        for folder in ("adapters", "exporters", "observers"):
             directory = os.path.join(os.getcwd(), folder)
             files = [
                 f
