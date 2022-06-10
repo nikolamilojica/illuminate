@@ -65,7 +65,9 @@ class Assistant(Interface):
                 spec.loader.exec_module(module)
 
                 for name, cls in inspect.getmembers(module, inspect.isclass):
-                    if name.startswith(folder.capitalize()[:-1]):
+                    proper_class = name.startswith(folder.capitalize()[:-1])
+                    basic_import = len(name) == len(folder[:-1])
+                    if proper_class and not basic_import:
                         context[folder].append(cls)
 
         return context
