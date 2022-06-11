@@ -1,5 +1,5 @@
 class Interface:
     """Interface for Observer class"""
-    async def observe(self, *args, **kwargs):
-        """Extract observations and/or findings"""
+    async def observe(self, response, *args, **kwargs):
+        """Extract observations and/or findings from response"""
         return NotImplemented

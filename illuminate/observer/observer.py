@@ -9,5 +9,5 @@ class Observer(Interface):
         self.initial_observations = []
 
     async def observe(self, response, *args, **kwargs):
-        """Extract observations and/or findings"""
+        """Extract observations and/or findings from response"""
         raise BasicManagerException
