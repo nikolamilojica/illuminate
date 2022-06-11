@@ -1,8 +1,8 @@
-from illuminate.discrete.exporter.exporter import Interface
+from illuminate.discrete.exporter.sql import Interface
 from illuminate.exceptions.manager import BasicManagerException
 
 
-class Exporter(Interface):
+class SQLExporter(Interface):
 
     def export(self, item, *args, **kwargs):
         """Perform load upon item"""
