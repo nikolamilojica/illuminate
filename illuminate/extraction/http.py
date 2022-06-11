@@ -1,9 +1,9 @@
 from tornado import httpclient
 
-from illuminate.discrete.extraction.http import Interface
+from illuminate.extraction.extraction import Extraction
 
 
-class HTTPExtraction(Interface):
+class HTTPExtraction(Extraction):
     def __init__(self, allowed, url, callback):
         self._allowed = allowed
         self.url = url
@@ -16,7 +16,8 @@ class HTTPExtraction(Interface):
                 return True
         return False
 
-    async def callback(self, *args, **kwargs):
+    async def extract(self, *args, **kwargs):
+        """Read source and use observer's callback function against response"""
         try:
             response = await httpclient.AsyncHTTPClient().fetch(self.url)
             # TODO: log response
