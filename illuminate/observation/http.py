@@ -4,6 +4,7 @@ from illuminate.observation.observation import Observation
 
 
 class HTTPObservation(Observation):
+    """HTTPObservation class, responsible for reading source with callback"""
     def __init__(self, allowed, url, callback):
         self._allowed = allowed
         self.url = url
@@ -16,7 +17,7 @@ class HTTPObservation(Observation):
                 return True
         return False
 
-    async def extract(self, *args, **kwargs):
+    async def observe(self, *args, **kwargs):
         """Read source and use observer's callback function against response"""
         try:
             response = await httpclient.AsyncHTTPClient().fetch(self.url)

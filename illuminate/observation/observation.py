@@ -2,4 +2,4 @@ from illuminate.discrete.observation.observation import Interface
 
 
 class Observation(Interface):
-    pass
+    """Observation class, responsible for reading source with callback"""

@@ -3,7 +3,8 @@ from illuminate.exporter.exporter import Exporter
 
 
 class SQLExporter(Exporter):
+    """SQLExporter class, responsible for writing to destination"""
 
     async def export(self, item, *args, **kwargs):
-        """Load transformation to destination"""
+        """Load to destination"""
         raise BasicManagerException

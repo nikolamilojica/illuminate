@@ -1,5 +1,5 @@
-class Interface(object):
-    """Interface for manager class"""
+class Interface:
+    """Interface for Manager class"""
 
     @staticmethod
     def db_populate(fixtures, selector, url=None):

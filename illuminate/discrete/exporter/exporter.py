@@ -1,5 +1,5 @@
-class Interface(object):
-    """Interface for exporter class"""
+class Interface:
+    """Interface for Exporter class"""
     async def export(self, item, *args, **kwargs):
-        """Load transformation to destination"""
+        """Load to destination"""
         return NotImplemented

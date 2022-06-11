@@ -10,6 +10,8 @@ from illuminate.exceptions.manager import BasicManagerException
 
 
 class Assistant(Interface):
+    """Assistant class, responsible for assisting Manager class"""
+
     @staticmethod
     def create_alembic_config(path, url):
         """Creates config object needed to perform Alembic commands"""

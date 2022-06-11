@@ -1,5 +1,5 @@
-class Interface(object):
-    """Interface for manager class"""
+class Interface:
+    """Interface for Assistant class"""
 
     @staticmethod
     def create_alembic_config(path, url):

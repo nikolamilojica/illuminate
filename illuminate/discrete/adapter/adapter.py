@@ -1,5 +1,5 @@
-class Interface(object):
-    """Interface for adapter class"""
+class Interface:
+    """Interface for Adapter class"""
     async def adapt(self, item, *args, **kwargs):
-        """Transform observation and produce exporters"""
+        """Transform finding and produce exporters"""
         return NotImplemented

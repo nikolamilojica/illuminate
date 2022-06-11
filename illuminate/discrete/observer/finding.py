@@ -1,2 +1,2 @@
-class Interface(object):
-    """Interface for finding class"""
+class Interface:
+    """Interface for Finding class"""
