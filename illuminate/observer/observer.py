@@ -7,6 +7,6 @@ class Observer(Interface):
     def __init__(self):
         self.initial_observations = []
 
-    def observe(self, response, *args, **kwargs):
-        """Extract instances of observation class or reschedule extraction"""
+    async def observe(self, response, *args, **kwargs):
+        """Extract observations or resume observing"""
         raise BasicManagerException

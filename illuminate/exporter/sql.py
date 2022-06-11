@@ -4,6 +4,6 @@ from illuminate.exceptions.manager import BasicManagerException
 
 class SQLExporter(Interface):
 
-    def export(self, item, *args, **kwargs):
-        """Perform load upon item"""
+    async def export(self, item, *args, **kwargs):
+        """Load transformation to destination"""
         raise BasicManagerException

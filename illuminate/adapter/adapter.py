@@ -4,6 +4,6 @@ from illuminate.exceptions.manager import BasicManagerException
 
 class Adapter(Interface):
 
-    def adapt(self, item, *args, **kwargs):
-        """Perform transformation upon item"""
+    async def adapt(self, item, *args, **kwargs):
+        """Transform observation and produce exporters"""
         raise BasicManagerException
