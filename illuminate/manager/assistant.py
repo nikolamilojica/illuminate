@@ -41,14 +41,13 @@ class Assistant(Interface):
         settings = Assistant.import_settings()
         context = {
             "adapters": [],
-            "exporters": [],
             "name": settings.NAME,
             "observers": [],
             "path": os.getcwd(),
             "settings": settings,
         }
 
-        for folder in ("adapters", "exporters", "observers"):
+        for folder in ("adapters", "observers"):
             directory = os.path.join(os.getcwd(), folder)
             files = [
                 f
