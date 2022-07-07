@@ -1,3 +1,18 @@
+_ADAPTER_EXAMPLE = """
+from illuminate.adapter.adapter import Adapter
+
+from {name}.exporters.example import ExporterExample
+from {name}.models.example import ModelExample
+
+
+class AdapterExample(Adapter):
+    async def adapt(self, finding, *args, **kwargs):
+        yield ExporterExample(
+            model=ModelExample(title=finding.title, url=finding.url)
+        )
+
+"""
+
 _ALEMBIC_ENV_PY = """
 from logging.config import fileConfig
 from pydoc import locate
@@ -106,45 +121,69 @@ services:
 volumes:
   postgres:
     driver: local
-    
+
 """
 
 _EMPTY = """
 """
 
+_EXPORTER_EXAMPLE = """
+from illuminate.exporter.sql import SQLExporter
+
+
+class ExporterExample(SQLExporter):
+    def __init__(self, model):
+        super().__init__(model)
+        self.name = "main"
+        self.type = "postgresql"
+
+"""
+
 _FIXTURE_EXAMPLE = """
 [
     {{
-    "name": "model",
+    "name": "{name}",
     "data": [
         {{
-            "field": "Alice"
+            "url": "https://webscraper.io/",
+            "title": "Web Scraper - The #1 web scraping extension"
         }},
         {{
-            "field": "Bob"
+            "url": "https://webscraper.io/tutorials",
+            "title": "Web Scraper Tutorials"
         }}
     ]
     }}
 ]
 """
 
-_ILLUMINATE_MODEL = """
+_MODEL_EXAMPLE = """
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-class Model(Base):
-    __tablename__ = 'model'
+
+class ModelExample(Base):
+    __tablename__ = 'example'
     id = Column(Integer, primary_key=True)
-    field = Column(String)
-    
+    title = Column(String)
+    url = Column(String)
+
+    def __str__(self):
+        return f"{{self.title}} -- {{self.url}}"
+
 """
 
 _ILLUMINATE_SETTINGS = """
 import os
 
 
+CONCURRENCY = {{
+    "observers": 8,
+    "adapters": 2,
+    "exporters": 16,
+}}
 DB = {{
     "main": {{
         "host": "localhost",
@@ -156,10 +195,89 @@ DB = {{
 }}
 
 MODELS = [
-    "{name}.models.example.Model",
+    "{name}.models.example.ModelExample",
 ]
 
 NAME = "{name}"
+
+"""
+
+_FINDING_EXAMPLE = """
+from dataclasses import dataclass
+from dataclasses import field
+
+from illuminate.observer.finding import Finding
+
+
+@dataclass(frozen=True, order=True)
+class FindingExample(Finding):
+    title: str = field()
+    url: str = field()
+
+"""
+
+_OBSERVER_EXAMPLE = """
+from urllib.parse import urldefrag
+from urllib.parse import urljoin
+
+from bs4 import BeautifulSoup
+from illuminate.observation.http import HTTPObservation
+from illuminate.manager.manager import Manager
+from illuminate.observer.observer import Observer
+
+from {name}.findings.example import FindingExample
+
+
+async def _create_soup(response):
+    html = response.body.decode(errors="ignore")
+    soup = BeautifulSoup(html, "html.parser")
+    return soup
+
+
+async def _extract_hrefs(soup, url):
+    links = soup.find_all("a")
+    for link in links:
+        _url = link.get("href")
+        if _url:
+            yield urljoin(url, urldefrag(_url)[0])
+
+
+class ObserverExample(Observer):
+    ALLOWED = ("https://webscraper.io/",)
+    NAME = "example"
+
+    def __init__(self):
+        super().__init__()
+        self._manager = Manager()
+        self.initial_observations = [
+            HTTPObservation(
+                allowed=self.ALLOWED,
+                url="https://webscraper.io/",
+                callback=self.observe,
+            ),
+        ]
+
+    async def observe(self, response, *args, **kwargs):
+        soup = await _create_soup(response)
+        hrefs = _extract_hrefs(soup, response.effective_url)
+        async for href in hrefs:
+            yield HTTPObservation(
+                allowed=self.ALLOWED,
+                url=href,
+                callback=self.resume,
+            )
+        yield FindingExample(soup.title.text, response.effective_url)
+
+    async def resume(self, response, *args, **kwargs):
+        soup = await _create_soup(response)
+        hrefs = _extract_hrefs(soup, response.effective_url)
+        async for href in hrefs:
+            yield HTTPObservation(
+                allowed=self.ALLOWED,
+                url=href,
+                callback=self.resume,
+            )
+        yield FindingExample(soup.title.text, response.effective_url)
 
 """
 
@@ -167,14 +285,18 @@ FILES = {
     "__init__.py": _EMPTY,
     "docker-compose.yaml": _DOCKER_COMPOSE,
     "settings.py": _ILLUMINATE_SETTINGS,
+    "adapters/__init__.py": _EMPTY,
+    "adapters/example.py": _ADAPTER_EXAMPLE,
     "exporters/__init__.py": _EMPTY,
-    "exporters/example.py": _EMPTY,
+    "exporters/example.py": _EXPORTER_EXAMPLE,
     "fixtures/example.json": _FIXTURE_EXAMPLE,
     "models/__init__.py": _EMPTY,
-    "models/example.py": _ILLUMINATE_MODEL,
+    "models/example.py": _MODEL_EXAMPLE,
     "migrations/env.py": _ALEMBIC_ENV_PY,
     "migrations/script.py.mako": _ALEMBIC_SCRIPT_PY_MAKO,
     "migrations/versions/.gitkeep": _EMPTY,
+    "findings/__init__.py": _EMPTY,
     "observers/__init__.py": _EMPTY,
-    "observers/example.py": _EMPTY,
+    "findings/example.py": _FINDING_EXAMPLE,
+    "observers/example.py": _OBSERVER_EXAMPLE,
 }
