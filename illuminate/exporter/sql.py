@@ -1,10 +1,13 @@
-from illuminate.exceptions.manager import BasicManagerException
 from illuminate.exporter.exporter import Exporter
 
 
 class SQLExporter(Exporter):
     """SQLExporter class, responsible for writing to destination"""
+    def __init__(self, model):
+        self.model = model
 
-    async def export(self, *args, **kwargs):
+    def export(self, session, *args, **kwargs):
         """Load to destination"""
-        raise BasicManagerException
+        session.add(self.model)
+        session.commit()
+        print(self.model)
