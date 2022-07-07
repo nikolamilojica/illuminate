@@ -1,6 +1,5 @@
 import json
 import os
-from datetime import timedelta
 from glob import glob
 from pydoc import locate
 
@@ -8,21 +7,24 @@ from alembic import command
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
 from illuminate.common.project_templates import FILES
 from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
-from illuminate.extraction.http import HTTPExtraction
 from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
-from illuminate.observer.observation import Observation
+from illuminate.observation.http import HTTPObservation
+from illuminate.observer.finding import Finding
 
 
 class Manager(Interface, metaclass=Singleton):
+    """Manager class, responsible for framework cli commands"""
+
     def __init__(
         self,
-        exporters=None,
+        adapters=None,
         name=None,
         observers=None,
         path=None,
@@ -30,14 +32,14 @@ class Manager(Interface, metaclass=Singleton):
         *args,
         **kwargs,
     ):
-        self.exporters = exporters
+        self.adapters = adapters
         self.name = name
         self.observers = observers
         self.path = path
         self.settings = settings
-        self.__extract_queue = queues.Queue()
-        self.__transform_queue = queues.Queue()
-        self.__load_queue = queues.Queue()
+        self.__observe_queue = queues.Queue()
+        self.__adapt_queue = queues.Queue()
+        self.__export_queue = queues.Queue()
         self.__failed = set()
         self.__requested = set()
         self.__requesting = set()
@@ -111,83 +113,112 @@ class Manager(Interface, metaclass=Singleton):
 
     async def _observe_start(self):
         """Main async function"""
-        eq = self.__extract_queue
-        tq = self.__transform_queue
-        lq = self.__load_queue
+        _adapters = self.adapters
+        _observers = self.observers
+        oq = self.__observe_queue
+        aq = self.__adapt_queue
+        eq = self.__export_queue
         failed = self.__failed
         requested = self.__requested
         requesting = self.__requesting
         settings = self.settings
 
-        async def execute(observers):
-            for observer in observers:
+        async def start(_observers):
+            for observer in _observers:
                 instance = observer()
-                for observation in instance.initial_observations:
-                    await extract(observation)
+                for _observation in instance.initial_observations:
+                    await observation(_observation)
 
-        async def extractor():
-            async for item in eq:
+        async def observe():
+            async for item in oq:
                 if not item:
                     return
-                await extract(item)
-                eq.task_done()
+                await observation(item)
+                del item
+                oq.task_done()
 
-        async def extract(item):
-            items = None
-            if isinstance(item, HTTPExtraction):
+        async def observation(item):
+            items = []
+            if isinstance(item, HTTPObservation):
                 if item.url in requesting:
                     return
                 requesting.add(item.url)
-                items = await item.callback()
+                items = await item.observe()
                 if not items:
                     failed.add(item.url)
                     return
                 requested.add(item.url)
-            async for item in items:
-                await extraction_router(item)
+            async for _item in items:
+                await observation_router(_item)
 
-        async def extraction_router(item):
-            if isinstance(item, Observation):
-                await tq.put(item)
-            if isinstance(item, HTTPExtraction):
+        async def observation_router(item):
+            if isinstance(item, Finding):
+                await aq.put(item)
+            if isinstance(item, HTTPObservation):
                 if item.allowed:
-                    await eq.put(item)
+                    await oq.put(item)
 
-        async def loader():
-            async for item in lq:
+        async def adapt():
+            async for item in aq:
                 if not item:
                     return
-                await load(item)
-                lq.task_done()
+                await adaptation(item)
+                del item
+                aq.task_done()
 
-        async def load(item):
-            """End of line"""
+        async def adaptation(item):
+            for adapter in _adapters:
+                instance = adapter()
+                adapted = instance.adapt(item)
+                async for _adaptation in adapted:
+                    await eq.put(_adaptation)
 
-        async def transformer():
-            async for item in tq:
+        async def export():
+            sessions = await export_sessions()
+            async for item in eq:
                 if not item:
                     return
-                await transform(item)
-                tq.task_done()
+                await exportation(item, sessions)
+                del item
+                eq.task_done()
 
-        async def transform(item):
-            await lq.put(item)
+        async def exportation(item, sessions):
+            try:
+                session = sessions[item.type][item.name]
+            except KeyError:
+                raise BasicManagerException
+            item.export(session)
+
+        async def export_sessions():
+            sessions = {
+                "mysql": {},
+                "postgresql": {},
+            }
+            for db in settings.DB:
+                if settings.DB[db]["type"] in ("mysql", "postgresql"):
+                    url = Assistant.create_db_url(db, settings)
+                    engine = create_engine(url)
+                    session = sessionmaker(bind=engine)()
+                    sessions[settings.DB[db]["type"]] = {db: session}
+            return sessions
 
         con = settings.CONCURRENCY
-        extractors = gen.multi([extractor() for _ in range(con)])
-        transformers = gen.multi([transformer() for _ in range(con)])
-        loaders = gen.multi([loader() for _ in range(con)])
+        observers = gen.multi([observe() for _ in range(con["observers"])])
+        adapters = gen.multi([adapt() for _ in range(con["adapters"])])
+        exporters = gen.multi([export() for _ in range(con["exporters"])])
 
-        await execute(self.observers)
-        await eq.join(timeout=timedelta(seconds=300))
-        await tq.join(timeout=timedelta(seconds=300))
-        await lq.join(timeout=timedelta(seconds=300))
+        await start(_observers)
+        await oq.join()
+        await aq.join()
+        await eq.join()
 
-        for _ in range(settings.CONCURRENCY):
+        for _ in range(con["observers"]):
+            await oq.put(None)
+        for _ in range(con["adapters"]):
+            await aq.put(None)
+        for _ in range(con["exporters"]):
             await eq.put(None)
-            await tq.put(None)
-            await lq.put(None)
 
-        await extractors
-        await transformers
-        await loaders
+        await observers
+        await adapters
+        await exporters
