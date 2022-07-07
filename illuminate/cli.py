@@ -3,6 +3,7 @@ import os
 import click
 
 from illuminate import __version__
+from illuminate.manager.manager import Assistant
 from illuminate.manager.manager import Manager
 
 
@@ -16,7 +17,14 @@ def cli(ctx):
 @cli.group("manage")
 @click.pass_context
 def manage(ctx):
-    """Framework manager"""
+    """Framework manage group of commands"""
+    pass
+
+
+@cli.group("observe")
+@click.pass_context
+def observe(ctx):
+    """Framework observe group of commands"""
     pass
 
 
@@ -77,6 +85,16 @@ def setup(ctx, name, path, *args, **kwargs):
     """Creates project structure with example files"""
     kwargs["context"] = ctx
     Manager.project_setup(name, path, *args, **kwargs)
+
+
+@observe.command("start")
+@click.pass_context
+def start(ctx, *args, **kwargs):
+    """Start producer/consumer ETL process based on project files"""
+    kwargs["context"] = ctx
+    context = Assistant.provide_context()
+    manager = Manager(**context)
+    manager.observe_start()
 
 
 if __name__ == "__main__":
