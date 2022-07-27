@@ -1,5 +1,5 @@
-class Interface(object):
-    """Interface for manager class"""
+class Interface:
+    """Interface for Manager class"""
 
     @staticmethod
     def db_populate(fixtures, selector, url=None):
@@ -19,4 +19,8 @@ class Interface(object):
     @staticmethod
     def project_setup(name, path):
         """Create project directory and populates it with project files"""
+        raise NotImplementedError
+
+    def observe_start(self):
+        """Start producer/consumer ETL process based on project files"""
         raise NotImplementedError

@@ -1,5 +1,5 @@
-class Interface(object):
-    """Interface for manager class"""
+class Interface:
+    """Interface for Assistant class"""
 
     @staticmethod
     def create_alembic_config(path, url):
@@ -14,4 +14,9 @@ class Interface(object):
     @staticmethod
     def import_settings():
         """Tries to import project settings.py module and returns it"""
+        raise NotImplementedError
+
+    @staticmethod
+    def provide_context():
+        """Provides context for the current runtime"""
         raise NotImplementedError
