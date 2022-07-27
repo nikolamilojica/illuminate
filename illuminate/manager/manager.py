@@ -36,6 +36,7 @@ class Manager(Interface, metaclass=Singleton):
         self.name = name
         self.observers = observers
         self.path = path
+        self.sessions = None
         self.settings = settings
         self.__observe_queue = queues.Queue()
         self.__adapt_queue = queues.Queue()
@@ -173,24 +174,23 @@ class Manager(Interface, metaclass=Singleton):
                 async for _adaptation in adapted:
                     await eq.put(_adaptation)
 
-        async def export():
-            sessions = await export_sessions()
+        async def export(_sessions):
             async for item in eq:
                 if not item:
                     return
-                await exportation(item, sessions)
+                await exportation(item, _sessions)
                 del item
                 eq.task_done()
 
-        async def exportation(item, sessions):
+        async def exportation(item, _sessions):
             try:
-                session = sessions[item.type][item.name]
+                session = _sessions[item.type][item.name]
             except KeyError:
                 raise BasicManagerException
             item.export(session)
 
-        async def export_sessions():
-            sessions = {
+        def _create_sessions():
+            _sessions = {
                 "mysql": {},
                 "postgresql": {},
             }
@@ -199,13 +199,15 @@ class Manager(Interface, metaclass=Singleton):
                     url = Assistant.create_db_url(db, settings)
                     engine = create_engine(url)
                     session = sessionmaker(bind=engine)()
-                    sessions[settings.DB[db]["type"]] = {db: session}
-            return sessions
+                    _sessions[settings.DB[db]["type"]] = {db: session}
+            return _sessions
+
+        self.sessions = _create_sessions()
 
         con = settings.CONCURRENCY
         observers = gen.multi([observe() for _ in range(con["observers"])])
         adapters = gen.multi([adapt() for _ in range(con["adapters"])])
-        exporters = gen.multi([export() for _ in range(con["exporters"])])
+        exporters = gen.multi([export(self.sessions) for _ in range(con["exporters"])])
 
         await start(_observers)
         await oq.join()
