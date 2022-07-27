@@ -10,4 +10,3 @@ class SQLExporter(Exporter):
         """Load to destination"""
         session.add(self.model)
         session.commit()
-        print(self.model)
