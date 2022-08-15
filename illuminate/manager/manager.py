@@ -141,6 +141,9 @@ class Manager(Interface, metaclass=Singleton):
         async def observation(item):
             items = []
             if isinstance(item, HTTPObservation):
+                item.configuration = {
+                   **settings.OBSERVER_CONFIGURATION["http"], **item.configuration
+                }
                 if item.url in requesting:
                     return
                 requesting.add(item.url)

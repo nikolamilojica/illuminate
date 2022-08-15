@@ -184,6 +184,7 @@ CONCURRENCY = {{
     "adapters": 2,
     "exporters": 16,
 }}
+
 DB = {{
     "main": {{
         "host": "localhost",
@@ -199,6 +200,19 @@ MODELS = [
 ]
 
 NAME = "{name}"
+
+OBSERVER_CONFIGURATION = {{
+    "http": {{
+        "auth_username": None,
+        "auth_password": None,
+        "connect_timeout": 10.0,
+        "body": None,
+        "headers": None,
+        "method": "GET",
+        "request_timeout": 10.0,
+        "user_agent": "Illuminate ETL Bot -- {name}",
+    }}
+}}
 
 """
 
@@ -251,8 +265,8 @@ class ObserverExample(Observer):
         self._manager = Manager()
         self.initial_observations = [
             HTTPObservation(
+                "https://webscraper.io/",
                 allowed=self.ALLOWED,
-                url="https://webscraper.io/",
                 callback=self.observe,
             ),
         ]
@@ -262,8 +276,8 @@ class ObserverExample(Observer):
         hrefs = _extract_hrefs(soup, response.effective_url)
         async for href in hrefs:
             yield HTTPObservation(
+                href,
                 allowed=self.ALLOWED,
-                url=href,
                 callback=self.resume,
             )
         yield FindingExample(soup.title.text, response.effective_url)
@@ -273,8 +287,8 @@ class ObserverExample(Observer):
         hrefs = _extract_hrefs(soup, response.effective_url)
         async for href in hrefs:
             yield HTTPObservation(
+                href,
                 allowed=self.ALLOWED,
-                url=href,
                 callback=self.resume,
             )
         yield FindingExample(soup.title.text, response.effective_url)
