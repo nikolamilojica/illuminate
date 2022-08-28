@@ -11,8 +11,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
-from illuminate.common.project_logging import LOGO
 from illuminate.common.project_templates import FILES
+from illuminate.decorators.logging import show_logo
 from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.manager.assistant import Assistant
@@ -113,6 +113,7 @@ class Manager(Interface, metaclass=Singleton):
             with open(file_path, "w") as file:
                 file.write(f"{content.format(name=name).strip()}\n")
 
+    @show_logo
     def observe_start(self):
         """Start producer/consumer ETL process based on project files"""
         io_loop = ioloop.IOLoop.current()
@@ -219,8 +220,6 @@ class Manager(Interface, metaclass=Singleton):
                     _sessions[settings.DB[db]["type"]] = {db: session}
             return _sessions
 
-        logo = f"<fg 239,242,201>{LOGO}</fg 239,242,201>"
-        logger.opt(colors=True).success(logo)
         self.sessions = _create_sessions()
 
         con = settings.CONCURRENCY

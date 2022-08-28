@@ -11,3 +11,5 @@ LOGO = f"""
 
 Version: {__version__}
 """
+
+LOGO_COLOR = "239,242,201"
