@@ -48,6 +48,7 @@ class Manager(Interface, metaclass=Singleton):
         self.__requesting = set()
 
     @staticmethod
+    @logger.catch
     def db_populate(fixtures, selector, url=None, *args, **kwargs):
         """Populates db with Alembic framework"""
         settings = Assistant.import_settings()
@@ -70,6 +71,7 @@ class Manager(Interface, metaclass=Singleton):
                 op.bulk_insert(model.__table__, table_data[model.__tablename__])
 
     @staticmethod
+    @logger.catch
     def db_revision(path, revision, selector, url=None, *args, **kwargs):
         """Creates db revision with Alembic framework"""
         settings = Assistant.import_settings()
@@ -84,6 +86,7 @@ class Manager(Interface, metaclass=Singleton):
         )
 
     @staticmethod
+    @logger.catch
     def db_upgrade(path, revision, selector, url=None, *args, **kwargs):
         """Performs db migration with Alembic framework"""
         settings = Assistant.import_settings()
@@ -93,6 +96,7 @@ class Manager(Interface, metaclass=Singleton):
         command.upgrade(config, revision)
 
     @staticmethod
+    @logger.catch
     def project_setup(name, path, *args, **kwargs):
         """Create project directory and populates it with project files"""
 
@@ -114,6 +118,7 @@ class Manager(Interface, metaclass=Singleton):
         io_loop = ioloop.IOLoop.current()
         io_loop.run_sync(self._observe_start)
 
+    @logger.catch
     async def _observe_start(self):
         """Main async function"""
         _adapters = self.adapters
