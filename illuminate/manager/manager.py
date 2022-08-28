@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
 from illuminate.common.project_templates import FILES
+from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
@@ -114,6 +115,7 @@ class Manager(Interface, metaclass=Singleton):
                 file.write(f"{content.format(name=name).strip()}\n")
 
     @show_logo
+    @show_info
     def observe_start(self):
         """Start producer/consumer ETL process based on project files"""
         io_loop = ioloop.IOLoop.current()

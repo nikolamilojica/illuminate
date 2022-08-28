@@ -1,9 +1,40 @@
 import functools
+from pydoc import locate
+from timeit import default_timer
 
 from loguru import logger
 
 from illuminate.common.project_logging import LOGO
 from illuminate.common.project_logging import LOGO_COLOR
+
+
+def show_info(func):
+    @functools.wraps(func)
+    def wrapper(self):
+        start = default_timer()
+        log_context(self)
+        log_settings(self)
+        func(self)
+        logger.info(f"Process finished in {default_timer() - start:.2f} seconds")
+
+    def log_context(self):
+        logger.opt(colors=True).info(
+            f"Project files for project <yellow>{self.name}</yellow> loaded into context"
+        )
+        logger.info(f"Adapters discovered {[i for i in self.adapters]}")
+        logger.info(f"Models discovered {[locate(i) for i in self.settings.MODELS]}")
+        logger.info(f"Observers discovered {[i for i in self.observers]}")
+
+    def log_settings(self):
+        settings_conn = self.settings.CONCURRENCY
+        settings_db = self.settings.DB.copy()
+        settings_db["password"] = "****"
+        settings_obs = self.settings.OBSERVER_CONFIGURATION
+        logger.debug(f"Concurrency settings {settings_conn}")
+        logger.debug(f"Database settings {settings_db}")
+        logger.debug(f"Observer settings {settings_obs}")
+
+    return wrapper
 
 
 def show_logo(func):
