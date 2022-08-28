@@ -149,7 +149,8 @@ class Manager(Interface, metaclass=Singleton):
             items = []
             if isinstance(item, HTTPObservation):
                 item.configuration = {
-                   **settings.OBSERVER_CONFIGURATION["http"], **item.configuration
+                    **settings.OBSERVER_CONFIGURATION["http"],
+                    **item.configuration,
                 }
                 if item.url in requesting:
                     return
@@ -204,11 +205,17 @@ class Manager(Interface, metaclass=Singleton):
                 "mysql": {},
                 "postgresql": {},
             }
+            logger.info(f"Found {len(settings.DB)} expected db connections")
             for db in settings.DB:
                 if settings.DB[db]["type"] in ("mysql", "postgresql"):
                     url = Assistant.create_db_url(db, settings)
                     engine = create_engine(url)
-                    session = sessionmaker(bind=engine)()
+                    session = sessionmaker(bind=engine)()  # TODO: try/catch
+                    host = settings.DB[db]["host"]
+                    port = settings.DB[db]["port"]
+                    logger.opt(colors=True).info(
+                        f"Adding session with <magenta>{db}</magenta> at <yellow>{host}:{port}</yellow> to context"
+                    )
                     _sessions[settings.DB[db]["type"]] = {db: session}
             return _sessions
 
