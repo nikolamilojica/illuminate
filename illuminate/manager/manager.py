@@ -6,10 +6,12 @@ from pydoc import locate
 from alembic import command
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
+from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
+from illuminate.common.project_logging import LOGO
 from illuminate.common.project_templates import FILES
 from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
@@ -205,6 +207,8 @@ class Manager(Interface, metaclass=Singleton):
                     _sessions[settings.DB[db]["type"]] = {db: session}
             return _sessions
 
+        logo = f"<fg 239,242,201>{LOGO}</fg 239,242,201>"
+        logger.opt(colors=True).success(logo)
         self.sessions = _create_sessions()
 
         con = settings.CONCURRENCY
