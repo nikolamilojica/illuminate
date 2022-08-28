@@ -1,5 +1,6 @@
 from illuminate import __version__
 
+LOGGING_LEVELS = ("TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL")
 
 LOGO = f"""
   ___ _     _    _   _ __  __ ___ _   _    _  _____ _____ 
