@@ -11,11 +11,16 @@ from illuminate.common.project_logging import LOGO_COLOR
 def show_info(func):
     @functools.wraps(func)
     def wrapper(self):
+        logger.info(f"Process started")
         start = default_timer()
         log_context(self)
         log_settings(self)
         func(self)
-        logger.info(f"Process finished in {default_timer() - start:.2f} seconds")
+        end = default_timer() - start
+        log_results(self)
+        logger.opt(colors=True).info(
+            f"Process finished in <yellow>{end:.2f}</yellow> seconds"
+        )
 
     def log_context(self):
         logger.opt(colors=True).info(
@@ -24,6 +29,19 @@ def show_info(func):
         logger.info(f"Adapters discovered {[i for i in self.adapters]}")
         logger.info(f"Models discovered {[locate(i) for i in self.settings.MODELS]}")
         logger.info(f"Observers discovered {[i for i in self.observers]}")
+
+    def log_results(self):
+        logger.success("Results gathered")
+        logger.opt(colors=True).info(
+            f"<yellow>Unsuccessful</yellow> observations: <magenta>{len(self.failed)}</magenta>"
+        )
+        logger.debug(f"Unsuccessful attempts {self.failed}")
+        logger.opt(colors=True).info(
+            f"<yellow>Successful</yellow> observations: <magenta>{len(self.requested) - len(self.failed)}</magenta>"
+        )
+        logger.opt(colors=True).info(
+            f"Number of <yellow>findings</yellow>: <magenta>{len(self.fetched)}</magenta>"
+        )
 
     def log_settings(self):
         settings_conn = self.settings.CONCURRENCY
@@ -43,4 +61,5 @@ def show_logo(func):
         logo = f"<fg {LOGO_COLOR}>{LOGO}</fg {LOGO_COLOR}>"
         logger.opt(colors=True).success(logo)
         func(*args, **kwargs)
+
     return wrapper

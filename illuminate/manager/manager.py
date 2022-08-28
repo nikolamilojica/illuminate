@@ -45,8 +45,21 @@ class Manager(Interface, metaclass=Singleton):
         self.__adapt_queue = queues.Queue()
         self.__export_queue = queues.Queue()
         self.__failed = set()
+        self.__fetched = set()
         self.__requested = set()
         self.__requesting = set()
+
+    @property
+    def failed(self):
+        return self.__failed
+
+    @property
+    def fetched(self):
+        return self.__fetched
+
+    @property
+    def requested(self):
+        return self.__requested
 
     @staticmethod
     @logger.catch
@@ -130,6 +143,7 @@ class Manager(Interface, metaclass=Singleton):
         aq = self.__adapt_queue
         eq = self.__export_queue
         failed = self.__failed
+        fetched = self.__fetched
         requested = self.__requested
         requesting = self.__requesting
         settings = self.settings
@@ -202,6 +216,7 @@ class Manager(Interface, metaclass=Singleton):
             except KeyError:
                 raise BasicManagerException
             item.export(session)
+            fetched.add(item.model)
 
         def _create_sessions():
             _sessions = {
