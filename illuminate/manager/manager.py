@@ -223,7 +223,7 @@ class Manager(Interface, metaclass=Singleton):
                 "mysql": {},
                 "postgresql": {},
             }
-            logger.info(f"Found {len(settings.DB)} expected db connections")
+            logger.opt(colors=True).info(f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>")
             for db in settings.DB:
                 if settings.DB[db]["type"] in ("mysql", "postgresql"):
                     url = Assistant.create_db_url(db, settings)
@@ -232,7 +232,7 @@ class Manager(Interface, metaclass=Singleton):
                     host = settings.DB[db]["host"]
                     port = settings.DB[db]["port"]
                     logger.opt(colors=True).info(
-                        f"Adding session with <magenta>{db}</magenta> at <yellow>{host}:{port}</yellow> to context"
+                        f"Adding session with <yellow>{db}</yellow> at <magenta>{host}:{port}</magenta> to context"
                     )
                     _sessions[settings.DB[db]["type"]] = {db: session}
             return _sessions
