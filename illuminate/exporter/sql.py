@@ -13,7 +13,7 @@ class SQLExporter(Exporter):
         """Load to destination"""
         session.add(self.model)
         session.commit()  # TODO: try/catch
-        logger.info(f'{self}.export(session="{session}")')
+        logger.success(f'{self}.export(session="{session}")')
 
     def __repr__(self):
         return f"SQLExporter(model={self.model})"
