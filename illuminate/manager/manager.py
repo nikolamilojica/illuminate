@@ -151,6 +151,9 @@ class Manager(Interface, metaclass=Singleton):
         async def start(_observers):
             for observer in _observers:
                 instance = observer()
+                logger.opt(colors=True).info(
+                    f"Observer <yellow>{instance.NAME}</yellow> initialized"
+                )
                 for _observation in instance.initial_observations:
                     await observation(_observation)
 
@@ -159,6 +162,7 @@ class Manager(Interface, metaclass=Singleton):
                 if not item:
                     return
                 await observation(item)
+                logger.debug(f"Coroutine observed {item}")
                 del item
                 oq.task_done()
 
@@ -192,6 +196,7 @@ class Manager(Interface, metaclass=Singleton):
                 if not item:
                     return
                 await adaptation(item)
+                logger.debug(f"Coroutine adapted {item}")
                 del item
                 aq.task_done()
 
@@ -207,6 +212,7 @@ class Manager(Interface, metaclass=Singleton):
                 if not item:
                     return
                 await exportation(item, _sessions)
+                logger.debug(f"Coroutine exported {item}")
                 del item
                 eq.task_done()
 
@@ -223,7 +229,9 @@ class Manager(Interface, metaclass=Singleton):
                 "mysql": {},
                 "postgresql": {},
             }
-            logger.opt(colors=True).info(f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>")
+            logger.opt(colors=True).info(
+                f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>"
+            )
             for db in settings.DB:
                 if settings.DB[db]["type"] in ("mysql", "postgresql"):
                     url = Assistant.create_db_url(db, settings)
