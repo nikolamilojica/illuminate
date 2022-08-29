@@ -170,8 +170,8 @@ class ModelExample(Base):
     title = Column(String)
     url = Column(String)
 
-    def __str__(self):
-        return f"{{self.title}} -- {{self.url}}"
+    def __repr__(self):
+        return f'ModelExample(title="{{self.title}}",url="{{self.url}}")'
 
 """
 
