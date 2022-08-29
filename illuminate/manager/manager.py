@@ -73,6 +73,8 @@ class Manager(Interface, metaclass=Singleton):
         op = Operations(context)
         table_data = {}
         files = fixtures if fixtures else glob("fixtures/*.json", recursive=True)
+        for file in files:
+            logger.info(f"Database fixtures file discovered {file}")
         for _file in files:
             with open(_file, "r") as file:
                 content = json.load(file)
@@ -81,8 +83,11 @@ class Manager(Interface, metaclass=Singleton):
         models = [locate(i) for i in settings.MODELS]
         for model in models:
             if model.__tablename__ in table_data:
-                # TODO: log insert process
-                op.bulk_insert(model.__table__, table_data[model.__tablename__])
+                data = table_data[model.__tablename__]
+                op.bulk_insert(model.__table__, data)
+                for record in data:
+                    logger.debug(f"Row {record} added to table {model.__tablename__}")
+        logger.success(f"Database {selector} populated")
 
     @staticmethod
     @logger.catch
