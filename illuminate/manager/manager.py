@@ -117,7 +117,10 @@ class Manager(Interface, metaclass=Singleton):
         if path != ".":
             path = os.path.join(path, name)
             if os.path.exists(path):
-                raise BasicManagerException
+                raise BasicManagerException("Directory already exists")
+            logger.opt(colors=True).info(
+                f"Creating project directory for project <yellow>{name}</yellow>"
+            )
             os.mkdir(path)
 
         for _name, content in FILES.items():
@@ -125,7 +128,10 @@ class Manager(Interface, metaclass=Singleton):
             if os.sep in _name:
                 os.makedirs(os.sep.join(file_path.split(os.sep)[:-1]), exist_ok=True)
             with open(file_path, "w") as file:
+                logger.debug(f"Creating project file {_name} at {file_path}")
                 file.write(f"{content.format(name=name).strip()}\n")
+
+        logger.success(f"Project structure created for {name}")
 
     @show_logo
     @show_info
