@@ -112,7 +112,8 @@ class Manager(Interface, metaclass=Singleton):
         if not url:
             url = Assistant.create_db_url(selector, settings)
         config = Assistant.create_alembic_config(path, url)
-        command.upgrade(config, revision)
+        command.upgrade(config, revision)  # TODO: try/catch
+        logger.success(f"Database {selector} upgraded")
 
     @staticmethod
     @logger.catch
