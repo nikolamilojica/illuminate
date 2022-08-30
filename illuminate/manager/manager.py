@@ -103,6 +103,7 @@ class Manager(Interface, metaclass=Singleton):
             autogenerate=True,
             head=revision,
         )
+        logger.success("Revision created")
 
     @staticmethod
     @logger.catch
