@@ -40,7 +40,7 @@ def show_info(func):
             f"<yellow>Successful</yellow> observations: <magenta>{len(self.requested) - len(self.failed)}</magenta>"
         )
         logger.opt(colors=True).info(
-            f"Number of <yellow>findings</yellow>: <magenta>{len(self.fetched)}</magenta>"
+            f"Number of <yellow>exports</yellow>: <magenta>{len(self.exported)}</magenta>"
         )
 
     def log_settings(self):
