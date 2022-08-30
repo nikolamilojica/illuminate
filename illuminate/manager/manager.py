@@ -113,7 +113,7 @@ class Manager(Interface, metaclass=Singleton):
         if not url:
             url = Assistant.create_db_url(selector, settings)
         config = Assistant.create_alembic_config(path, url)
-        command.upgrade(config, revision)  # TODO: try/catch
+        command.upgrade(config, revision)
         logger.success(f"Database {selector} upgraded")
 
     @staticmethod
@@ -249,7 +249,7 @@ class Manager(Interface, metaclass=Singleton):
                 if settings.DB[db]["type"] in ("mysql", "postgresql"):
                     url = Assistant.create_db_url(db, settings)
                     engine = create_engine(url)
-                    session = sessionmaker(bind=engine)()  # TODO: try/catch
+                    session = sessionmaker(bind=engine)()
                     host = settings.DB[db]["host"]
                     port = settings.DB[db]["port"]
                     logger.opt(colors=True).info(
