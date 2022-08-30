@@ -12,7 +12,10 @@ class SQLExporter(Exporter):
     def export(self, session, *args, **kwargs):
         """Load to destination"""
         session.add(self.model)
-        session.commit()  # TODO: try/catch
+        try:
+            session.commit()
+        except Exception as exception:
+            logger.critical(f'{self}.export(session="{session}") -> {exception}')
         logger.success(f'{self}.export(session="{session}")')
 
     def __repr__(self):
