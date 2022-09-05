@@ -6,11 +6,14 @@ from pydoc import locate
 from alembic import command
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
+from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
 from illuminate.common.project_templates import FILES
+from illuminate.decorators.logging import show_info
+from illuminate.decorators.logging import show_logo
 from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.manager.assistant import Assistant
@@ -41,11 +44,25 @@ class Manager(Interface, metaclass=Singleton):
         self.__observe_queue = queues.Queue()
         self.__adapt_queue = queues.Queue()
         self.__export_queue = queues.Queue()
+        self.__exported = set()
         self.__failed = set()
         self.__requested = set()
         self.__requesting = set()
 
+    @property
+    def failed(self):
+        return self.__failed
+
+    @property
+    def exported(self):
+        return self.__exported
+
+    @property
+    def requested(self):
+        return self.__requested
+
     @staticmethod
+    @logger.catch
     def db_populate(fixtures, selector, url=None, *args, **kwargs):
         """Populates db with Alembic framework"""
         settings = Assistant.import_settings()
@@ -56,6 +73,8 @@ class Manager(Interface, metaclass=Singleton):
         op = Operations(context)
         table_data = {}
         files = fixtures if fixtures else glob("fixtures/*.json", recursive=True)
+        for file in files:
+            logger.info(f"Database fixtures file discovered {file}")
         for _file in files:
             with open(_file, "r") as file:
                 content = json.load(file)
@@ -64,10 +83,14 @@ class Manager(Interface, metaclass=Singleton):
         models = [locate(i) for i in settings.MODELS]
         for model in models:
             if model.__tablename__ in table_data:
-                # TODO: log insert process
-                op.bulk_insert(model.__table__, table_data[model.__tablename__])
+                data = table_data[model.__tablename__]
+                op.bulk_insert(model.__table__, data)
+                for record in data:
+                    logger.debug(f"Row {record} added to table {model.__tablename__}")
+        logger.success(f"Database {selector} populated")
 
     @staticmethod
+    @logger.catch
     def db_revision(path, revision, selector, url=None, *args, **kwargs):
         """Creates db revision with Alembic framework"""
         settings = Assistant.import_settings()
@@ -80,8 +103,10 @@ class Manager(Interface, metaclass=Singleton):
             autogenerate=True,
             head=revision,
         )
+        logger.success("Revision created")
 
     @staticmethod
+    @logger.catch
     def db_upgrade(path, revision, selector, url=None, *args, **kwargs):
         """Performs db migration with Alembic framework"""
         settings = Assistant.import_settings()
@@ -89,15 +114,20 @@ class Manager(Interface, metaclass=Singleton):
             url = Assistant.create_db_url(selector, settings)
         config = Assistant.create_alembic_config(path, url)
         command.upgrade(config, revision)
+        logger.success(f"Database {selector} upgraded")
 
     @staticmethod
+    @logger.catch
     def project_setup(name, path, *args, **kwargs):
         """Create project directory and populates it with project files"""
 
         if path != ".":
             path = os.path.join(path, name)
             if os.path.exists(path):
-                raise BasicManagerException
+                raise BasicManagerException("Directory already exists")
+            logger.opt(colors=True).info(
+                f"Creating project directory for project <yellow>{name}</yellow>"
+            )
             os.mkdir(path)
 
         for _name, content in FILES.items():
@@ -105,13 +135,19 @@ class Manager(Interface, metaclass=Singleton):
             if os.sep in _name:
                 os.makedirs(os.sep.join(file_path.split(os.sep)[:-1]), exist_ok=True)
             with open(file_path, "w") as file:
+                logger.debug(f"Creating project file {_name} at {file_path}")
                 file.write(f"{content.format(name=name).strip()}\n")
 
+        logger.success(f"Project structure created for {name}")
+
+    @show_logo
+    @show_info
     def observe_start(self):
         """Start producer/consumer ETL process based on project files"""
         io_loop = ioloop.IOLoop.current()
         io_loop.run_sync(self._observe_start)
 
+    @logger.catch
     async def _observe_start(self):
         """Main async function"""
         _adapters = self.adapters
@@ -119,6 +155,7 @@ class Manager(Interface, metaclass=Singleton):
         oq = self.__observe_queue
         aq = self.__adapt_queue
         eq = self.__export_queue
+        exported = self.__exported
         failed = self.__failed
         requested = self.__requested
         requesting = self.__requesting
@@ -127,6 +164,9 @@ class Manager(Interface, metaclass=Singleton):
         async def start(_observers):
             for observer in _observers:
                 instance = observer()
+                logger.opt(colors=True).info(
+                    f"Observer <yellow>{instance.NAME}</yellow> initialized"
+                )
                 for _observation in instance.initial_observations:
                     await observation(_observation)
 
@@ -135,6 +175,7 @@ class Manager(Interface, metaclass=Singleton):
                 if not item:
                     return
                 await observation(item)
+                logger.debug(f"Coroutine observed {item}")
                 del item
                 oq.task_done()
 
@@ -142,7 +183,8 @@ class Manager(Interface, metaclass=Singleton):
             items = []
             if isinstance(item, HTTPObservation):
                 item.configuration = {
-                   **settings.OBSERVER_CONFIGURATION["http"], **item.configuration
+                    **settings.OBSERVER_CONFIGURATION["http"],
+                    **item.configuration,
                 }
                 if item.url in requesting:
                     return
@@ -167,6 +209,7 @@ class Manager(Interface, metaclass=Singleton):
                 if not item:
                     return
                 await adaptation(item)
+                logger.debug(f"Coroutine adapted {item}")
                 del item
                 aq.task_done()
 
@@ -182,6 +225,7 @@ class Manager(Interface, metaclass=Singleton):
                 if not item:
                     return
                 await exportation(item, _sessions)
+                logger.debug(f"Coroutine exported {item}")
                 del item
                 eq.task_done()
 
@@ -191,17 +235,26 @@ class Manager(Interface, metaclass=Singleton):
             except KeyError:
                 raise BasicManagerException
             item.export(session)
+            exported.add(item.model)
 
         def _create_sessions():
             _sessions = {
                 "mysql": {},
                 "postgresql": {},
             }
+            logger.opt(colors=True).info(
+                f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>"
+            )
             for db in settings.DB:
                 if settings.DB[db]["type"] in ("mysql", "postgresql"):
                     url = Assistant.create_db_url(db, settings)
                     engine = create_engine(url)
                     session = sessionmaker(bind=engine)()
+                    host = settings.DB[db]["host"]
+                    port = settings.DB[db]["port"]
+                    logger.opt(colors=True).info(
+                        f"Adding session with <yellow>{db}</yellow> at <magenta>{host}:{port}</magenta> to context"
+                    )
                     _sessions[settings.DB[db]["type"]] = {db: session}
             return _sessions
 

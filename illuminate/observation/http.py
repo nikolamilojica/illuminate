@@ -1,3 +1,4 @@
+from loguru import logger
 from tornado import httpclient
 from tornado.httpclient import HTTPClientError
 
@@ -6,6 +7,7 @@ from illuminate.observation.observation import Observation
 
 class HTTPObservation(Observation):
     """HTTPObservation class, responsible for reading source with callback"""
+
     def __init__(self, url, /, allowed, callback, *args, **kwargs):
         self.url = url
         self._allowed = allowed
@@ -25,8 +27,14 @@ class HTTPObservation(Observation):
             response = await httpclient.AsyncHTTPClient().fetch(
                 self.url, **self.configuration
             )
-            # TODO: log response
+            logger.info(f"{self}.observe() -> {response}")
             return self._callback(response, *args, **kwargs)
         except HTTPClientError as exception:
-            # TODO: log exception
-            return None
+            logger.warning(f"{self}.observe() -> {exception}")
+            return
+        except Exception as exception:
+            logger.critical(f"{self}.observe() -> {exception}")
+            return
+
+    def __repr__(self):
+        return f'HTTPObservation("{self.url}",callback="{self._callback}")'
