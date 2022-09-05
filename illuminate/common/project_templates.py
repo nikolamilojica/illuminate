@@ -165,7 +165,7 @@ Base = declarative_base()
 
 
 class ModelExample(Base):
-    __tablename__ = 'example'
+    __tablename__ = "{name}"
     id = Column(Integer, primary_key=True)
     title = Column(String)
     url = Column(String)
