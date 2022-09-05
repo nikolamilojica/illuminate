@@ -23,6 +23,7 @@ def cli(ctx, verbosity):
     """Framework entrypoint"""
     logger.remove()
     logger.add(sys.stdout, level=verbosity)
+    sys.path.insert(0, os.getcwd())
 
 
 @cli.group("manage")

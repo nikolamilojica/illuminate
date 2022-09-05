@@ -1,8 +1,8 @@
 _ADAPTER_EXAMPLE = """
 from illuminate.adapter.adapter import Adapter
 
-from {name}.exporters.example import ExporterExample
-from {name}.models.example import ModelExample
+from exporters.example import ExporterExample
+from models.example import ModelExample
 
 
 class AdapterExample(Adapter):
@@ -21,7 +21,7 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from {name}.settings import MODELS
+from settings import MODELS
 
 config = context.config
 
@@ -196,7 +196,7 @@ DB = {{
 }}
 
 MODELS = [
-    "{name}.models.example.ModelExample",
+    "models.example.ModelExample",
 ]
 
 NAME = "{name}"
@@ -239,7 +239,7 @@ from illuminate.observation.http import HTTPObservation
 from illuminate.manager.manager import Manager
 from illuminate.observer.observer import Observer
 
-from {name}.findings.example import FindingExample
+from findings.example import FindingExample
 
 
 async def _create_soup(response):
