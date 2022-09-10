@@ -144,10 +144,10 @@ class TestManagerDBCommandGroup:
         session.query(ModelExample).all()
         query = session.query(ModelExample).all()
         assert len(query) == 2
-        assert query[0].url == "https://example.mock/category/product/1"
-        assert query[1].url == "https://example.mock/category/product/2"
-        assert query[0].title == "Product 1"
-        assert query[1].title == "Product 2"
+        assert query[0].url == "https://webscraper.io/"
+        assert query[1].url == "https://webscraper.io/tutorials"
+        assert query[0].title == "Web Scraper - The #1 web scraping extension"
+        assert query[1].title == "Web Scraper Tutorials"
 
 
 class TestManagerProjectCommandGroup:
