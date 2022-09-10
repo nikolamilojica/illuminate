@@ -62,7 +62,6 @@ class Manager(Interface, metaclass=Singleton):
         return self.__requested
 
     @staticmethod
-    @logger.catch
     def db_populate(fixtures, selector, url=None, *args, **kwargs):
         """Populates db with Alembic framework"""
         settings = Assistant.import_settings()
@@ -90,7 +89,6 @@ class Manager(Interface, metaclass=Singleton):
         logger.success(f"Database {selector} populated")
 
     @staticmethod
-    @logger.catch
     def db_revision(path, revision, selector, url=None, *args, **kwargs):
         """Creates db revision with Alembic framework"""
         settings = Assistant.import_settings()
@@ -106,7 +104,6 @@ class Manager(Interface, metaclass=Singleton):
         logger.success("Revision created")
 
     @staticmethod
-    @logger.catch
     def db_upgrade(path, revision, selector, url=None, *args, **kwargs):
         """Performs db migration with Alembic framework"""
         settings = Assistant.import_settings()
@@ -117,7 +114,6 @@ class Manager(Interface, metaclass=Singleton):
         logger.success(f"Database {selector} upgraded")
 
     @staticmethod
-    @logger.catch
     def project_setup(name, path, *args, **kwargs):
         """Create project directory and populates it with project files"""
 

@@ -23,7 +23,6 @@ class Assistant(Interface):
         return config
 
     @staticmethod
-    @logger.catch
     def create_db_url(selector, settings):
         """Creates db url from data in settings.py module"""
         db = settings.DB[selector]
@@ -31,7 +30,6 @@ class Assistant(Interface):
         return "{type}://{user}:{pass}@{host}/{db}".format(**db)
 
     @staticmethod
-    @logger.catch
     def import_settings():
         """Tries to import project settings.py module and returns it"""
         try:
@@ -42,7 +40,6 @@ class Assistant(Interface):
             raise BasicManagerException
 
     @staticmethod
-    @logger.catch
     def provide_context():
         """Provides context for the current runtime"""
         settings = Assistant.import_settings()
