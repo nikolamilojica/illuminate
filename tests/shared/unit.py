@@ -47,7 +47,7 @@ class Test:
     @contextmanager
     def path(self):
         """
-        Puts temporary directory path to PYTHONPATH and use it as cwd
+        Put temporary directory path to PYTHONPATH, set it as cwd and clean imports
         :yields: _GeneratorContextManager, TemporaryDirectory
         """
         with tempfile.TemporaryDirectory() as path:
@@ -57,6 +57,12 @@ class Test:
             yield path
             sys.path.remove(path)
             self.folder = None
+            for module in sys.modules.copy():
+                try:
+                    if sys.modules[module].__file__.startswith(path):
+                        del sys.modules[module]
+                except AttributeError:
+                    pass
 
     @property
     def session(self):
