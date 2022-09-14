@@ -67,7 +67,7 @@ class Test:
     @property
     def session(self):
         """
-        Creates database session
+        Create database session
         :return: sqlalchemy.orm.Session or None
         """
         _session = sessionmaker(self.engine)()
@@ -76,7 +76,7 @@ class Test:
     @property
     def url(self):
         """
-        Creates database URL
+        Create database URL
         :return: str or None
         """
         _url = f"{self.protocol}/{self.folder}/{self.db}.db" if self.folder else None
