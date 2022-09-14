@@ -24,7 +24,7 @@ class TestManagerClassInstance:
 
 class TestManagerDBCommandGroup(Test):
     @pytest.mark.xfail(raises=BasicManagerException)
-    def test_revision_unsuccessfully(self):
+    def test_db_revision_unsuccessfully(self):
         """
         Given: Current directory is not a project directory
         When: Creating revision of a db with Alembic
@@ -35,7 +35,7 @@ class TestManagerDBCommandGroup(Test):
                 Manager.db_revision(path, "head", "main", "")
 
     @pytest.mark.xfail(raises=BasicManagerException)
-    def test_upgrade_unsuccessfully(self):
+    def test_db_upgrade_unsuccessfully(self):
         """
         Given: Current directory is not a project directory
         When: Running db upgrade with Alembic
@@ -46,7 +46,7 @@ class TestManagerDBCommandGroup(Test):
                 Manager.db_upgrade(path, "head", "main", "")
 
     @pytest.mark.xfail(raises=BasicManagerException)
-    def test_populate_unsuccessfully(self):
+    def test_db_upgrade_unsuccessfully(self):
         """
         Given: Current directory is not a project directory
         When: Running db populate
@@ -56,7 +56,7 @@ class TestManagerDBCommandGroup(Test):
             with self.path() as path:
                 Manager.db_upgrade(path, "head", "main", "")
 
-    def test_revision_successfully(self):
+    def test_db_revision_successfully(self):
         """
         Given: Current directory is a project directory
         When: Creating revision of a db with Alembic
@@ -74,7 +74,7 @@ class TestManagerDBCommandGroup(Test):
                     return
             assert False
 
-    def test_upgrade_successfully(self):
+    def test_db_upgrade_successfully(self):
         """
         Given: Current directory is a project directory
         When: Running db upgrade with Alembic
@@ -88,7 +88,7 @@ class TestManagerDBCommandGroup(Test):
             data = inspect(self.engine)
             assert name in data.get_table_names()
 
-    def test_populate_successfully(self):
+    def test_db_populate_successfully(self):
         """
         Given: Current directory is a project directory
         When: Running db populate
@@ -111,30 +111,8 @@ class TestManagerDBCommandGroup(Test):
 
 
 class TestManagerProjectCommandGroup(Test):
-    def test_setup_successfully(self):
-        """
-        Given: No directory or file exists with the same name as project
-        When: Setting up new project
-        Expected: Creates directories and files needed for framework
-        """
-        with self.path() as path:
-            name = "example"
-            Manager.project_setup(name, path)
-            self.assert_project_structure(name, FILES, path)
-
-    def test_setup_in_current_folder_successfully(self):
-        """
-        Given: Current working directory is target for project files
-        When: Setting up new project
-        Expected: Creates directories and files needed for framework
-        """
-        with self.path() as path:
-            name = "example"
-            Manager.project_setup(name, ".")
-            self.assert_project_structure(name, FILES, path, cwd=True)
-
     @pytest.mark.xfail(raises=BasicManagerException)
-    def test_setup_unsuccessfully_directory_or_file_exists(self):
+    def test_project_setup_unsuccessfully(self):
         """
         Given: Directory of file exists with the same name as project
         When: Setting up new project
@@ -146,3 +124,25 @@ class TestManagerProjectCommandGroup(Test):
                 name = "example"
                 Manager.project_setup(name, path)
                 Manager.project_setup(name, path)
+
+    def test_project_setup_successfully(self):
+        """
+        Given: No directory or file exists with the same name as project
+        When: Setting up new project
+        Expected: Creates directories and files needed for framework
+        """
+        with self.path() as path:
+            name = "example"
+            Manager.project_setup(name, path)
+            self.assert_project_structure(name, FILES, path)
+
+    def test_project_setup_in_current_folder_successfully(self):
+        """
+        Given: Current working directory is target for project files
+        When: Setting up new project
+        Expected: Creates directories and files needed for framework
+        """
+        with self.path() as path:
+            name = "example"
+            Manager.project_setup(name, ".")
+            self.assert_project_structure(name, FILES, path, cwd=True)
