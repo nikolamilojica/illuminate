@@ -95,10 +95,10 @@ class TestManagerDBCommandGroup(Test):
         Expected: Populate db with data in fixture files
         """
         with self.path() as path:
-            from models.example import ModelExample
-
             name = "example"
             Manager.project_setup(name, ".")
+            from models.example import ModelExample
+
             Manager.db_revision(path, "head", "main", self.url)
             Manager.db_upgrade(path, "head", "main", self.url)
             Manager.db_populate(["fixtures/example.json"], "main", self.url)
