@@ -1,17 +1,13 @@
 import os
-import shutil
-import sys
-import tempfile
-from contextlib import contextmanager
 from os import walk
 
 import pytest
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import inspect
 
 from illuminate.common.project_templates import FILES
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.manager.manager import Manager
+from tests.shared.unit import Test
 
 
 class TestManagerClassInstance:
@@ -26,38 +22,7 @@ class TestManagerClassInstance:
         assert manager_1 == manager_2
 
 
-class TestManagerDBCommandGroup:
-    RUNTIME_PERSISTENT_FOLDER = "/tmp/example"
-    RUNTIME_PERSISTENT_DB_URL = f"sqlite:///{RUNTIME_PERSISTENT_FOLDER}/example.db"
-
-    @classmethod
-    def setup_class(cls):
-        """
-        Test class setup method
-        :return: None
-        """
-        os.mkdir(cls.RUNTIME_PERSISTENT_FOLDER)
-
-    @classmethod
-    def teardown_class(cls):
-        """
-        Test class teardown method
-        :return: None
-        """
-        shutil.rmtree(cls.RUNTIME_PERSISTENT_FOLDER)
-
-    @contextmanager
-    def force_python_path(self, path):
-        """
-        Put directory path to PYTHONPATH temporarily and use it as cwd
-        :param path: directory path: str
-        :yields: _GeneratorContextManager
-        """
-        sys.path.append(path)
-        os.chdir(path)
-        yield
-        sys.path.remove(path)
-
+class TestManagerDBCommandGroup(Test):
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_revision_unsuccessfully(self):
         """
@@ -65,10 +30,9 @@ class TestManagerDBCommandGroup:
         When: Creating revision of a db with Alembic
         Expected: Exception is raised
         """
-        with pytest.raises(BasicManagerException) as error:
-            with tempfile.TemporaryDirectory() as path:
-                with self.force_python_path(path):
-                    Manager.db_revision(path, "head", "main", "sqlite://")
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                Manager.db_revision(path, "head", "main", "")
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_upgrade_unsuccessfully(self):
@@ -77,10 +41,9 @@ class TestManagerDBCommandGroup:
         When: Running db upgrade with Alembic
         Expected: Exception is raised
         """
-        with pytest.raises(BasicManagerException) as error:
-            with tempfile.TemporaryDirectory() as path:
-                with self.force_python_path(path):
-                    Manager.db_upgrade(path, "head", "main", "sqlite://")
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                Manager.db_upgrade(path, "head", "main", "")
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_populate_unsuccessfully(self):
@@ -89,10 +52,9 @@ class TestManagerDBCommandGroup:
         When: Running db populate
         Expected: Exception is raised
         """
-        with pytest.raises(BasicManagerException) as error:
-            with tempfile.TemporaryDirectory() as path:
-                with self.force_python_path(path):
-                    Manager.db_upgrade(path, "head", "main", "sqlite://")
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                Manager.db_upgrade(path, "head", "main", "")
 
     def test_revision_successfully(self):
         """
@@ -100,18 +62,17 @@ class TestManagerDBCommandGroup:
         When: Creating revision of a db with Alembic
         Expected: File migrations/versions/<REV_ID>_<PROJECT_NAME>.py exists
         """
-        path = self.RUNTIME_PERSISTENT_FOLDER
-        with self.force_python_path(path):
+        with self.path() as path:
             name = "example"
             Manager.project_setup(name, ".")
-            Manager.db_revision(path, "head", "main", "sqlite://")
-        versions = os.path.join(path, "migrations/versions/")
-        assert os.path.isdir(versions)
-        for file in next(walk(versions), (None, None, []))[2]:
-            if name in file:
-                assert True
-                return
-        assert False
+            Manager.db_revision(path, "head", "main", self.url)
+            versions = os.path.join(path, "migrations/versions/")
+            assert os.path.isdir(versions)
+            for file in next(walk(versions), (None, None, []))[2]:
+                if name in file:
+                    assert True
+                    return
+            assert False
 
     def test_upgrade_successfully(self):
         """
@@ -119,13 +80,13 @@ class TestManagerDBCommandGroup:
         When: Running db upgrade with Alembic
         Expected: Modify db schema to match model definitions
         """
-        path = self.RUNTIME_PERSISTENT_FOLDER
-        url = self.RUNTIME_PERSISTENT_DB_URL
-        engine = create_engine(url)
-        with self.force_python_path(path):
-            Manager.db_upgrade(path, "head", "main", url)
-        data = inspect(engine)
-        assert "example" in data.get_table_names()
+        with self.path() as path:
+            name = "example"
+            Manager.project_setup(name, ".")
+            Manager.db_revision(path, "head", "main", self.url)
+            Manager.db_upgrade(path, "head", "main", self.url)
+            data = inspect(self.engine)
+            assert name in data.get_table_names()
 
     def test_populate_successfully(self):
         """
@@ -133,51 +94,33 @@ class TestManagerDBCommandGroup:
         When: Running db populate
         Expected: Populate db with data in fixture files
         """
-        path = self.RUNTIME_PERSISTENT_FOLDER
-        url = self.RUNTIME_PERSISTENT_DB_URL
-        engine = create_engine(url)
-        with self.force_python_path(path):
+        with self.path() as path:
             from models.example import ModelExample
 
-            Manager.db_populate(["fixtures/example.json"], "main", url)
-        session = sessionmaker(engine)()
-        session.query(ModelExample).all()
-        query = session.query(ModelExample).all()
-        assert len(query) == 2
-        assert query[0].url == "https://webscraper.io/"
-        assert query[1].url == "https://webscraper.io/tutorials"
-        assert query[0].title == "Web Scraper - The #1 web scraping extension"
-        assert query[1].title == "Web Scraper Tutorials"
+            name = "example"
+            Manager.project_setup(name, ".")
+            Manager.db_revision(path, "head", "main", self.url)
+            Manager.db_upgrade(path, "head", "main", self.url)
+            Manager.db_populate(["fixtures/example.json"], "main", self.url)
+            query = self.session.query(ModelExample).all()
+            assert len(query) == 2
+            assert query[0].url == "https://webscraper.io/"
+            assert query[1].url == "https://webscraper.io/tutorials"
+            assert query[0].title == "Web Scraper - The #1 web scraping extension"
+            assert query[1].title == "Web Scraper Tutorials"
 
 
-class TestManagerProjectCommandGroup:
-    @staticmethod
-    def assert_project_structure(name, path, cwd=False):
-        """
-        Helper method for asserting project structure
-        :param name: name of the project: str
-        :param path: path of the project: str
-        :param cwd: assert in same folder: bool
-        :return: None
-        """
-        project_path = os.path.join(path, name) if not cwd else path
-        assert os.path.exists(project_path)
-        for _name, content in FILES.items():
-            test_file_path = os.path.join(project_path, _name)
-            assert os.path.exists(test_file_path)
-            with open(test_file_path, "r") as file:
-                assert content.format(name=name).strip() == file.read().strip()
-
+class TestManagerProjectCommandGroup(Test):
     def test_setup_successfully(self):
         """
         Given: No directory or file exists with the same name as project
         When: Setting up new project
         Expected: Creates directories and files needed for framework
         """
-        with tempfile.TemporaryDirectory() as path:
+        with self.path() as path:
             name = "example"
             Manager.project_setup(name, path)
-            self.assert_project_structure(name, path)
+            self.assert_project_structure(name, FILES, path)
 
     def test_setup_in_current_folder_successfully(self):
         """
@@ -185,11 +128,10 @@ class TestManagerProjectCommandGroup:
         When: Setting up new project
         Expected: Creates directories and files needed for framework
         """
-        with tempfile.TemporaryDirectory() as path:
-            os.chdir(path)
+        with self.path() as path:
             name = "example"
             Manager.project_setup(name, ".")
-            self.assert_project_structure(name, path, cwd=True)
+            self.assert_project_structure(name, FILES, path, cwd=True)
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_setup_unsuccessfully_directory_or_file_exists(self):
@@ -199,8 +141,8 @@ class TestManagerProjectCommandGroup:
         Expected: Raise exception
         NOTE: This test will clean files from test_setup_successfully
         """
-        with pytest.raises(BasicManagerException) as error:
-            name = "example"
-            with tempfile.TemporaryDirectory() as path:
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                name = "example"
                 Manager.project_setup(name, path)
                 Manager.project_setup(name, path)
