@@ -2,6 +2,7 @@ from loguru import logger
 from tornado import httpclient
 from tornado.httpclient import HTTPClientError
 
+from illuminate.exceptions.observation import BasicObservationException
 from illuminate.observation.observation import Observation
 
 
@@ -34,7 +35,7 @@ class HTTPObservation(Observation):
             return
         except Exception as exception:
             logger.critical(f"{self}.observe() -> {exception}")
-            return
+            raise BasicObservationException
 
     def __repr__(self):
         return f'HTTPObservation("{self.url}",callback="{self._callback}")'
