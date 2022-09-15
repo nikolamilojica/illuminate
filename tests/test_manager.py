@@ -46,7 +46,7 @@ class TestManagerDBCommandGroup(Test):
                 Manager.db_upgrade(path, "head", "main", "")
 
     @pytest.mark.xfail(raises=BasicManagerException)
-    def test_db_upgrade_unsuccessfully(self):
+    def test_db_populate_unsuccessfully(self):
         """
         Given: Current directory is not a project directory
         When: Running db populate
