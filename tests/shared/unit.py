@@ -54,15 +54,17 @@ class Test:
             sys.path.append(path)
             os.chdir(path)
             self.folder = path
-            yield path
-            sys.path.remove(path)
-            self.folder = None
-            for module in sys.modules.copy():
-                try:
-                    if sys.modules[module].__file__.startswith(path):
-                        del sys.modules[module]
-                except AttributeError:
-                    pass
+            try:
+                yield path
+            finally:
+                sys.path.remove(path)
+                self.folder = None
+                for module in sys.modules.copy():
+                    try:
+                        if sys.modules[module].__file__.startswith(path):
+                            del sys.modules[module]
+                    except AttributeError:
+                        pass
 
     @property
     def session(self):
