@@ -12,7 +12,7 @@ class TestExporterSQL(Test):
     @pytest.mark.xfail(raises=BasicExporterException)
     def test_export_unsuccessfully(self):
         """
-        Given: Given: Current directory is a project directory
+        Given: Current directory is a project directory
         When: Exporting model and process fails
         Expected: BasicExporterException is raised
         """
