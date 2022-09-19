@@ -39,7 +39,7 @@ class Manager(Interface, metaclass=Singleton):
         self.name = name
         self.observers = observers
         self.path = path
-        self.sessions = None
+        self.sessions = None if not settings else self._create_sessions(settings)
         self.settings = settings
         self.__observe_queue = queues.Queue()
         self.__adapt_queue = queues.Queue()
@@ -143,6 +143,29 @@ class Manager(Interface, metaclass=Singleton):
         io_loop = ioloop.IOLoop.current()
         io_loop.run_sync(self._observe_start)
 
+    @staticmethod
+    def _create_sessions(settings):
+        """Create sessions dictionary from settings"""
+        _sessions = {
+            "mysql": {},
+            "postgresql": {},
+        }
+        logger.opt(colors=True).info(
+            f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>"
+        )
+        for db in settings.DB:
+            if settings.DB[db]["type"] in ("mysql", "postgresql"):
+                url = Assistant.create_db_url(db, settings)
+                engine = create_engine(url)
+                session = sessionmaker(bind=engine)()
+                host = settings.DB[db]["host"]
+                port = settings.DB[db]["port"]
+                logger.opt(colors=True).info(
+                    f"Adding session with <yellow>{db}</yellow> at <magenta>{host}:{port}</magenta> to context"
+                )
+                _sessions[settings.DB[db]["type"]] = {db: session}
+        return _sessions
+
     @logger.catch
     async def _observe_start(self):
         """Main async function"""
@@ -232,29 +255,6 @@ class Manager(Interface, metaclass=Singleton):
                 raise BasicManagerException
             item.export(session)
             exported.add(item.model)
-
-        def _create_sessions():
-            _sessions = {
-                "mysql": {},
-                "postgresql": {},
-            }
-            logger.opt(colors=True).info(
-                f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>"
-            )
-            for db in settings.DB:
-                if settings.DB[db]["type"] in ("mysql", "postgresql"):
-                    url = Assistant.create_db_url(db, settings)
-                    engine = create_engine(url)
-                    session = sessionmaker(bind=engine)()
-                    host = settings.DB[db]["host"]
-                    port = settings.DB[db]["port"]
-                    logger.opt(colors=True).info(
-                        f"Adding session with <yellow>{db}</yellow> at <magenta>{host}:{port}</magenta> to context"
-                    )
-                    _sessions[settings.DB[db]["type"]] = {db: session}
-            return _sessions
-
-        self.sessions = _create_sessions()
 
         con = settings.CONCURRENCY
         observers = gen.multi([observe() for _ in range(con["observers"])])
