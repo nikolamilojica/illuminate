@@ -11,7 +11,7 @@ from illuminate.common.project_logging import LOGO_COLOR
 def show_info(func):
     @functools.wraps(func)
     def wrapper(self):
-        logger.info(f"Process started")
+        logger.info("Process started")
         start = default_timer()
         log_context(self)
         log_settings(self)
@@ -24,23 +24,29 @@ def show_info(func):
 
     def log_context(self):
         logger.opt(colors=True).info(
-            f"Project files for project <yellow>{self.name}</yellow> loaded into context"
+            f"Project files for project "
+            f"<yellow>{self.name}</yellow> loaded into context"
         )
         logger.info(f"Adapters discovered {[i for i in self.adapters]}")
-        logger.info(f"Models discovered {[locate(i) for i in self.settings.MODELS]}")
+        logger.info(
+            f"Models discovered {[locate(i) for i in self.settings.MODELS]}"
+        )
         logger.info(f"Observers discovered {[i for i in self.observers]}")
 
     def log_results(self):
         logger.success("Results gathered")
         logger.opt(colors=True).info(
-            f"<yellow>Unsuccessful</yellow> observations: <magenta>{len(self.failed)}</magenta>"
+            f"<yellow>Unsuccessful</yellow> observations: "
+            f"<magenta>{len(self.failed)}</magenta>"
         )
         logger.debug(f"Unsuccessful attempts {self.failed}")
         logger.opt(colors=True).info(
-            f"<yellow>Successful</yellow> observations: <magenta>{len(self.requested) - len(self.failed)}</magenta>"
+            f"<yellow>Successful</yellow> observations: "
+            f"<magenta>{len(self.requested) - len(self.failed)}</magenta>"
         )
         logger.opt(colors=True).info(
-            f"Number of <yellow>exports</yellow>: <magenta>{len(self.exported)}</magenta>"
+            f"Number of <yellow>exports</yellow>: "
+            f"<magenta>{len(self.exported)}</magenta>"
         )
 
     def log_settings(self):
