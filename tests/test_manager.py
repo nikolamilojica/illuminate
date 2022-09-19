@@ -1,11 +1,16 @@
+import asyncio
+import io
 import os
 from os import walk
 
 import pytest
 from sqlalchemy import inspect
+from tornado.httpclient import HTTPRequest
+from tornado.httpclient import HTTPResponse
 
 from illuminate.common.project_templates import FILES
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.manager.manager import Assistant
 from illuminate.manager.manager import Manager
 from tests.shared.unit import Test
 
@@ -20,6 +25,7 @@ class TestManagerClassInstance:
         manager_1 = Manager("example1", "/opt/example1")
         manager_2 = Manager("example2", "/opt/example2")
         assert manager_1 == manager_2
+        Manager._instances = {}
 
 
 class TestManagerDBCommandGroup(Test):
@@ -146,3 +152,63 @@ class TestManagerProjectCommandGroup(Test):
             name = "example"
             Manager.project_setup(name, ".")
             self.assert_project_structure(name, FILES, path, cwd=True)
+
+
+class TestManagerObserveCommandGroup(Test):
+
+    function = "tornado.httpclient.AsyncHTTPClient.fetch"
+
+    @staticmethod
+    @pytest.fixture(scope="function")
+    def async_http_responses_ok(mocker):
+        """
+        Patch fetch function to return predefined response object
+        """
+        body = b"""
+        <!DOCTYPE HTML>
+        <html lang="en">
+        <head>
+        <META charset="UTF-8">
+        <META name="viewport"
+         content="width=device-width, initial-scale=1.0">
+        <title>Example</title>
+        </head>
+        <body>
+        <p>
+        Example
+        </p>
+        </body>
+        </html>
+        """
+        future = asyncio.Future()
+        request = HTTPRequest("https://example.com")
+        response = HTTPResponse(request, 200, None, io.BytesIO(body))
+        future.set_result(response)
+        mocker.patch(TestManagerObserveCommandGroup.function, return_value=future)
+
+    def test_observe_start_successfully(self, async_http_responses_ok):
+        """
+        Given: Current working directory is already configured project
+        When: Observation process is done
+        Expected: Data is exported to database
+        """
+        with self.path() as path:
+            name = "example"
+            Manager.project_setup(name, ".")
+            from models.example import ModelExample
+
+            Manager.db_revision(path, "head", "main", self.url)
+            Manager.db_upgrade(path, "head", "main", self.url)
+            context = Assistant.provide_context()
+            manager = Manager(**context)
+            manager.sessions["postgresql"]["main"] = self.session
+            manager.observe_start()
+
+            query = self.session.query(ModelExample).all()
+            assert len(manager.exported) == 1
+            assert len(manager.requested) == 1
+            assert len(query) == 1
+            assert query[0].url == "https://example.com"
+            assert query[0].title == "Example"
+
+        Manager._instances = {}
