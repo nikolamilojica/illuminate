@@ -39,7 +39,7 @@ class Manager(Interface, metaclass=Singleton):
         self.name = name
         self.observers = observers
         self.path = path
-        self.sessions = None
+        self.sessions = None if not settings else self._create_sessions(settings)
         self.settings = settings
         self.__observe_queue = queues.Queue()
         self.__adapt_queue = queues.Queue()
@@ -62,7 +62,6 @@ class Manager(Interface, metaclass=Singleton):
         return self.__requested
 
     @staticmethod
-    @logger.catch
     def db_populate(fixtures, selector, url=None, *args, **kwargs):
         """Populates db with Alembic framework"""
         settings = Assistant.import_settings()
@@ -90,7 +89,6 @@ class Manager(Interface, metaclass=Singleton):
         logger.success(f"Database {selector} populated")
 
     @staticmethod
-    @logger.catch
     def db_revision(path, revision, selector, url=None, *args, **kwargs):
         """Creates db revision with Alembic framework"""
         settings = Assistant.import_settings()
@@ -106,7 +104,6 @@ class Manager(Interface, metaclass=Singleton):
         logger.success("Revision created")
 
     @staticmethod
-    @logger.catch
     def db_upgrade(path, revision, selector, url=None, *args, **kwargs):
         """Performs db migration with Alembic framework"""
         settings = Assistant.import_settings()
@@ -117,7 +114,6 @@ class Manager(Interface, metaclass=Singleton):
         logger.success(f"Database {selector} upgraded")
 
     @staticmethod
-    @logger.catch
     def project_setup(name, path, *args, **kwargs):
         """Create project directory and populates it with project files"""
 
@@ -146,6 +142,29 @@ class Manager(Interface, metaclass=Singleton):
         """Start producer/consumer ETL process based on project files"""
         io_loop = ioloop.IOLoop.current()
         io_loop.run_sync(self._observe_start)
+
+    @staticmethod
+    def _create_sessions(settings):
+        """Create sessions dictionary from settings"""
+        _sessions = {
+            "mysql": {},
+            "postgresql": {},
+        }
+        logger.opt(colors=True).info(
+            f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>"
+        )
+        for db in settings.DB:
+            if settings.DB[db]["type"] in ("mysql", "postgresql"):
+                url = Assistant.create_db_url(db, settings)
+                engine = create_engine(url)
+                session = sessionmaker(bind=engine)()
+                host = settings.DB[db]["host"]
+                port = settings.DB[db]["port"]
+                logger.opt(colors=True).info(
+                    f"Adding session with <yellow>{db}</yellow> at <magenta>{host}:{port}</magenta> to context"
+                )
+                _sessions[settings.DB[db]["type"]] = {db: session}
+        return _sessions
 
     @logger.catch
     async def _observe_start(self):
@@ -236,29 +255,6 @@ class Manager(Interface, metaclass=Singleton):
                 raise BasicManagerException
             item.export(session)
             exported.add(item.model)
-
-        def _create_sessions():
-            _sessions = {
-                "mysql": {},
-                "postgresql": {},
-            }
-            logger.opt(colors=True).info(
-                f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>"
-            )
-            for db in settings.DB:
-                if settings.DB[db]["type"] in ("mysql", "postgresql"):
-                    url = Assistant.create_db_url(db, settings)
-                    engine = create_engine(url)
-                    session = sessionmaker(bind=engine)()
-                    host = settings.DB[db]["host"]
-                    port = settings.DB[db]["port"]
-                    logger.opt(colors=True).info(
-                        f"Adding session with <yellow>{db}</yellow> at <magenta>{host}:{port}</magenta> to context"
-                    )
-                    _sessions[settings.DB[db]["type"]] = {db: session}
-            return _sessions
-
-        self.sessions = _create_sessions()
 
         con = settings.CONCURRENCY
         observers = gen.multi([observe() for _ in range(con["observers"])])

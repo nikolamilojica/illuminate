@@ -1,5 +1,6 @@
 from loguru import logger
 
+from illuminate.exceptions.exporter import BasicExporterException
 from illuminate.exporter.exporter import Exporter
 
 
@@ -16,6 +17,7 @@ class SQLExporter(Exporter):
             session.commit()
         except Exception as exception:
             logger.critical(f'{self}.export(session="{session}") -> {exception}')
+            raise BasicExporterException
         logger.success(f'{self}.export(session="{session}")')
 
     def __repr__(self):
