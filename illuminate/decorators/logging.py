@@ -52,7 +52,7 @@ def show_info(func):
     def log_settings(self):
         settings_conn = self.settings.CONCURRENCY
         settings_db = self.settings.DB.copy()
-        settings_db["password"] = "****"
+        settings_db["password"] = "****"  # nosec
         settings_obs = self.settings.OBSERVER_CONFIGURATION
         logger.debug(f"Concurrency settings {settings_conn}")
         logger.debug(f"Database settings {settings_db}")
