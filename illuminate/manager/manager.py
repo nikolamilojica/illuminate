@@ -39,7 +39,9 @@ class Manager(Interface, metaclass=Singleton):
         self.name = name
         self.observers = observers
         self.path = path
-        self.sessions = None if not settings else self._create_sessions(settings)
+        self.sessions = (
+            None if not settings else self._create_sessions(settings)
+        )
         self.settings = settings
         self.__observe_queue = queues.Queue()
         self.__adapt_queue = queues.Queue()
@@ -71,7 +73,9 @@ class Manager(Interface, metaclass=Singleton):
         context = MigrationContext.configure(engine.connect())
         op = Operations(context)
         table_data = {}
-        files = fixtures if fixtures else glob("fixtures/*.json", recursive=True)
+        files = (
+            fixtures if fixtures else glob("fixtures/*.json", recursive=True)
+        )
         for file in files:
             logger.info(f"Database fixtures file discovered {file}")
         for _file in files:
@@ -85,7 +89,9 @@ class Manager(Interface, metaclass=Singleton):
                 data = table_data[model.__tablename__]
                 op.bulk_insert(model.__table__, data)
                 for record in data:
-                    logger.debug(f"Row {record} added to table {model.__tablename__}")
+                    logger.debug(
+                        f"Row {record} added to table {model.__tablename__}"
+                    )
         logger.success(f"Database {selector} populated")
 
     @staticmethod
@@ -122,14 +128,17 @@ class Manager(Interface, metaclass=Singleton):
             if os.path.exists(path):
                 raise BasicManagerException("Directory already exists")
             logger.opt(colors=True).info(
-                f"Creating project directory for project <yellow>{name}</yellow>"
+                f"Creating project directory for project "
+                f"<yellow>{name}</yellow>"
             )
             os.mkdir(path)
 
         for _name, content in FILES.items():
             file_path = os.path.join(path, _name)
             if os.sep in _name:
-                os.makedirs(os.sep.join(file_path.split(os.sep)[:-1]), exist_ok=True)
+                os.makedirs(
+                    os.sep.join(file_path.split(os.sep)[:-1]), exist_ok=True
+                )
             with open(file_path, "w") as file:
                 logger.debug(f"Creating project file {_name} at {file_path}")
                 file.write(f"{content.format(name=name).strip()}\n")
@@ -151,7 +160,8 @@ class Manager(Interface, metaclass=Singleton):
             "postgresql": {},
         }
         logger.opt(colors=True).info(
-            f"Number of expected db connections: <yellow>{len(settings.DB)}</yellow>"
+            f"Number of expected db connections: "
+            f"<yellow>{len(settings.DB)}</yellow>"
         )
         for db in settings.DB:
             if settings.DB[db]["type"] in ("mysql", "postgresql"):
@@ -161,7 +171,8 @@ class Manager(Interface, metaclass=Singleton):
                 host = settings.DB[db]["host"]
                 port = settings.DB[db]["port"]
                 logger.opt(colors=True).info(
-                    f"Adding session with <yellow>{db}</yellow> at <magenta>{host}:{port}</magenta> to context"
+                    f"Adding session with <yellow>{db}</yellow> at "
+                    f"<magenta>{host}:{port}</magenta> to context"
                 )
                 _sessions[settings.DB[db]["type"]] = {db: session}
         return _sessions
@@ -259,7 +270,9 @@ class Manager(Interface, metaclass=Singleton):
         con = settings.CONCURRENCY
         observers = gen.multi([observe() for _ in range(con["observers"])])
         adapters = gen.multi([adapt() for _ in range(con["adapters"])])
-        exporters = gen.multi([export(self.sessions) for _ in range(con["exporters"])])
+        exporters = gen.multi(
+            [export(self.sessions) for _ in range(con["exporters"])]
+        )
 
         await start(_observers)
         await oq.join()

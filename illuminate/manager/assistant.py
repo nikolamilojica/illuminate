@@ -18,7 +18,9 @@ class Assistant(Interface):
     def create_alembic_config(path, url):
         """Creates config object needed to perform Alembic commands"""
         config = Config()
-        config.set_main_option("script_location", os.path.join(path, "migrations"))
+        config.set_main_option(
+            "script_location", os.path.join(path, "migrations")
+        )
         config.set_main_option("sqlalchemy.url", url)
         return config
 

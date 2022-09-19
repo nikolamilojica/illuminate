@@ -56,7 +56,9 @@ def project(ctx):
 
 @db.command("populate")
 @click.option("--selector", default="main", required=False)
-@click.option("--fixtures", multiple=True, required=False, type=click.Path(exists=True))
+@click.option(
+    "--fixtures", multiple=True, required=False, type=click.Path(exists=True)
+)
 @click.argument("url", default=None, required=False)
 @click.pass_context
 def db_populate(ctx, selector, url, *args, **kwargs):

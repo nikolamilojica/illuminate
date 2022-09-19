@@ -16,7 +16,9 @@ class SQLExporter(Exporter):
         try:
             session.commit()
         except Exception as exception:
-            logger.critical(f'{self}.export(session="{session}") -> {exception}')
+            logger.critical(
+                f'{self}.export(session="{session}") -> {exception}'
+            )
             raise BasicExporterException
         logger.success(f'{self}.export(session="{session}")')
 
