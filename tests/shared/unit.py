@@ -3,6 +3,7 @@ import sys
 import tempfile
 from contextlib import contextmanager
 
+from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -50,6 +51,10 @@ class Test:
         Put temporary directory path to PYTHONPATH, set it as cwd and clean imports
         :yields: _GeneratorContextManager, TemporaryDirectory
         """
+
+        logger.remove()
+        logger.add(sys.stdout, level="DEBUG")
+
         with tempfile.TemporaryDirectory() as path:
             sys.path.append(path)
             os.chdir(path)
