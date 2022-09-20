@@ -177,114 +177,111 @@ class Manager(Interface, metaclass=Singleton):
                 _sessions[settings.DB[db]["type"]] = {db: session}
         return _sessions
 
+    async def __start(self):
+        """Initialize observers and schedule initial observations"""
+        for observer in self.observers:
+            instance = observer()
+            logger.opt(colors=True).info(
+                f"Observer <yellow>{instance.NAME}</yellow> initialized"
+            )
+            for _observation in instance.initial_observations:
+                await self.__observation(_observation)
+
+    async def __observe(self):
+        """Take item from observe queue and schedule observation"""
+        async for item in self.__observe_queue:
+            if not item:
+                return
+            await self.__observation(item)
+            logger.debug(f"Coroutine observed {item}")
+            del item
+            self.__observe_queue.task_done()
+
+    async def __observation(self, item):
+        """Configure observation and perform observe with a callback"""
+        items = []
+        if isinstance(item, HTTPObservation):
+            item.configuration = {
+                **self.settings.OBSERVER_CONFIGURATION["http"],
+                **item.configuration,
+            }
+            if item.url in self.__requesting:
+                return
+            self.__requesting.add(item.url)
+            items = await item.observe()
+            if not items:
+                self.__failed.add(item.url)
+                return
+            self.__requested.add(item.url)
+        async for _item in items:
+            await self.__observation_router(_item)
+
+    async def __observation_router(self, item):
+        """Route item based on its class to proper queue"""
+        if isinstance(item, Finding):
+            await self.__adapt_queue.put(item)
+        if isinstance(item, HTTPObservation) and item.allowed:
+            await self.__observe_queue.put(item)
+
+    async def __adapt(self):
+        """Take item from adapt queue and schedule adaptions"""
+        async for item in self.__adapt_queue:
+            if not item:
+                return
+            await self.__adaptation(item)
+            logger.debug(f"Coroutine adapted {item}")
+            del item
+            self.__adapt_queue.task_done()
+
+    async def __adaptation(self, item):
+        """Instance adapters and perform adapt on item"""
+        for adapter in self.adapters:
+            instance = adapter()
+            adapted = instance.adapt(item)
+            async for _adaptation in adapted:
+                await self.__export_queue.put(_adaptation)
+
+    async def __export(self):
+        """Take item from export queue and schedule exportation"""
+        async for item in self.__export_queue:
+            if not item:
+                return
+            await self.__exportation(item)
+            logger.debug(f"Coroutine exported {item}")
+            del item
+            self.__export_queue.task_done()
+
+    async def __exportation(self, item):
+        """Perform export on item"""
+        try:
+            session = self.sessions[item.type][item.name]
+        except KeyError:
+            raise BasicManagerException
+        item.export(session)
+        self.__exported.add(item.model)
+
     @logger.catch
     async def _observe_start(self):
         """Main async function"""
-        _adapters = self.adapters
-        _observers = self.observers
-        oq = self.__observe_queue
-        aq = self.__adapt_queue
-        eq = self.__export_queue
-        exported = self.__exported
-        failed = self.__failed
-        requested = self.__requested
-        requesting = self.__requesting
-        settings = self.settings
+        _observers = self.settings.CONCURRENCY["observers"]
+        _adapters = self.settings.CONCURRENCY["adapters"]
+        _exporters = self.settings.CONCURRENCY["exporters"]
 
-        async def start(_observers):
-            for observer in _observers:
-                instance = observer()
-                logger.opt(colors=True).info(
-                    f"Observer <yellow>{instance.NAME}</yellow> initialized"
-                )
-                for _observation in instance.initial_observations:
-                    await observation(_observation)
+        observers = gen.multi([self.__observe() for _ in range(_observers)])
+        adapters = gen.multi([self.__adapt() for _ in range(_adapters)])
+        exporters = gen.multi([self.__export() for _ in range(_exporters)])
 
-        async def observe():
-            async for item in oq:
-                if not item:
-                    return
-                await observation(item)
-                logger.debug(f"Coroutine observed {item}")
-                del item
-                oq.task_done()
+        await self.__start()
+        await self.__observe_queue.join()
+        await self.__adapt_queue.join()
+        await self.__export_queue.join()
 
-        async def observation(item):
-            items = []
-            if isinstance(item, HTTPObservation):
-                item.configuration = {
-                    **settings.OBSERVER_CONFIGURATION["http"],
-                    **item.configuration,
-                }
-                if item.url in requesting:
-                    return
-                requesting.add(item.url)
-                items = await item.observe()
-                if not items:
-                    failed.add(item.url)
-                    return
-                requested.add(item.url)
-            async for _item in items:
-                await observation_router(_item)
-
-        async def observation_router(item):
-            if isinstance(item, Finding):
-                await aq.put(item)
-            if isinstance(item, HTTPObservation):
-                if item.allowed:
-                    await oq.put(item)
-
-        async def adapt():
-            async for item in aq:
-                if not item:
-                    return
-                await adaptation(item)
-                logger.debug(f"Coroutine adapted {item}")
-                del item
-                aq.task_done()
-
-        async def adaptation(item):
-            for adapter in _adapters:
-                instance = adapter()
-                adapted = instance.adapt(item)
-                async for _adaptation in adapted:
-                    await eq.put(_adaptation)
-
-        async def export(_sessions):
-            async for item in eq:
-                if not item:
-                    return
-                await exportation(item, _sessions)
-                logger.debug(f"Coroutine exported {item}")
-                del item
-                eq.task_done()
-
-        async def exportation(item, _sessions):
-            try:
-                session = _sessions[item.type][item.name]
-            except KeyError:
-                raise BasicManagerException
-            item.export(session)
-            exported.add(item.model)
-
-        con = settings.CONCURRENCY
-        observers = gen.multi([observe() for _ in range(con["observers"])])
-        adapters = gen.multi([adapt() for _ in range(con["adapters"])])
-        exporters = gen.multi(
-            [export(self.sessions) for _ in range(con["exporters"])]
-        )
-
-        await start(_observers)
-        await oq.join()
-        await aq.join()
-        await eq.join()
-
-        for _ in range(con["observers"]):
-            await oq.put(None)
-        for _ in range(con["adapters"]):
-            await aq.put(None)
-        for _ in range(con["exporters"]):
-            await eq.put(None)
+        for _ in range(_observers):
+            await self.__observe_queue.put(None)
+        for _ in range(_adapters):
+            await self.__adapt_queue.put(None)
+        for _ in range(_exporters):
+            await self.__export_queue.put(None)
 
         await observers
         await adapters
