@@ -237,9 +237,11 @@ class Manager(Interface, metaclass=Singleton):
         """Instance adapters and perform adapt on item"""
         for adapter in self.adapters:
             instance = adapter()
-            adapted = instance.adapt(item)
-            async for _adaptation in adapted:
-                await self.__export_queue.put(_adaptation)
+            for subscriber in instance.subscribers:
+                if isinstance(item, subscriber):
+                    adapted = instance.adapt(item)
+                    async for _adaptation in adapted:
+                        await self.__export_queue.put(_adaptation)
 
     async def __export(self):
         """Take item from export queue and schedule exportation"""
