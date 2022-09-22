@@ -2,10 +2,13 @@ _ADAPTER_EXAMPLE = """
 from illuminate.adapter.adapter import Adapter
 
 from exporters.example import ExporterExample
+from findings.example import FindingExample
 from models.example import ModelExample
 
 
 class AdapterExample(Adapter):
+    subscribers = (FindingExample,)
+
     async def adapt(self, finding, *args, **kwargs):
         yield ExporterExample(
             model=ModelExample(title=finding.title, url=finding.url)
