@@ -1,8 +1,8 @@
 from illuminate.exceptions.manager import BasicManagerException
-from illuminate.interface.observer import Interface
+from illuminate.interface.observer import IObserver
 
 
-class Observer(Interface):
+class Observer(IObserver):
     """Observer class, responsible for producing observations and findings"""
 
     def __init__(self):

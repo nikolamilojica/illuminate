@@ -1,4 +1,4 @@
-class Interface:
+class IAssistant:
     """Interface for Assistant class"""
 
     @staticmethod

@@ -1,4 +1,4 @@
-class Interface:
+class IManager:
     """Interface for Manager class"""
 
     @staticmethod

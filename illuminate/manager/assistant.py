@@ -7,10 +7,10 @@ from alembic.config import Config
 from loguru import logger
 
 from illuminate.exceptions.manager import BasicManagerException
-from illuminate.interface.assistant import Interface
+from illuminate.interface.assistant import IAssistant
 
 
-class Assistant(Interface):
+class Assistant(IAssistant):
     """Assistant class, responsible for assisting Manager class"""
 
     @staticmethod

@@ -1,4 +1,4 @@
-class Interface:
+class IExporter:
     """Interface for Exporter class"""
 
     async def export(self, *args, **kwargs):

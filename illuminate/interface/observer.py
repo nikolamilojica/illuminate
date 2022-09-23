@@ -1,4 +1,4 @@
-class Interface:
+class IObserver:
     """Interface for Observer class"""
 
     async def observe(self, response, *args, **kwargs):

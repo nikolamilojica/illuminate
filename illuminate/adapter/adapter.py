@@ -1,8 +1,8 @@
 from illuminate.exceptions.manager import BasicManagerException
-from illuminate.interface.adapter import Interface
+from illuminate.interface.adapter import IAdapter
 
 
-class Adapter(Interface):
+class Adapter(IAdapter):
     """Adapter class, responsible for producing exporters"""
 
     async def adapt(self, finding, *args, **kwargs):
