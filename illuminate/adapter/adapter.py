@@ -1,5 +1,5 @@
-from illuminate.discrete.adapter.adapter import Interface
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.interface.adapter import Interface
 
 
 class Adapter(Interface):

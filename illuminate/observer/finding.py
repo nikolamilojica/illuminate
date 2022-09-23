@@ -1,4 +1,4 @@
-from illuminate.discrete.observer.finding import Interface
+from illuminate.interface.finding import Interface
 
 
 class Finding(Interface):

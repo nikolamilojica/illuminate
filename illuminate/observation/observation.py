@@ -1,4 +1,4 @@
-from illuminate.discrete.observation.observation import Interface
+from illuminate.interface.observation import Interface
 
 
 class Observation(Interface):

@@ -1,5 +1,5 @@
-from illuminate.discrete.observer.observer import Interface
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.interface.observer import Interface
 
 
 class Observer(Interface):

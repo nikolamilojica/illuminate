@@ -1,4 +1,4 @@
-from illuminate.discrete.exporter.exporter import Interface
+from illuminate.interface.exporter import Interface
 
 
 class Exporter(Interface):

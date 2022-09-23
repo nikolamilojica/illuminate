@@ -6,8 +6,8 @@ import sys
 from alembic.config import Config
 from loguru import logger
 
-from illuminate.discrete.manager.assistant import Interface
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.interface.assistant import Interface
 
 
 class Assistant(Interface):

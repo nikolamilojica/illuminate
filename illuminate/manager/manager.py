@@ -14,8 +14,8 @@ from tornado import gen, ioloop, queues
 from illuminate.common.project_templates import FILES
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
-from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.interface.manager import Interface
 from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
 from illuminate.observation.http import HTTPObservation
