@@ -1,7 +1,10 @@
-from illuminate.discrete.exporter.exporter import Interface
+from illuminate.exceptions.exporter import BasicExporterException
+from illuminate.interface.exporter import IExporter
 
 
-class Exporter(Interface):
+class Exporter(IExporter):
     """Exporter class, responsible for writing to destination"""
 
-    pass
+    async def export(self, *args, **kwargs):
+        """Load to destination"""
+        raise BasicExporterException

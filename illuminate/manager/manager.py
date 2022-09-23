@@ -14,15 +14,15 @@ from tornado import gen, ioloop, queues
 from illuminate.common.project_templates import FILES
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
-from illuminate.discrete.manager.manager import Interface
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.interface.manager import IManager
 from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
 from illuminate.observation.http import HTTPObservation
 from illuminate.observer.finding import Finding
 
 
-class Manager(Interface, metaclass=Singleton):
+class Manager(IManager, metaclass=Singleton):
     """Manager class, responsible for framework cli commands"""
 
     def __init__(
