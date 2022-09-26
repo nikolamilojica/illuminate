@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 from glob import glob
@@ -15,10 +16,12 @@ from illuminate.common.project_templates import FILES
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.exporter.exporter import Exporter
 from illuminate.interface.manager import IManager
 from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
 from illuminate.observation.http import HTTPObservation
+from illuminate.observation.http import Observation
 from illuminate.observer.finding import Finding
 
 
@@ -187,6 +190,27 @@ class Manager(IManager, metaclass=Singleton):
             for _observation in instance.initial_observations:
                 await self.__observation(_observation)
 
+    async def __router(self, item):
+        """Route item based on its class to proper queue"""
+        if isinstance(item, Exporter):
+            await self.__export_queue.put(item)
+        elif isinstance(item, Finding):
+            if inspect.stack()[1][3] != "__adaptation":
+                await self.__adapt_queue.put(item)
+            else:
+                logger.warning(
+                    f"Findings can only yield Exporters and Observations "
+                    f"thus rejecting item {item}"
+                )
+        elif isinstance(item, Observation):
+            if isinstance(item, HTTPObservation) and item.allowed:
+                await self.__observe_queue.put(item)
+        else:
+            logger.warning(
+                f"Manager rejected item {item} due to unsupported "
+                f"item type {type(item)}"
+            )
+
     async def __observe(self):
         """Take item from observe queue and schedule observation"""
         async for item in self.__observe_queue:
@@ -214,14 +238,7 @@ class Manager(IManager, metaclass=Singleton):
                 return
             self.__requested.add(item.url)
         async for _item in items:
-            await self.__observation_router(_item)
-
-    async def __observation_router(self, item):
-        """Route item based on its class to proper queue"""
-        if isinstance(item, Finding):
-            await self.__adapt_queue.put(item)
-        if isinstance(item, HTTPObservation) and item.allowed:
-            await self.__observe_queue.put(item)
+            await self.__router(_item)
 
     async def __adapt(self):
         """Take item from adapt queue and schedule adaptions"""
@@ -239,9 +256,9 @@ class Manager(IManager, metaclass=Singleton):
             instance = adapter()
             for subscriber in instance.subscribers:
                 if isinstance(item, subscriber):
-                    adapted = instance.adapt(item)
-                    async for _adaptation in adapted:
-                        await self.__export_queue.put(_adaptation)
+                    items = instance.adapt(item)
+                    async for _item in items:
+                        await self.__router(_item)
 
     async def __export(self):
         """Take item from export queue and schedule exportation"""
