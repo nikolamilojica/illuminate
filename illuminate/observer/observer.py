@@ -1,4 +1,4 @@
-from illuminate.exceptions.manager import BasicManagerException
+from illuminate.exceptions.observer import BasicObserverException
 from illuminate.interface.observer import IObserver
 
 
@@ -10,4 +10,4 @@ class Observer(IObserver):
 
     async def observe(self, response, *args, **kwargs):
         """Extract observations and/or findings from response"""
-        raise BasicManagerException
+        raise BasicObserverException
