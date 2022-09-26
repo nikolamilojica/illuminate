@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 from glob import glob
@@ -194,7 +195,13 @@ class Manager(IManager, metaclass=Singleton):
         if isinstance(item, Exporter):
             await self.__export_queue.put(item)
         elif isinstance(item, Finding):
-            await self.__adapt_queue.put(item)
+            if inspect.stack()[1][3] != self.__adaptation:
+                await self.__adapt_queue.put(item)
+            else:
+                logger.warning(
+                    f"Findings can only yield Exporters and Observations "
+                    f"thus rejecting item {item}"
+                )
         elif isinstance(item, Observation):
             if isinstance(item, HTTPObservation) and item.allowed:
                 await self.__observe_queue.put(item)
