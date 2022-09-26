@@ -12,12 +12,14 @@ from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
 from illuminate.common.project_templates import FILES
+from illuminate.exporter.exporter import Exporter
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.interface.manager import IManager
 from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
+from illuminate.observation.http import Observation
 from illuminate.observation.http import HTTPObservation
 from illuminate.observer.finding import Finding
 
@@ -187,6 +189,21 @@ class Manager(IManager, metaclass=Singleton):
             for _observation in instance.initial_observations:
                 await self.__observation(_observation)
 
+    async def __router(self, item):
+        """Route item based on its class to proper queue"""
+        if isinstance(item, Exporter):
+            await self.__export_queue.put(item)
+        elif isinstance(item, Finding):
+            await self.__adapt_queue.put(item)
+        elif isinstance(item, Observation):
+            if isinstance(item, HTTPObservation) and item.allowed:
+                await self.__observe_queue.put(item)
+        else:
+            logger.warning(
+                f"Manager rejected item {item} due to unsupported "
+                f"item type {type(item)}"
+            )
+
     async def __observe(self):
         """Take item from observe queue and schedule observation"""
         async for item in self.__observe_queue:
@@ -214,14 +231,7 @@ class Manager(IManager, metaclass=Singleton):
                 return
             self.__requested.add(item.url)
         async for _item in items:
-            await self.__observation_router(_item)
-
-    async def __observation_router(self, item):
-        """Route item based on its class to proper queue"""
-        if isinstance(item, Finding):
-            await self.__adapt_queue.put(item)
-        if isinstance(item, HTTPObservation) and item.allowed:
-            await self.__observe_queue.put(item)
+            await self.__router(_item)
 
     async def __adapt(self):
         """Take item from adapt queue and schedule adaptions"""
