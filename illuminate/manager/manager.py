@@ -249,9 +249,9 @@ class Manager(IManager, metaclass=Singleton):
             instance = adapter()
             for subscriber in instance.subscribers:
                 if isinstance(item, subscriber):
-                    adapted = instance.adapt(item)
-                    async for _adaptation in adapted:
-                        await self.__export_queue.put(_adaptation)
+                    items = instance.adapt(item)
+                    async for _item in items:
+                        await self.__router(_item)
 
     async def __export(self):
         """Take item from export queue and schedule exportation"""
