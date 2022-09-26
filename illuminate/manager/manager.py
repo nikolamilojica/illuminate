@@ -195,7 +195,7 @@ class Manager(IManager, metaclass=Singleton):
         if isinstance(item, Exporter):
             await self.__export_queue.put(item)
         elif isinstance(item, Finding):
-            if inspect.stack()[1][3] != self.__adaptation:
+            if inspect.stack()[1][3] != "__adaptation":
                 await self.__adapt_queue.put(item)
             else:
                 logger.warning(
