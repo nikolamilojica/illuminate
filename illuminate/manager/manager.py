@@ -13,15 +13,15 @@ from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
 from illuminate.common.project_templates import FILES
-from illuminate.exporter.exporter import Exporter
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.exceptions.manager import BasicManagerException
+from illuminate.exporter.exporter import Exporter
 from illuminate.interface.manager import IManager
 from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
-from illuminate.observation.http import Observation
 from illuminate.observation.http import HTTPObservation
+from illuminate.observation.http import Observation
 from illuminate.observer.finding import Finding
 
 
