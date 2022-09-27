@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - master
+      - feat/github-actions
 
 jobs:
   test:
