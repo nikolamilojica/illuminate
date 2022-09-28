@@ -4,8 +4,8 @@
 https://img.shields.io/badge/code%20style-black-000000.svg)](
 https://github.com/psf/black)
 [![Coveralls Coverage](
-https://img.shields.io/coveralls/github/nikolamilojica/illuminate/develop)](
-https://coveralls.io/)
+https://coveralls.io/repos/github/nikolamilojica/illuminate/badge.svg?branch=develop&t=YU1NaL)](
+https://coveralls.io/github/nikolamilojica/illuminate?branch=develop)
 [![GitHub Actions](
 https://github.com/nikolamilojica/illuminate/workflows/Tests/badge.svg?branch=develop)](
 https://github.com/nikolamilojica/illuminate/actions)
