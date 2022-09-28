@@ -6,23 +6,22 @@
 ___
 <img align="left" style="margin:8px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Accueil_scribe_invert.png/241px-Accueil_scribe_invert.png">
 
->> Data is like garbage.
-> You’d better know what you are going to do with it before you collect it.
->> <div align="right"><i>Mark Twain</i></div>
->
-> This code aims to be a thin, but with "batteries included", ETL framework.
+>> <p align="justify"><i>Data is like garbage.
+>> You’d better know what you are going to do with it before you
+>> collect it.</i></p>
+>> <p align="right"><i>&mdash; Mark Twain</i></p>
+> <p align="justify">This code aims to be a thin,
+> but with "batteries included", ETL framework.
 > It is written using prominent Python frameworks such as
-> [Alembic](https://alembic.sqlalchemy.org/en/latest/),
-> [Click](https://click.palletsprojects.com/),
-> [Tornado](https://www.tornadoweb.org/en/stable/)
-> and [SQLAlchemy](https://www.sqlalchemy.org/).
->
-> Driver behind this project was a personal need for a rapid ETL and Scraping
-> capabilities framework that is both development and deployment friendly,
-> as well as to return something to the community.
->
-> The whole idea is obviously heavily influenced by
-> [django](https://www.djangoproject.com/) and
-> [Scrapy](https://scrapy.org/).
-> Tested with [pytest](https://docs.pytest.org/).
-> Tests run with [tox](https://tox.wiki/en/latest/).
+> <a href="https://alembic.sqlalchemy.org/en/latest/">Alembic</a>,
+> <a href="https://click.palletsprojects.com/">Click</a>,
+> <a href="https://www.tornadoweb.org/en/stable/">Tornado</a>
+> and <a href="https://www.sqlalchemy.org/">SQLAlchemy</a>.</p>
+> <p align="justify">Driver behind this project was a need for a rapid ETL
+> and Scraping capabilities framework that is both development and deployment
+> friendly, as well as something to return to the community.</p>
+> <p align="justify">The whole idea is obviously heavily influenced by
+> <a href="https://www.djangoproject.com/">django</a> and
+> <a href="https://scrapy.org/">Scrapy</a>.
+> Tested with <a href="https://docs.pytest.org/">pytest</a> with a help of
+> <a href="https://tox.wiki/en/latest/">tox</a>.</p>
