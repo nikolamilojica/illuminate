@@ -1,8 +1,14 @@
 # Illuminate
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Coveralls branch](https://img.shields.io/coveralls/github/nikolamilojica/illuminate/develop)](https://img.shields.io/)
-[![Actions Status](https://github.com/nikolamilojica/illuminate/workflows/Tests/badge.svg?branch=develop)](https://github.com/nikolamilojica/illuminate/actions)
+[![Code Style: Black](
+https://img.shields.io/badge/code%20style-black-000000.svg)](
+https://github.com/psf/black)
+[![Coveralls Coverage](
+https://img.shields.io/coveralls/github/nikolamilojica/illuminate/develop)](
+https://coveralls.io/)
+[![GitHub Actions](
+https://github.com/nikolamilojica/illuminate/workflows/Tests/badge.svg?branch=develop)](
+https://github.com/nikolamilojica/illuminate/actions)
 ___
 <img align="left" style="margin:8px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Accueil_scribe_invert.png/241px-Accueil_scribe_invert.png">
 
