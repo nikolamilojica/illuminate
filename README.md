@@ -8,7 +8,7 @@ ___
 
 >> Data is like garbage.
 > You’d better know what you are going to do with it before you collect it.
->> <div style="text-align: right"><i>Mark Twain</i></div>
+>> <div align="right"><i>Mark Twain</i></div>
 >
 > This code aims to be a thin, but with "batteries included", ETL framework.
 > It is written using prominent Python frameworks such as
