@@ -11,7 +11,7 @@ ___
 >> collect it.</i></p>
 >> <p align="right"><i>&mdash; Mark Twain</i></p>
 > <p align="justify">This code aims to be a thin,
-> but with "batteries included", ETL framework.
+> "batteries included", ETL framework.
 > It is written using prominent Python frameworks such as
 > <a href="https://alembic.sqlalchemy.org/en/latest/">Alembic</a>,
 > <a href="https://click.palletsprojects.com/">Click</a>,
@@ -20,7 +20,7 @@ ___
 > Driver behind this project was a need for a rapid ETL
 > and Scraping capabilities framework that is both development and deployment
 > friendly, as well as something to return to the community.
-> The whole idea is obviously heavily influenced by
+> The whole idea is heavily influenced by
 > <a href="https://www.djangoproject.com/">django</a> and
 > <a href="https://scrapy.org/">Scrapy</a>.
 > Tested with <a href="https://docs.pytest.org/">pytest</a> with a help of
