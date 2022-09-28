@@ -4,11 +4,11 @@
 https://img.shields.io/badge/code%20style-black-000000.svg)](
 https://github.com/psf/black)
 [![Coveralls Coverage](
-https://img.shields.io/coveralls/github/nikolamilojica/illuminate/develop)](
-https://coveralls.io/)
-[![GitHub Actions](
-https://github.com/nikolamilojica/illuminate/workflows/Tests/badge.svg?branch=develop)](
-https://github.com/nikolamilojica/illuminate/actions)
+https://coveralls.io/repos/github/nikolamilojica/illuminate/badge.svg?branch=develop&t=YU1NaL)](
+https://coveralls.io/github/nikolamilojica/illuminate?branch=develop)
+[![GitHub Actions - Tests Workflow](
+https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml/badge.svg?branch=develop)](
+https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml)
 ___
 <img align="left" style="margin:8px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Accueil_scribe_invert.png/241px-Accueil_scribe_invert.png">
 
