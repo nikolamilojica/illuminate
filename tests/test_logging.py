@@ -24,7 +24,7 @@ def _cli():
             self.DB = {}
             self.MODELS = []
             self.NAME = name
-            self.OBSERVER_CONFIGURATION = {}
+            self.OBSERVATION_CONFIGURATION = {}
 
     @show_logo
     @show_info
@@ -60,7 +60,7 @@ class TestLogging:
         assert "Observers discovered" in result.output
         assert "Concurrency settings" in result.output
         assert "Database settings {'password': '****'}" in result.output
-        assert "Observer settings" in result.output
+        assert "Observation settings" in result.output
         assert "Results gathered" in result.output
         assert "Unsuccessful observations" in result.output
         assert "Unsuccessful attempts" in result.output
