@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 import json
 import os
@@ -213,10 +214,11 @@ class Manager(IManager, metaclass=Singleton):
             )
 
     async def __observe(self):
-        """Take item from observe queue and schedule observation"""
+        """Take item from observe queue and schedule observation after delay"""
         async for item in self.__observe_queue:
             if not item:
                 return
+            await asyncio.sleep(self.settings.OBSERVER_CONFIGURATION["delay"])
             await self.__observation(item)
             logger.debug(f"Coroutine observed {item}")
             del item
