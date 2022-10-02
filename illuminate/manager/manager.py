@@ -218,7 +218,9 @@ class Manager(IManager, metaclass=Singleton):
         async for item in self.__observe_queue:
             if not item:
                 return
-            await asyncio.sleep(self.settings.OBSERVER_CONFIGURATION["delay"])
+            await asyncio.sleep(
+                self.settings.OBSERVATION_CONFIGURATION["delay"]
+            )
             await self.__observation(item)
             logger.debug(f"Coroutine observed {item}")
             del item
@@ -232,7 +234,7 @@ class Manager(IManager, metaclass=Singleton):
     async def __observation_http(self, item):
         """Configure HTTP observation and perform observe with a callback"""
         item.configuration = {
-            **self.settings.OBSERVER_CONFIGURATION["http"],
+            **self.settings.OBSERVATION_CONFIGURATION["http"],
             **item.configuration,
         }
         if item.url in self.__requesting:
