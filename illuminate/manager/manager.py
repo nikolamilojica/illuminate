@@ -222,21 +222,24 @@ class Manager(IManager, metaclass=Singleton):
             self.__observe_queue.task_done()
 
     async def __observation(self, item):
-        """Configure observation and perform observe with a callback"""
-        items = []
+        """Pass item based on its type to proper observation function"""
         if isinstance(item, HTTPObservation):
-            item.configuration = {
-                **self.settings.OBSERVER_CONFIGURATION["http"],
-                **item.configuration,
-            }
-            if item.url in self.__requesting:
-                return
-            self.__requesting.add(item.url)
-            items = await item.observe()
-            if not items:
-                self.__failed.add(item.url)
-                return
-            self.__requested.add(item.url)
+            await self.__observation_http(item)
+
+    async def __observation_http(self, item):
+        """Configure HTTP observation and perform observe with a callback"""
+        item.configuration = {
+            **self.settings.OBSERVER_CONFIGURATION["http"],
+            **item.configuration,
+        }
+        if item.url in self.__requesting:
+            return
+        self.__requesting.add(item.url)
+        items = await item.observe()
+        if not items:
+            self.__failed.add(item.url)
+            return
+        self.__requested.add(item.url)
         async for _item in items:
             await self.__router(_item)
 
