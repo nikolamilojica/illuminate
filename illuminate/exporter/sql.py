@@ -9,6 +9,8 @@ class SQLExporter(Exporter):
 
     def __init__(self, model):
         self.model = model
+        self.name = None
+        self.type = None
 
     def export(self, session, *args, **kwargs):
         """Load to destination"""
