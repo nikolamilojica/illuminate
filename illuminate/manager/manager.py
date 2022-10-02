@@ -17,6 +17,7 @@ from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.exporter.exporter import Exporter
+from illuminate.exporter.sql import SQLExporter
 from illuminate.interface.manager import IManager
 from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
@@ -274,7 +275,18 @@ class Manager(IManager, metaclass=Singleton):
             self.__export_queue.task_done()
 
     async def __exportation(self, item):
-        """Perform export on item"""
+        """Pass item based on its type to proper exportation function"""
+        if isinstance(item, SQLExporter):
+            await self.__exportation_sql(item)
+        try:
+            session = self.sessions[item.type][item.name]
+        except KeyError:
+            raise BasicManagerException
+        item.export(session)
+        self.__exported.add(item.model)
+
+    async def __exportation_sql(self, item):
+        """Perform SQL export on item"""
         try:
             session = self.sessions[item.type][item.name]
         except KeyError:
