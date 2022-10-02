@@ -278,12 +278,6 @@ class Manager(IManager, metaclass=Singleton):
         """Pass item based on its type to proper exportation function"""
         if isinstance(item, SQLExporter):
             await self.__exportation_sql(item)
-        try:
-            session = self.sessions[item.type][item.name]
-        except KeyError:
-            raise BasicManagerException
-        item.export(session)
-        self.__exported.add(item.model)
 
     async def __exportation_sql(self, item):
         """Perform SQL export on item"""
