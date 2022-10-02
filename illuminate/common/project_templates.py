@@ -207,7 +207,8 @@ MODELS = [
 
 NAME = "{name}"
 
-OBSERVER_CONFIGURATION = {{
+OBSERVATION_CONFIGURATION = {{
+    "delay": .1,
     "http": {{
         "auth_username": None,
         "auth_password": None,

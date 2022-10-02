@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 import json
 import os
@@ -213,10 +214,13 @@ class Manager(IManager, metaclass=Singleton):
             )
 
     async def __observe(self):
-        """Take item from observe queue and schedule observation"""
+        """Take item from observe queue and schedule observation after delay"""
         async for item in self.__observe_queue:
             if not item:
                 return
+            await asyncio.sleep(
+                self.settings.OBSERVATION_CONFIGURATION["delay"]
+            )
             await self.__observation(item)
             logger.debug(f"Coroutine observed {item}")
             del item
@@ -230,7 +234,7 @@ class Manager(IManager, metaclass=Singleton):
     async def __observation_http(self, item):
         """Configure HTTP observation and perform observe with a callback"""
         item.configuration = {
-            **self.settings.OBSERVER_CONFIGURATION["http"],
+            **self.settings.OBSERVATION_CONFIGURATION["http"],
             **item.configuration,
         }
         if item.url in self.__requesting:
