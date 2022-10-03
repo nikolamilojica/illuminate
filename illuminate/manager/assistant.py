@@ -35,7 +35,7 @@ class Assistant(IAssistant):
     def import_settings():
         """Tries to import project settings.py module and returns it"""
         try:
-            import settings
+            import settings  # type: ignore
 
             return settings
         except ImportError:
