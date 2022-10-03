@@ -1,8 +1,30 @@
 [tool.poetry]
-name = "illuminate"
-version = "0.1.0"
-description = ""
 authors = ["Nikola Milojica <nikola.milojica@protonmail.com>"]
+classifiers = [
+    "Environment :: Console",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License"
+
+]
+description = "Lightwieght ETL Framework"
+homepage = "https://github.com/nikolamilojica/illuminate"
+include = [
+    "LICENSE",
+]
+keywords = [
+    "ETL",
+    "Scraping"
+]
+license = "MIT"
+name = "illuminated"
+packages = [
+    { include = "illuminate" }
+]
+repository = "https://github.com/nikolamilojica/illuminate"
+version = "0.1.0"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -31,5 +53,5 @@ tox = "^3.25.1"
 illuminate = "illuminate.cli:cli"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
