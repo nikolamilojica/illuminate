@@ -23,8 +23,27 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - name: Info
+        id: info
+        run: |
+          echo "::set-output name=repository::$GITHUB_REPOSITORY"
+          echo "::set-output name=tag::v$(poetry version -s)"
       - name: Publish Package on PyPI
         env:
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI }}
           POETRY_HTTP_BASIC_PYPI_USERNAME: nikolamilojica
         run: poetry publish --build
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: nikolamilojica
+          password: ${{ secrets.DOCKER }}
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ steps.info.outputs.repository }}:${{ steps.info.outputs.tag }}
+            ${{ steps.info.outputs.repository }}:latest
