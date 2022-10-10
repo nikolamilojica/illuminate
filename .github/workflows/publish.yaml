@@ -46,3 +46,9 @@ jobs:
           tags: |
             ${{ steps.info.outputs.repository }}:${{ steps.info.outputs.tag }}
             ${{ steps.info.outputs.repository }}:latest
+      - name: Publish Package on GitHub
+        run: >
+          gh release create ${{ steps.info.outputs.tag }}
+           ./dist/*.whl -F changelog.md --target master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
