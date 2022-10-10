@@ -14,8 +14,8 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        poetry-version: ["1.1.15"]
+        python-version: [ "3.8", "3.9", "3.10" ]
+        poetry-version: [ "1.1.15" ]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -64,3 +64,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           poetry run coveralls --service=github
+
+  publish:
+    needs: [ coverage, test ]
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+    - name: Invoke Publish Workflow
+      run: gh workflow run publish.yaml --ref master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
