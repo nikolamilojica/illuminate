@@ -196,8 +196,8 @@ Base = declarative_base()
 
 class ModelExample(Base):
     \"\"\"
-    SQLAlchemy model used by Exporter object. For more information about
-    Exporter class check {name}/exporters/example.py.
+    SQLAlchemy model used by SQLExporter object. For more information about
+    SQLExporter class check {name}/exporters/example.py.
     \"\"\"
 
     __tablename__ = "{name}"
