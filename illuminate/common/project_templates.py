@@ -138,6 +138,14 @@ from illuminate.exporter.sql import SQLExporter
 
 
 class ExporterExample(SQLExporter):
+    \"\"\"
+    SQLExporter class will commit a model to database using session. Model is
+    passed at initialization, while database session is found by attributes
+    name and type in the pool of existing sessions. These attributes must
+    co-respond to DB section in {name}/settings.py. For more information how
+    to initialize SQLExporter class, check {name}/adapters/example.py
+    \"\"\"
+
     def __init__(self, model):
         super().__init__(model)
         self.name = "main"
