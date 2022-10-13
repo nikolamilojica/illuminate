@@ -7,6 +7,22 @@ from models.example import ModelExample
 
 
 class AdapterExample(Adapter):
+    \"\"\"
+    Adapter class is responsible for turning Finding objects into Exporter or
+    Observation objects, and yielding them when adapt method is called.
+
+    It is also designated to be a place where you should perform any additional
+    enrichment of data, calling external services with some async library. If
+    additional data can be used to construct URL, you can yield additional
+    Observations. For more information how to yield Observation object, check
+    {name}/observers/example.py.
+
+    Attribute subscribers is a collection of Finding classes that will be
+    processed by Adapter.
+
+    Note: Method adapt can not yield Findings.
+    \"\"\"
+
     subscribers = (FindingExample,)
 
     async def adapt(self, finding, *args, **kwargs):
