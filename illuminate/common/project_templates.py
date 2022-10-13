@@ -232,6 +232,14 @@ from illuminate.observer.finding import Finding
 
 @dataclass(frozen=True, order=True)
 class FindingExample(Finding):
+    \"\"\"
+    Finding is a data class, meant to hold raw data extracted by Observation's
+    callback. Finding will be passed to Adapter object's adapt method if
+    it is subscribed to Adapter.
+
+    Check {name}/adapters/example.py to learn more about subscription.
+    \"\"\"
+
     title: str = field()
     url: str = field()
 
