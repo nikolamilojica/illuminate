@@ -18,11 +18,13 @@ class AdapterExample(Adapter):
     {name}/observers/example.py.
 
     Attribute subscribers is a collection of Finding classes that will be
-    processed by Adapter.
+    processed by Adapter. If Finding is subscribed to two or more Adapters,
+    priority in adaptation will be give to Adapter with higher priority score.
 
     Note: Method adapt can not yield Findings.
     \"\"\"
 
+    priority = 10
     subscribers = (FindingExample,)
 
     async def adapt(self, finding, *args, **kwargs):
