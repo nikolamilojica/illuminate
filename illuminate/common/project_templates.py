@@ -7,6 +7,22 @@ from models.example import ModelExample
 
 
 class AdapterExample(Adapter):
+    \"\"\"
+    Adapter class is responsible for turning Finding objects into Exporter or
+    Observation objects, and yielding them when adapt method is called.
+
+    It is also designated to be a place where you should perform any additional
+    enrichment of data, calling external services with some async library. If
+    additional data can be used to construct URL, you can yield additional
+    Observations. For more information how to yield Observation object, check
+    {name}/observers/example.py.
+
+    Attribute subscribers is a collection of Finding classes that will be
+    processed by Adapter.
+
+    Note: Method adapt can not yield Findings.
+    \"\"\"
+
     subscribers = (FindingExample,)
 
     async def adapt(self, finding, *args, **kwargs):
@@ -138,6 +154,14 @@ from illuminate.exporter.sql import SQLExporter
 
 
 class ExporterExample(SQLExporter):
+    \"\"\"
+    SQLExporter class will commit a model to database using session. Model is
+    passed at initialization, while database session is found by attributes
+    name and type in the pool of existing sessions. These attributes must
+    co-respond to DB section in {name}/settings.py. For more information how
+    to initialize SQLExporter class, check {name}/adapters/example.py
+    \"\"\"
+
     def __init__(self, model):
         super().__init__(model)
         self.name = "main"
@@ -171,6 +195,11 @@ Base = declarative_base()
 
 
 class ModelExample(Base):
+    \"\"\"
+    SQLAlchemy model used by SQLExporter object. For more information about
+    SQLExporter class check {name}/exporters/example.py.
+    \"\"\"
+
     __tablename__ = "{name}"
     id = Column(Integer, primary_key=True)
     title = Column(String)
@@ -182,13 +211,39 @@ class ModelExample(Base):
 """
 
 _ILLUMINATE_SETTINGS = """
+\"\"\"
+This file represents project {name}'s settings. It will be imported by a
+framework and used to configure run. The sections are as following:
+
+* CONCURRENCY
+Number of workers per queue type. I/O heavy queues can have more workers
+assigned to them to exploit longer wait times.
+
+* DB
+Database related data used by SQLAlchemy to acquire sessions. Sessions are
+obtained at the start of the ETL process and can be accessed by instantiating
+Manager class and access sessions attribute.
+
+* MODELS
+List of SQLAlchemy models affected by illuminate cli when invoking
+'db revision' and 'db upgrade' commands.
+
+* NAME
+Project name.
+
+* OBSERVATION_CONFIGURATION
+General and Observation type specific configuration. Type specific
+configuration is used if Observation is not specifying its own.
+\"\"\"
+
 import os
 
+from illuminate import __version__
 
 CONCURRENCY = {{
     "observers": 8,
     "adapters": 2,
-    "exporters": 16,
+    "exporters": 8,
 }}
 
 DB = {{
@@ -217,7 +272,8 @@ OBSERVATION_CONFIGURATION = {{
         "headers": None,
         "method": "GET",
         "request_timeout": 10.0,
-        "user_agent": "Illuminate ETL Bot -- {name}",
+        "user_agent": f"Illuminate-bot/{{__version__}}",
+        "validate_cert": False,
     }}
 }}
 
@@ -232,6 +288,14 @@ from illuminate.observer.finding import Finding
 
 @dataclass(frozen=True, order=True)
 class FindingExample(Finding):
+    \"\"\"
+    Finding is a data class, meant to hold raw data extracted by Observation's
+    callback. Finding will be passed to Adapter object's adapt method if
+    it is subscribed to Adapter.
+
+    Check {name}/adapters/example.py to learn more about subscription.
+    \"\"\"
+
     title: str = field()
     url: str = field()
 
@@ -264,10 +328,29 @@ async def _extract_hrefs(soup, url):
 
 
 class ObserverExample(Observer):
+    \"\"\"
+    Observer is ETL configuration class. It represents entry point, and it
+    defines the flow with observe, and any additional method.
+
+    Once initialized by the framework, it will fill an observation queue with
+    objects from Observer's initial_observation collection, starting the whole
+    process.
+
+    Note: You can have multiple Observers in your project.
+    \"\"\"
+
     ALLOWED = ("https://webscraper.io/",)
     NAME = "example"
 
     def __init__(self):
+        \"\"\"
+        Collection initial_observations is de facto entry point. It must
+        contain Observation objects initialized with URL, allowed list of
+        strings and callback method. If Observation's URL starts with element
+        in allowed collection, it will be performed. Otherwise, it is
+        rejected.
+        \"\"\"
+
         super().__init__()
         self._manager = Manager()
         self.initial_observations = [
@@ -279,24 +362,40 @@ class ObserverExample(Observer):
         ]
 
     async def observe(self, response, *args, **kwargs):
-        soup = await _create_soup(response)
-        hrefs = _extract_hrefs(soup, response.effective_url)
-        async for href in hrefs:
-            yield HTTPObservation(
-                href,
-                allowed=self.ALLOWED,
-                callback=self.resume,
-            )
-        yield FindingExample(soup.title.text, response.effective_url)
+        \"\"\"
+        ETL flow is regulated by a yielded object type of Observation's
+        callback method. Each object type corresponds to ETL stage:
 
-    async def resume(self, response, *args, **kwargs):
+        * Observation -> Extract
+        * Finding -> Transform
+        * Exporter -> Load
+
+        In the example below, initial HTTPObservation returned Tornado's
+        HTTP response object that was used to extract all hrefs from HTML.
+        These hrefs will be used as URLs for new HTTPObservations, using
+        the same observe method as a callback and same allowed collection.
+        Finally, Finding object is yielded, representing a desired data.
+
+        This flow, with everything set, represents a simple web scraper that
+        will visit every page found on a domain, and take page's title and URL
+        as desired data.
+
+        Tip: If there is no need for some further data enrichment or
+        manipulation, yield Exporter object instead of Finding object.
+        For reference check {name}/adapters/example.py.
+
+        Note: Illuminate takes care of tracking what resources were already
+        requested, avoiding duplication. Resource check pool is shared between
+        Observers, avoiding overlapping.
+        \"\"\"
+
         soup = await _create_soup(response)
         hrefs = _extract_hrefs(soup, response.effective_url)
         async for href in hrefs:
             yield HTTPObservation(
                 href,
                 allowed=self.ALLOWED,
-                callback=self.resume,
+                callback=self.observe,
             )
         yield FindingExample(soup.title.text, response.effective_url)
 
