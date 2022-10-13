@@ -171,6 +171,11 @@ Base = declarative_base()
 
 
 class ModelExample(Base):
+    \"\"\"
+    SQLAlchemy model used by Exporter object. For more information about
+    Exporter class check {name}/exporters/example.py.
+    \"\"\"
+
     __tablename__ = "{name}"
     id = Column(Integer, primary_key=True)
     title = Column(String)
