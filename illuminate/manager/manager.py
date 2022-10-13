@@ -295,6 +295,8 @@ class Manager(IManager, metaclass=Singleton):
     @logger.catch
     async def _observe_start(self):
         """Main async function"""
+        self.adapters.sort(key=lambda x: x.priority, reverse=True)
+
         _observers = self.settings.CONCURRENCY["observers"]
         _adapters = self.settings.CONCURRENCY["adapters"]
         _exporters = self.settings.CONCURRENCY["exporters"]
