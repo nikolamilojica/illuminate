@@ -264,10 +264,29 @@ async def _extract_hrefs(soup, url):
 
 
 class ObserverExample(Observer):
+    \"\"\"
+    Observer is ETL configuration class. It represents entry point, and it
+    defines the flow with observe, and any additional method.
+
+    Once initialized by the framework, it will fill an observation queue with
+    objects from Observer's initial_observation collection, starting the whole
+    process.
+
+    Note: You can have multiple Observers in your project.
+    \"\"\"
+
     ALLOWED = ("https://webscraper.io/",)
     NAME = "example"
 
     def __init__(self):
+        \"\"\"
+        Collection initial_observations is de facto entry point. It must
+        contain Observation objects initialized with URL, allowed list of
+        strings and callback method. If Observation's URL starts with element
+        in allowed collection, it will be performed. Otherwise, it is
+        rejected.
+        \"\"\"
+
         super().__init__()
         self._manager = Manager()
         self.initial_observations = [
@@ -279,24 +298,40 @@ class ObserverExample(Observer):
         ]
 
     async def observe(self, response, *args, **kwargs):
-        soup = await _create_soup(response)
-        hrefs = _extract_hrefs(soup, response.effective_url)
-        async for href in hrefs:
-            yield HTTPObservation(
-                href,
-                allowed=self.ALLOWED,
-                callback=self.resume,
-            )
-        yield FindingExample(soup.title.text, response.effective_url)
+        \"\"\"
+        ETL flow is regulated by a yielded object type of Observation's
+        callback method. Each object type corresponds to ETL stage:
 
-    async def resume(self, response, *args, **kwargs):
+        * Observation -> Extract
+        * Finding -> Transform
+        * Exporter -> Load
+
+        In the example below, initial HTTPObservation returned Tornado's
+        HTTP response object that was used to extract all hrefs from HTML.
+        These hrefs will be used as URLs for new HTTPObservations, using
+        the same observe method as a callback and same allowed collection.
+        Finally, Finding object is yielded, representing a desired data.
+
+        This flow, with everything set, represents a simple web scraper that
+        will visit every page found on a domain, and take page's title and URL
+        as desired data.
+
+        Tip: If there is no need for some further data enrichment or
+        manipulation, yield Exporter object instead of Finding object.
+        For reference check {name}/adapters/example.py.
+
+        Note: Illuminate takes care of tracking what resources were already
+        requested, avoiding duplication. Resource check pool is shared between
+        Observers, avoiding overlapping.
+        \"\"\"
+
         soup = await _create_soup(response)
         hrefs = _extract_hrefs(soup, response.effective_url)
         async for href in hrefs:
             yield HTTPObservation(
                 href,
                 allowed=self.ALLOWED,
-                callback=self.resume,
+                callback=self.observe,
             )
         yield FindingExample(soup.title.text, response.effective_url)
 
