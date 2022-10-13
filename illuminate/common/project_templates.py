@@ -182,13 +182,39 @@ class ModelExample(Base):
 """
 
 _ILLUMINATE_SETTINGS = """
+\"\"\"
+This file represents project {name}'s settings. It will be imported by a
+framework and used to configure run. The sections are as following:
+
+* CONCURRENCY
+Number of workers per queue type. I/O heavy queues can have more workers
+assigned to them to exploit longer wait times.
+
+* DB
+Database related data used by SQLAlchemy to acquire sessions. Sessions are
+obtained at the start of the ETL process and can be accessed by instantiating
+Manager class and access sessions attribute.
+
+* MODELS
+List of SQLAlchemy models affected by illuminate cli when invoking
+'db revision' and 'db upgrade' commands.
+
+* NAME
+Project name.
+
+* OBSERVATION_CONFIGURATION
+General and Observation type specific configuration. Type specific
+configuration is used if Observation is not specifying its own.
+\"\"\"
+
 import os
 
+from illuminate import __version__
 
 CONCURRENCY = {{
     "observers": 8,
     "adapters": 2,
-    "exporters": 16,
+    "exporters": 8,
 }}
 
 DB = {{
@@ -217,7 +243,8 @@ OBSERVATION_CONFIGURATION = {{
         "headers": None,
         "method": "GET",
         "request_timeout": 10.0,
-        "user_agent": "Illuminate ETL Bot -- {name}",
+        "user_agent": f"Illuminate-bot/{{__version__}}",
+        "validate_cert": False,
     }}
 }}
 
