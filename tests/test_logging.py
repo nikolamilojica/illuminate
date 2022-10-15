@@ -25,7 +25,7 @@ def __get_manager(name, observers=None):
 
 
 @click.command()
-def _cli():
+def _cli_observe_start():
     """Dummy Manager command"""
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
@@ -40,14 +40,14 @@ def _cli():
 
 
 class TestLogging:
-    def test_logging(self):
+    def test_observe_start(self):
         """
         Given: Manager class is instanced properly
         When: Calling function decorated with show_info and show_logo
         Expected: Information is printed to stdout
         """
         runner = CliRunner()
-        result = runner.invoke(_cli)
+        result = runner.invoke(_cli_observe_start)
         assert __version__ in result.output
         assert "Process started" in result.output
         assert "Project files for project example loaded into context" in result.output
