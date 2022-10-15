@@ -96,6 +96,11 @@ class TestCLI(Test):
                 assert "Database main upgraded" in result.output
 
     def test_manage_db_populate_unsuccessfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate manage db populate'
+        Expected: Data base is not populated
+        """
         with self.path() as path:
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path):
@@ -103,6 +108,11 @@ class TestCLI(Test):
                 assert not result.output
 
     def test_manage_db_populate_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate manage db populate'
+        Expected: Data base is populated
+        """
         with self.path() as path:
             name = "example"
             runner = CliRunner()
