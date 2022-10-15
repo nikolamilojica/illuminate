@@ -7,12 +7,15 @@ from loguru import logger
 from illuminate import __version__
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
+from illuminate.decorators.logging import show_observer_catalogue
 from illuminate.manager.manager import Manager
+from tests.shared.mock import Observer
 from tests.shared.mock import Settings
 
 
 def __get_manager(name, observers=None):
     """Manager setup function"""
+    Manager._instances = {}
     manager = Manager(name=name)
     manager.adapters = []
     manager.observers = observers or []
@@ -22,6 +25,20 @@ def __get_manager(name, observers=None):
     manager.__requested = []
     manager.__requesting = []
     return manager
+
+
+@click.command()
+def _cli_observe_catalogue():
+    """Dummy Manager command"""
+    logger.remove()
+    logger.add(sys.stdout, level="INFO")
+
+    @show_observer_catalogue
+    def f(_context):
+        """Dummy Assistant function"""
+        return _context
+
+    f({"observers": [Observer]})
 
 
 @click.command()
@@ -40,6 +57,17 @@ def _cli_observe_start():
 
 
 class TestLogging:
+    def test_observe_catalogue(self):
+        """
+        Given: Manager class is instanced properly
+        When: Calling function decorated with show_observer_catalogue
+        Expected: Information is printed to stdout
+        """
+        runner = CliRunner()
+        result = runner.invoke(_cli_observe_catalogue)
+        assert "<class 'tests.shared.mock.Observer'>" in result.output
+        assert "[('https://webscraper.io/', 'observe')]" in result.output
+
     def test_observe_start(self):
         """
         Given: Manager class is instanced properly
