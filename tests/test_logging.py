@@ -8,6 +8,7 @@ from illuminate import __version__
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.manager.manager import Manager
+from tests.shared.mock import Settings
 
 
 @click.command()
@@ -15,16 +16,6 @@ def _cli():
     """Dummy Manager command"""
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
-
-    class Settings:
-        """Dummy Manager settings"""
-
-        def __init__(self, name):
-            self.CONCURRENCY = {}
-            self.DB = {}
-            self.MODELS = []
-            self.NAME = name
-            self.OBSERVATION_CONFIGURATION = {}
 
     @show_logo
     @show_info
