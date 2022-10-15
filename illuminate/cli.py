@@ -6,6 +6,7 @@ from loguru import logger
 
 from illuminate import __version__
 from illuminate.common.project_logging import LOGGING_LEVELS
+from illuminate.decorators.logging import show_observer_catalogue
 from illuminate.manager.manager import Assistant
 from illuminate.manager.manager import Manager
 
@@ -99,6 +100,14 @@ def setup(ctx, name, path, *args, **kwargs):
     """Creates project structure with example files"""
     kwargs["context"] = ctx
     Manager.project_setup(name, path, *args, **kwargs)
+
+
+@observe.command("catalogue")
+@click.pass_context
+@show_observer_catalogue
+def catalogue(ctx, *args, **kwargs):
+    """List observers found in project files"""
+    return Assistant.provide_context()
 
 
 @observe.command("start")
