@@ -48,7 +48,8 @@ class Test:
     @contextmanager
     def path(self):
         """
-        Put temporary directory path to PYTHONPATH, set it as cwd and clean imports
+        Put temporary directory path to PYTHONPATH, set it as cwd and clean
+        imports once the test is finished
         :yields: _GeneratorContextManager, TemporaryDirectory
         """
 
