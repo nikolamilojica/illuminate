@@ -42,8 +42,8 @@ class Assistant(IAssistant):
             raise BasicManagerException
 
     @staticmethod
-    def provide_context():
-        """Provides context for the current runtime"""
+    def provide_context(_filter=None):
+        """Provides context for the current run"""
         settings = Assistant.import_settings()
         context = {
             "adapters": [],
@@ -74,5 +74,13 @@ class Assistant(IAssistant):
                     basic_import = len(name) == len(folder[:-1])
                     if proper_class and not basic_import:
                         context[folder].append(cls)
+
+        if _filter:
+            context["observers"] = list(
+                filter(
+                    lambda x: x.NAME in _filter or x.__name__ in _filter,
+                    context["observers"],
+                )
+            )
 
         return context
