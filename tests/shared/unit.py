@@ -48,7 +48,8 @@ class Test:
     @contextmanager
     def path(self):
         """
-        Put temporary directory path to PYTHONPATH, set it as cwd and clean imports
+        Put temporary directory path to PYTHONPATH, set it as cwd and clean
+        imports once the test is finished
         :yields: _GeneratorContextManager, TemporaryDirectory
         """
 
@@ -86,5 +87,9 @@ class Test:
         Create database URL
         :return: str or None
         """
-        _url = f"{self.protocol}/{self.folder}/{self.db}.db" if self.folder else None
+        _url = (
+            f"{self.protocol}/{self.folder}/{self.db}.db"
+            if self.folder
+            else None
+        )
         return _url

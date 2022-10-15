@@ -9,14 +9,12 @@ repos:
     rev: 21.12b0
     hooks:
     -   id: black
-        exclude: ^tests/
         args: [--line-length=79]
         additional_dependencies: [click==8.0.4]
 -   repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
-        exclude: ^tests/
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
     hooks:

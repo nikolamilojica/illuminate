@@ -18,7 +18,9 @@ class TestCLI(Test):
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 Manager.project_setup(name, tmp)
-                result = runner.invoke(cli, ["manage", "project", "setup", name, tmp])
+                result = runner.invoke(
+                    cli, ["manage", "project", "setup", name, tmp]
+                )
                 assert not result.output
 
     def test_manage_project_setup_successfully(self):
@@ -31,7 +33,9 @@ class TestCLI(Test):
             name = "example"
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path):
-                result = runner.invoke(cli, ["manage", "project", "setup", name, "."])
+                result = runner.invoke(
+                    cli, ["manage", "project", "setup", name, "."]
+                )
                 assert "Project structure created" in result.output
 
     def test_manage_db_revision_unsuccessfully(self):
@@ -57,7 +61,9 @@ class TestCLI(Test):
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                result = runner.invoke(cli, ["manage", "db", "revision", self.url, tmp])
+                result = runner.invoke(
+                    cli, ["manage", "db", "revision", self.url, tmp]
+                )
                 assert "Revision created" in result.output
 
     def test_manage_db_upgrade_unsuccessfully(self):
@@ -84,10 +90,17 @@ class TestCLI(Test):
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
                 runner.invoke(cli, ["manage", "db", "revision", self.url, tmp])
-                result = runner.invoke(cli, ["manage", "db", "upgrade", self.url, tmp])
+                result = runner.invoke(
+                    cli, ["manage", "db", "upgrade", self.url, tmp]
+                )
                 assert "Database main upgraded" in result.output
 
     def test_manage_db_populate_unsuccessfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate manage db populate'
+        Expected: Data base is not populated
+        """
         with self.path() as path:
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path):
@@ -95,6 +108,11 @@ class TestCLI(Test):
                 assert not result.output
 
     def test_manage_db_populate_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate manage db populate'
+        Expected: Data base is populated
+        """
         with self.path() as path:
             name = "example"
             runner = CliRunner()
@@ -102,7 +120,9 @@ class TestCLI(Test):
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
                 runner.invoke(cli, ["manage", "db", "revision", self.url, tmp])
                 runner.invoke(cli, ["manage", "db", "upgrade", self.url, tmp])
-                result = runner.invoke(cli, ["manage", "db", "populate", self.url])
+                result = runner.invoke(
+                    cli, ["manage", "db", "populate", self.url]
+                )
                 assert "Database main populated" in result.output
 
     def test_observe_catalogue_unsuccessfully(self):
@@ -129,8 +149,13 @@ class TestCLI(Test):
             with runner.isolated_filesystem(temp_dir=path):
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
                 result = runner.invoke(cli, ["observe", "catalogue"])
-                assert "<class 'observers.example.py.ObserverExample'>" in result.output
-                assert "[('https://webscraper.io/', 'observe')]" in result.output
+                assert (
+                    "<class 'observers.example.py.ObserverExample'>"
+                    in result.output
+                )
+                assert (
+                    "[('https://webscraper.io/', 'observe')]" in result.output
+                )
 
     def test_version(self):
         """

@@ -24,7 +24,9 @@ class TestSQLExporterClass:
         """
         future = asyncio.Future()
         request = HTTPRequest(TestSQLExporterClass.url)
-        response = HTTPResponse(request, 200, None, io.BytesIO(b'{"data": true}'))
+        response = HTTPResponse(
+            request, 200, None, io.BytesIO(b'{"data": true}')
+        )
         future.set_result(response)
         mocker.patch(TestSQLExporterClass.function, return_value=future)
 
@@ -34,8 +36,10 @@ class TestSQLExporterClass:
         """
         Patch fetch function to raise HTTPClientError
         """
+
         def _side_effect(*args, **kwargs):
             raise HTTPClientError(509, "Timeout", None)
+
         future = asyncio.Future()
         future.set_result(_side_effect)
         mocker.patch(TestSQLExporterClass.function, side_effect=_side_effect)
@@ -59,19 +63,25 @@ class TestSQLExporterClass:
         When: Accessing allowed property
         Expected: Returns True
         """
-        observation = HTTPObservation(self.url, allowed=(self.url,), callback=int)
+        observation = HTTPObservation(
+            self.url, allowed=(self.url,), callback=int
+        )
         assert observation.allowed
 
     @pytest.mark.asyncio
     @pytest.mark.xfail(raises=BasicObservationException)
-    async def test_observe_callback_unsuccessfully(self, async_http_response_ok):
+    async def test_observe_callback_unsuccessfully(
+        self, async_http_response_ok
+    ):
         """
         Given: Observation is initialized with faulty callback function
         When: Instance calls observe function
         Expected: BasicObservationException is raised
         """
         with pytest.raises(BasicObservationException):
-            observation = HTTPObservation(self.url, allowed=(self.url,), callback=int)
+            observation = HTTPObservation(
+                self.url, allowed=(self.url,), callback=int
+            )
             await observation.observe()
 
     @pytest.mark.asyncio
@@ -81,23 +91,31 @@ class TestSQLExporterClass:
         When: Instance calls observe function
         Expected: Callback returns object without exception raised
         """
+
         def callback(response):
             return json.loads(response.body)
 
-        observation = HTTPObservation(self.url, allowed=(self.url,), callback=callback)
+        observation = HTTPObservation(
+            self.url, allowed=(self.url,), callback=callback
+        )
         result = await observation.observe()
         assert result["data"]
 
     @pytest.mark.asyncio
-    async def test_observe_fetch_unsuccessfully(self, async_http_response_not_ok):
+    async def test_observe_fetch_unsuccessfully(
+        self, async_http_response_not_ok
+    ):
         """
         Given: Observation is initialized with proper callback function
         When: Instance calls observe function but HTTPClientError is raised
         Expected: Function observe returns None
         """
+
         def callback(response):
             return json.loads(response.body)
-        observation = HTTPObservation(self.url, allowed=(self.url,),
-                                      callback=callback)
+
+        observation = HTTPObservation(
+            self.url, allowed=(self.url,), callback=callback
+        )
         result = await observation.observe()
         assert not result
