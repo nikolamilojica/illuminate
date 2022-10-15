@@ -111,11 +111,12 @@ def catalogue(ctx, *args, **kwargs):
 
 
 @observe.command("start")
+@click.option("--observer", multiple=True)
 @click.pass_context
-def start(ctx, *args, **kwargs):
+def start(ctx, observer, *args, **kwargs):
     """Start producer/consumer ETL process based on project files"""
     kwargs["context"] = ctx
-    context = Assistant.provide_context()
+    context = Assistant.provide_context(observer)
     manager = Manager(**context)
     manager.observe_start()
 
