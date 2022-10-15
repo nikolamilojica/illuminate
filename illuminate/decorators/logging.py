@@ -69,3 +69,23 @@ def show_logo(func):
         func(*args, **kwargs)
 
     return wrapper
+
+
+def show_observer_catalogue(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        context = func(*args, **kwargs)
+        if not context["observers"]:
+            logger.info("No observers found")
+        outputs = []
+        for observer in context["observers"]:
+            _observer = observer()
+            _io = _observer.initial_observations
+            outputs.append(
+                f"<yellow>{_observer.__class__}</yellow> -> "
+                f"<cyan>{[(i.url, i._callback.__name__)for i in _io]}</cyan>"
+            )
+        for output in outputs:
+            logger.opt(colors=True).info(output)
+
+    return wrapper

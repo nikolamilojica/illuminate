@@ -7,24 +7,45 @@ from loguru import logger
 from illuminate import __version__
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
+from illuminate.decorators.logging import show_observer_catalogue
 from illuminate.manager.manager import Manager
+from tests.shared.mock import Observer
+from tests.shared.mock import Settings
+
+
+def __get_manager(name, observers=None):
+    """Manager setup function"""
+    Manager._instances = {}
+    manager = Manager(name=name)
+    manager.adapters = []
+    manager.observers = observers or []
+    manager.settings = Settings(name)
+    manager.__exported = []
+    manager.__failed = []
+    manager.__requested = []
+    manager.__requesting = []
+    return manager
 
 
 @click.command()
-def _cli():
+def _cli_observe_catalogue():
+    """Dummy Manager command"""
+    logger.remove()
+    logger.add(sys.stdout, level="INFO")
+
+    @show_observer_catalogue
+    def f(_context):
+        """Dummy Assistant function"""
+        return _context
+
+    f({"observers": [Observer]})
+
+
+@click.command()
+def _cli_observe_start():
     """Dummy Manager command"""
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
-
-    class Settings:
-        """Dummy Manager settings"""
-
-        def __init__(self, name):
-            self.CONCURRENCY = {}
-            self.DB = {}
-            self.MODELS = []
-            self.NAME = name
-            self.OBSERVATION_CONFIGURATION = {}
 
     @show_logo
     @show_info
@@ -32,26 +53,29 @@ def _cli():
         """Dummy Manager function"""
         return _manager
 
-    manager = Manager(name="example")
-    manager.adapters = []
-    manager.observers = []
-    manager.settings = Settings("example")
-    manager.__exported = []
-    manager.__failed = []
-    manager.__requested = []
-    manager.__requesting = []
-    f(manager)
+    f(__get_manager("example"))
 
 
 class TestLogging:
-    def test_logging(self):
+    def test_observe_catalogue(self):
+        """
+        Given: Manager class is instanced properly
+        When: Calling function decorated with show_observer_catalogue
+        Expected: Information is printed to stdout
+        """
+        runner = CliRunner()
+        result = runner.invoke(_cli_observe_catalogue)
+        assert "<class 'tests.shared.mock.Observer'>" in result.output
+        assert "[('https://webscraper.io/', 'observe')]" in result.output
+
+    def test_observe_start(self):
         """
         Given: Manager class is instanced properly
         When: Calling function decorated with show_info and show_logo
         Expected: Information is printed to stdout
         """
         runner = CliRunner()
-        result = runner.invoke(_cli)
+        result = runner.invoke(_cli_observe_start)
         assert __version__ in result.output
         assert "Process started" in result.output
         assert "Project files for project example loaded into context" in result.output
