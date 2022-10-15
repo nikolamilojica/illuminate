@@ -112,7 +112,9 @@ class TestManagerDBCommandGroup(Test):
             assert len(query) == 2
             assert query[0].url == "https://webscraper.io/"
             assert query[1].url == "https://webscraper.io/tutorials"
-            assert query[0].title == "Web Scraper - The #1 web scraping extension"
+            assert (
+                query[0].title == "Web Scraper - The #1 web scraping extension"
+            )
             assert query[1].title == "Web Scraper Tutorials"
 
 
@@ -184,7 +186,9 @@ class TestManagerObserveCommandGroup(Test):
         request = HTTPRequest("https://example.com")
         response = HTTPResponse(request, 200, None, io.BytesIO(body))
         future.set_result(response)
-        mocker.patch(TestManagerObserveCommandGroup.function, return_value=future)
+        mocker.patch(
+            TestManagerObserveCommandGroup.function, return_value=future
+        )
 
     def test_observe_start_successfully(self, async_http_responses_ok):
         """

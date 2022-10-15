@@ -78,7 +78,10 @@ class TestLogging:
         result = runner.invoke(_cli_observe_start)
         assert __version__ in result.output
         assert "Process started" in result.output
-        assert "Project files for project example loaded into context" in result.output
+        assert (
+            "Project files for project example loaded into context"
+            in result.output
+        )
         assert "Adapters discovered" in result.output
         assert "Models discovered" in result.output
         assert "Observers discovered" in result.output

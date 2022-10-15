@@ -86,5 +86,9 @@ class Test:
         Create database URL
         :return: str or None
         """
-        _url = f"{self.protocol}/{self.folder}/{self.db}.db" if self.folder else None
+        _url = (
+            f"{self.protocol}/{self.folder}/{self.db}.db"
+            if self.folder
+            else None
+        )
         return _url
