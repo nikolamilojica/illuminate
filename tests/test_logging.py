@@ -11,6 +11,19 @@ from illuminate.manager.manager import Manager
 from tests.shared.mock import Settings
 
 
+def __get_manager(name, observers=None):
+    """Manager setup function"""
+    manager = Manager(name=name)
+    manager.adapters = []
+    manager.observers = observers or []
+    manager.settings = Settings(name)
+    manager.__exported = []
+    manager.__failed = []
+    manager.__requested = []
+    manager.__requesting = []
+    return manager
+
+
 @click.command()
 def _cli():
     """Dummy Manager command"""
@@ -23,15 +36,7 @@ def _cli():
         """Dummy Manager function"""
         return _manager
 
-    manager = Manager(name="example")
-    manager.adapters = []
-    manager.observers = []
-    manager.settings = Settings("example")
-    manager.__exported = []
-    manager.__failed = []
-    manager.__requested = []
-    manager.__requesting = []
-    f(manager)
+    f(__get_manager("example"))
 
 
 class TestLogging:
