@@ -105,6 +105,33 @@ class TestCLI(Test):
                 result = runner.invoke(cli, ["manage", "db", "populate", self.url])
                 assert "Database main populated" in result.output
 
+    def test_observe_catalogue_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Running 'illuminate observe catalogue'
+        Expected: Observer list is not presented
+        """
+        with self.path() as path:
+            runner = CliRunner()
+            with runner.isolated_filesystem(temp_dir=path):
+                result = runner.invoke(cli, ["observe", "catalogue"])
+                assert not result.output
+
+    def test_observe_catalogue_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate observe catalogue'
+        Expected: Observer list is presented
+        """
+        with self.path() as path:
+            name = "example"
+            runner = CliRunner()
+            with runner.isolated_filesystem(temp_dir=path):
+                runner.invoke(cli, ["manage", "project", "setup", name, "."])
+                result = runner.invoke(cli, ["observe", "catalogue"])
+                assert "<class 'observers.example.py.ObserverExample'>" in result.output
+                assert "[('https://webscraper.io/', 'observe')]" in result.output
+
     def test_version(self):
         """
         Given: None
