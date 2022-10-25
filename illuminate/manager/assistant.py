@@ -25,10 +25,16 @@ class Assistant(IAssistant):
         return config
 
     @staticmethod
-    def create_db_url(selector, settings):
+    def create_db_url(selector, settings, _async=False):
         """Creates db url from data in settings.py module"""
         db = settings.DB[selector]
         db["db"] = settings.NAME
+        if _async:
+            async_drivers = {"postgresql": "asyncpg"}
+            driver = async_drivers[db["type"]]
+            return "{type}+{driver}://{user}:{pass}@{host}/{db}".format(
+                driver=driver, **db
+            )
         return "{type}://{user}:{pass}@{host}/{db}".format(**db)
 
     @staticmethod
