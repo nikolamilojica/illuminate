@@ -34,6 +34,22 @@ class TestAssistantClass(Test):
             url = Assistant.create_db_url("main", settings)
             assert url == "postgresql://illuminate:password@localhost/example"
 
+    def test_create_async_db_url_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant.create_db_url with _async=True option
+        Expected: Returns async database URL
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            settings = Assistant.import_settings()
+            url = Assistant.create_db_url("main", settings, _async=True)
+            assert (
+                url
+                == "postgresql+asyncpg://illuminate:password@localhost/example"
+            )
+
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_import_settings_unsuccessfully(self):
         """
