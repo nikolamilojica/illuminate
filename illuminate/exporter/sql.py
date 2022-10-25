@@ -12,16 +12,18 @@ class SQLExporter(Exporter):
         self.name = None
         self.type = None
 
-    def export(self, session, *args, **kwargs):
+    async def export(self, session, *args, **kwargs):
         """Load to destination"""
-        session.add(self.model)
-        try:
-            session.commit()
-        except Exception as exception:
-            logger.critical(
-                f'{self}.export(session="{session}") -> {exception}'
-            )
-            raise BasicExporterException
+        async with session() as session:
+            async with session.begin():
+                session.add(self.model)
+                try:
+                    await session.commit()
+                except Exception as exception:
+                    logger.critical(
+                        f'{self}.export(session="{session}") -> {exception}'
+                    )
+                    raise BasicExporterException
         logger.success(f'{self}.export(session="{session}")')
 
     def __repr__(self):
