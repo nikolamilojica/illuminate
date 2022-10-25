@@ -205,7 +205,7 @@ class TestManagerObserveCommandGroup(Test):
             Manager.db_upgrade(path, "head", "main", self.url)
             context = Assistant.provide_context()
             manager = Manager(**context)
-            manager.sessions["postgresql"]["main"] = self.session
+            manager.sessions["postgresql"]["main"] = self.session_async
             manager.observe_start()
 
             query = self.session.query(ModelExample).all()
