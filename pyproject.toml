@@ -37,6 +37,7 @@ SQLAlchemy = {extras = ["asyncio"], version = "^1.4.42"}
 tornado = "^6.1"
 
 [tool.poetry.dev-dependencies]
+aiosqlite = "^0.17.0"
 bandit = "^1.7.4"
 black = "^22.3.0"
 beautifulsoup4 = "^4.11.1"

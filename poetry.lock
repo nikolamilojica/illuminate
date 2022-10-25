@@ -1,4 +1,15 @@
 [[package]]
+name = "aiosqlite"
+version = "0.17.0"
+description = "asyncio bridge to the standard sqlite3 module"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+typing_extensions = ">=3.7.2"
+
+[[package]]
 name = "alembic"
 version = "1.8.1"
 description = "A database migration tool for SQLAlchemy."
@@ -691,9 +702,10 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "d8e6522c6a90a14678501b4371bfb78e4337f147b9cb970961147ef211b0794e"
+content-hash = "7b58781c27dcacb91912bffb3937d0c48c73adf832efffd47f28b7afae9f80de"
 
 [metadata.files]
+aiosqlite = []
 alembic = []
 asyncpg = []
 attrs = []
