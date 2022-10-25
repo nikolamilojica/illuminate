@@ -5,6 +5,8 @@ from contextlib import contextmanager
 
 from loguru import logger
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 
@@ -16,7 +18,6 @@ class Test:
 
     db = "test"
     folder = None
-    protocol = "sqlite://"
 
     @staticmethod
     def assert_project_structure(name, files, path, cwd=False):
@@ -42,8 +43,15 @@ class Test:
         Creates database engine
         :return: sqlalchemy.engine.Engine or None
         """
-        _engine = create_engine(self.url) if self.url else None
-        return _engine
+        return create_engine(self.url) if self.url else None
+
+    @property
+    def engine_async(self):
+        """
+        Creates async database engine
+        :return: sqlalchemy.ext.asyncio.engine.AsyncEngine or None
+        """
+        return create_async_engine(self.url_async) if self.url_async else None
 
     @contextmanager
     def path(self):
@@ -78,8 +86,23 @@ class Test:
         Create database session
         :return: sqlalchemy.orm.Session or None
         """
-        _session = sessionmaker(self.engine)()
-        return _session if self.engine else None
+        return sessionmaker(self.engine)() if self.url else None
+
+    @property
+    def session_async(self):
+        """
+        Create async database session
+        :return: sqlalchemy.ext.asyncio.session.AsyncSession or None
+        """
+        return (
+            sessionmaker(
+                self.engine_async,
+                class_=AsyncSession,
+                expire_on_commit=False,
+            )
+            if self.url_async
+            else None
+        )
 
     @property
     def url(self):
@@ -87,8 +110,17 @@ class Test:
         Create database URL
         :return: str or None
         """
+        _url = f"sqlite:///{self.folder}/{self.db}.db" if self.folder else None
+        return _url
+
+    @property
+    def url_async(self):
+        """
+        Create async database URL
+        :return: str or None
+        """
         _url = (
-            f"{self.protocol}/{self.folder}/{self.db}.db"
+            f"sqlite+aiosqlite:///{self.folder}/{self.db}.db"
             if self.folder
             else None
         )

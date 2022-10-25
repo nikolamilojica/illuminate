@@ -9,8 +9,9 @@ from tests.shared.unit import Test
 
 
 class TestExporterSQL(Test):
+    @pytest.mark.asyncio
     @pytest.mark.xfail(raises=BasicExporterException)
-    def test_export_unsuccessfully(self):
+    async def test_export_unsuccessfully(self):
         """
         Given: Current directory is a project directory
         When: Exporting model and process fails
@@ -29,9 +30,10 @@ class TestExporterSQL(Test):
                 model = ModelExample(title=title, url=url)
                 exporter = SQLExporter(model=model)
                 os.remove(os.path.join(path, f"{self.db}.db"))
-                exporter.export(self.session)
+                await exporter.export(self.session_async)
 
-    def test_export_successfully(self):
+    @pytest.mark.asyncio
+    async def test_export_successfully(self):
         """
         Given: Current directory is a project directory
         When: Exporting/committing a model
@@ -48,7 +50,7 @@ class TestExporterSQL(Test):
             url = "https//:example.com"
             model = ModelExample(title=title, url=url)
             exporter = SQLExporter(model=model)
-            exporter.export(self.session)
+            await exporter.export(self.session_async)
             query = self.session.query(ModelExample).all()
             assert query[0].title == title
             assert query[0].url == url
