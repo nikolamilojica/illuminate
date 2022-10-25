@@ -10,6 +10,8 @@ from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from loguru import logger
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
@@ -170,9 +172,13 @@ class Manager(IManager, metaclass=Singleton):
         )
         for db in settings.DB:
             if settings.DB[db]["type"] in ("mysql", "postgresql"):
-                url = Assistant.create_db_url(db, settings)
-                engine = create_engine(url)
-                session = sessionmaker(bind=engine)()
+                url = Assistant.create_db_url(db, settings, _async=True)
+                engine = create_async_engine(url)
+                session = sessionmaker(
+                    engine,
+                    class_=AsyncSession,
+                    expire_on_commit=False,
+                )
                 host = settings.DB[db]["host"]
                 port = settings.DB[db]["port"]
                 logger.opt(colors=True).info(
@@ -289,7 +295,7 @@ class Manager(IManager, metaclass=Singleton):
             session = self.sessions[item.type][item.name]
         except KeyError:
             raise BasicManagerException
-        item.export(session)
+        await item.export(session)
         self.__exported.add(item.model)
 
     @logger.catch
