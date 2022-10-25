@@ -529,7 +529,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "sqlalchemy"
-version = "1.4.41"
+version = "1.4.42"
 description = "Database Abstraction Library"
 category = "main"
 optional = false
@@ -678,7 +678,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "f246503451a6fdd6af86cb80de30ee7c83ae512c14600667005489b4b9b05b69"
+content-hash = "16eea7c82123fc030f41d3a28fe258ce01f43734c6111e755b873c5455391f60"
 
 [metadata.files]
 alembic = []
