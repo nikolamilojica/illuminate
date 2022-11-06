@@ -91,4 +91,9 @@ class Assistant(IAssistant):
                 )
             )
 
+        if not context["observers"]:
+            raise BasicManagerException(
+                "No observers found or left after filtering"
+            )
+
         return context
