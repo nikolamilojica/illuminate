@@ -70,7 +70,7 @@ def db_populate(ctx, selector, url, *args, **kwargs):
 
 @db.command("revision")
 @click.option("--selector", default="main", required=False)
-@click.option("--revision", default="head", required=True)
+@click.option("--revision", default="head", required=False)
 @click.argument("url", default=None, required=False)
 @click.argument("path", default=os.getcwd(), required=False)
 @click.pass_context
@@ -82,7 +82,7 @@ def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
 
 @db.command("upgrade")
 @click.option("--selector", default="main", required=False)
-@click.option("--revision", default="head", required=True)
+@click.option("--revision", default="head", required=False)
 @click.argument("url", default=None, required=False)
 @click.argument("path", default=os.getcwd(), required=False)
 @click.pass_context
