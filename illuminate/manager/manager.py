@@ -293,10 +293,13 @@ class Manager(IManager, metaclass=Singleton):
         """Perform SQL export on item"""
         try:
             session = self.sessions[item.type][item.name]
+            await item.export(session)
+            self.__exported.add(item.model)
         except KeyError:
-            raise BasicManagerException
-        await item.export(session)
-        self.__exported.add(item.model)
+            logger.critical(
+                f"Database {item.name} of a type {item.type} "
+                f"is not found in context"
+            )
 
     @logger.catch
     async def _observe_start(self):

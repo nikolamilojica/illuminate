@@ -7,4 +7,6 @@ class Exporter(IExporter):
 
     async def export(self, *args, **kwargs):
         """Load to destination"""
-        raise BasicExporterException
+        raise BasicExporterException(
+            "Method export must be implemented in child class"
+        )

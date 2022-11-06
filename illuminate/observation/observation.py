@@ -7,4 +7,6 @@ class Observation(IObservation):
 
     async def observe(self, *args, **kwargs):
         """Read source and use observer's callback function against response"""
-        raise BasicObservationException
+        raise BasicObservationException(
+            "Method observe must be implemented in child class"
+        )

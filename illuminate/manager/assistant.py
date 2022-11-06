@@ -45,7 +45,9 @@ class Assistant(IAssistant):
 
             return settings
         except ImportError:
-            raise BasicManagerException
+            raise BasicManagerException(
+                "Framework did not found settings.py in the current directory"
+            )
 
     @staticmethod
     def provide_context(_filter=None):
@@ -87,6 +89,11 @@ class Assistant(IAssistant):
                     lambda x: x.NAME in _filter or x.__name__ in _filter,
                     context["observers"],
                 )
+            )
+
+        if not context["observers"]:
+            raise BasicManagerException(
+                "No observers found or left after filtering"
             )
 
         return context

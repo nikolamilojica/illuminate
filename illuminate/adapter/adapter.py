@@ -10,4 +10,6 @@ class Adapter(IAdapter):
 
     async def adapt(self, finding, *args, **kwargs):
         """Transform finding and produce exporters"""
-        raise BasicAdapterException
+        raise BasicAdapterException(
+            "Method adapt must be implemented in child class"
+        )
