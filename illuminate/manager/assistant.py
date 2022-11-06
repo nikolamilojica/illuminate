@@ -45,7 +45,9 @@ class Assistant(IAssistant):
 
             return settings
         except ImportError:
-            raise BasicManagerException
+            raise BasicManagerException(
+                "Framework did not found settings.py in the current directory"
+            )
 
     @staticmethod
     def provide_context(_filter=None):
