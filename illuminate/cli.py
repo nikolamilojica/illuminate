@@ -16,6 +16,7 @@ from illuminate.manager.manager import Manager
 @click.option(
     "--verbosity",
     default=LOGGING_LEVELS[2],
+    help="Configure logging levels.",
     required=False,
     type=click.Choice(LOGGING_LEVELS),
     show_default=True,
@@ -58,9 +59,19 @@ def project(ctx):
 
 @db.command("populate")
 @click.option(
-    "--fixtures", multiple=True, required=False, type=click.Path(exists=True)
+    "--fixtures",
+    help="Fixture files paths.",
+    multiple=True,
+    required=False,
+    type=click.Path(exists=True),
 )
-@click.option("--selector", default="main", required=False, show_default=True)
+@click.option(
+    "--selector",
+    default="main",
+    help="Database connection selector.",
+    required=False,
+    show_default=True,
+)
 @click.argument("url", default=None, required=False, type=str)
 @click.pass_context
 def db_populate(ctx, selector, url, *args, **kwargs):
@@ -70,8 +81,20 @@ def db_populate(ctx, selector, url, *args, **kwargs):
 
 
 @db.command("revision")
-@click.option("--revision", default="head", required=False, show_default=True)
-@click.option("--selector", default="main", required=False, show_default=True)
+@click.option(
+    "--revision",
+    default="head",
+    help="Alembic revision selector.",
+    required=False,
+    show_default=True,
+)
+@click.option(
+    "--selector",
+    default="main",
+    help="Database connection selector.",
+    required=False,
+    show_default=True,
+)
 @click.argument(
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
 )
@@ -84,8 +107,20 @@ def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
 
 
 @db.command("upgrade")
-@click.option("--revision", default="head", required=False, show_default=True)
-@click.option("--selector", default="main", required=False, show_default=True)
+@click.option(
+    "--revision",
+    default="head",
+    help="Alembic revision selector.",
+    required=False,
+    show_default=True,
+)
+@click.option(
+    "--selector",
+    default="main",
+    help="Database connection selector.",
+    required=False,
+    show_default=True,
+)
 @click.argument(
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
 )
@@ -118,7 +153,11 @@ def catalogue(ctx, *args, **kwargs):
 
 
 @observe.command("start")
-@click.option("--observer", multiple=True)
+@click.option(
+    "--observer",
+    help="Observer selector. Leave empty to include all observers.",
+    multiple=True,
+)
 @click.pass_context
 def start(ctx, observer, *args, **kwargs):
     """Start producer/consumer ETL process based on project files"""
