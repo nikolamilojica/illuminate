@@ -56,10 +56,10 @@ def project(ctx):
 
 
 @db.command("populate")
-@click.option("--selector", default="main", required=False)
 @click.option(
     "--fixtures", multiple=True, required=False, type=click.Path(exists=True)
 )
+@click.option("--selector", default="main", required=False)
 @click.argument("url", default=None, required=False, type=str)
 @click.pass_context
 def db_populate(ctx, selector, url, *args, **kwargs):
@@ -69,12 +69,12 @@ def db_populate(ctx, selector, url, *args, **kwargs):
 
 
 @db.command("revision")
-@click.option("--selector", default="main", required=False)
 @click.option("--revision", default="head", required=False)
-@click.argument("url", default=None, required=False, type=str)
+@click.option("--selector", default="main", required=False)
 @click.argument(
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
 )
+@click.argument("url", default=None, required=False, type=str)
 @click.pass_context
 def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
     """Creates revision files"""
@@ -83,12 +83,12 @@ def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
 
 
 @db.command("upgrade")
-@click.option("--selector", default="main", required=False)
 @click.option("--revision", default="head", required=False)
-@click.argument("url", default=None, required=False, type=str)
+@click.option("--selector", default="main", required=False)
 @click.argument(
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
 )
+@click.argument("url", default=None, required=False, type=str)
 @click.pass_context
 def db_upgrade(ctx, path, revision, selector, url, *args, **kwargs):
     """Performs migration based on revision files"""
