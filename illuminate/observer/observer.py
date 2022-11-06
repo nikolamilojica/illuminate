@@ -10,4 +10,6 @@ class Observer(IObserver):
 
     async def observe(self, response, *args, **kwargs):
         """Extract observations and/or findings from response"""
-        raise BasicObserverException
+        raise BasicObserverException(
+            "Method observe must be implemented in child class"
+        )
