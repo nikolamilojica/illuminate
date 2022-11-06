@@ -62,7 +62,7 @@ class TestCLI(Test):
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
                 result = runner.invoke(
-                    cli, ["manage", "db", "revision", self.url, tmp]
+                    cli, ["manage", "db", "revision", tmp, self.url]
                 )
                 assert "Revision created" in result.output
 
@@ -89,9 +89,9 @@ class TestCLI(Test):
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                runner.invoke(cli, ["manage", "db", "revision", self.url, tmp])
+                runner.invoke(cli, ["manage", "db", "revision", tmp, self.url])
                 result = runner.invoke(
-                    cli, ["manage", "db", "upgrade", self.url, tmp]
+                    cli, ["manage", "db", "upgrade", tmp, self.url]
                 )
                 assert "Database main upgraded" in result.output
 
@@ -118,8 +118,8 @@ class TestCLI(Test):
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                runner.invoke(cli, ["manage", "db", "revision", self.url, tmp])
-                runner.invoke(cli, ["manage", "db", "upgrade", self.url, tmp])
+                runner.invoke(cli, ["manage", "db", "revision", tmp, self.url])
+                runner.invoke(cli, ["manage", "db", "upgrade", tmp, self.url])
                 result = runner.invoke(
                     cli, ["manage", "db", "populate", self.url]
                 )

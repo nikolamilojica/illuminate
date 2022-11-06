@@ -16,8 +16,10 @@ from illuminate.manager.manager import Manager
 @click.option(
     "--verbosity",
     default=LOGGING_LEVELS[2],
+    help="Configure logging levels.",
     required=False,
     type=click.Choice(LOGGING_LEVELS),
+    show_default=True,
 )
 @click.pass_context
 def cli(ctx, verbosity):
@@ -56,11 +58,21 @@ def project(ctx):
 
 
 @db.command("populate")
-@click.option("--selector", default="main", required=False)
 @click.option(
-    "--fixtures", multiple=True, required=False, type=click.Path(exists=True)
+    "--fixtures",
+    help="Fixture files paths.",
+    multiple=True,
+    required=False,
+    type=click.Path(exists=True),
 )
-@click.argument("url", default=None, required=False)
+@click.option(
+    "--selector",
+    default="main",
+    help="Database connection selector.",
+    required=False,
+    show_default=True,
+)
+@click.argument("url", default=None, required=False, type=str)
 @click.pass_context
 def db_populate(ctx, selector, url, *args, **kwargs):
     """Populate db with fixtures"""
@@ -69,10 +81,24 @@ def db_populate(ctx, selector, url, *args, **kwargs):
 
 
 @db.command("revision")
-@click.option("--selector", default="main", required=False)
-@click.option("--revision", default="head", required=True)
-@click.argument("url", default=None, required=False)
-@click.argument("path", default=os.getcwd(), required=False)
+@click.option(
+    "--revision",
+    default="head",
+    help="Alembic revision selector.",
+    required=False,
+    show_default=True,
+)
+@click.option(
+    "--selector",
+    default="main",
+    help="Database connection selector.",
+    required=False,
+    show_default=True,
+)
+@click.argument(
+    "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
+)
+@click.argument("url", default=None, required=False, type=str)
 @click.pass_context
 def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
     """Creates revision files"""
@@ -81,10 +107,24 @@ def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
 
 
 @db.command("upgrade")
-@click.option("--selector", default="main", required=False)
-@click.option("--revision", default="head", required=True)
-@click.argument("url", default=None, required=False)
-@click.argument("path", default=os.getcwd(), required=False)
+@click.option(
+    "--revision",
+    default="head",
+    help="Alembic revision selector.",
+    required=False,
+    show_default=True,
+)
+@click.option(
+    "--selector",
+    default="main",
+    help="Database connection selector.",
+    required=False,
+    show_default=True,
+)
+@click.argument(
+    "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
+)
+@click.argument("url", default=None, required=False, type=str)
 @click.pass_context
 def db_upgrade(ctx, path, revision, selector, url, *args, **kwargs):
     """Performs migration based on revision files"""
@@ -94,7 +134,9 @@ def db_upgrade(ctx, path, revision, selector, url, *args, **kwargs):
 
 @project.command("setup")
 @click.argument("name", required=True, type=str)
-@click.argument("path", default=os.getcwd(), required=False)
+@click.argument(
+    "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
+)
 @click.pass_context
 def setup(ctx, name, path, *args, **kwargs):
     """Creates project structure with example files"""
@@ -111,7 +153,11 @@ def catalogue(ctx, *args, **kwargs):
 
 
 @observe.command("start")
-@click.option("--observer", multiple=True)
+@click.option(
+    "--observer",
+    help="Observer selector. Leave empty to include all observers.",
+    multiple=True,
+)
 @click.pass_context
 def start(ctx, observer, *args, **kwargs):
     """Start producer/consumer ETL process based on project files"""
