@@ -175,11 +175,12 @@ def catalogue(ctx: dict, *args, **kwargs):
     "--observer",
     help="Observer selector. Leave empty to include all observers.",
     multiple=True,
+    required=False,
+    type=str,
 )
 @click.pass_context
 def start(ctx: dict, observer: tuple[str], *args, **kwargs):
     """Start producer/consumer ETL process based on project files"""
-    kwargs["context"] = ctx
     context = Assistant.provide_context(observer)
     manager = Manager(**context)  # type: ignore
     manager.observe_start()
