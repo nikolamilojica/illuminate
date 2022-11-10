@@ -1,5 +1,11 @@
 _ADAPTER_EXAMPLE = """
+from __future__ import annotations
+
+from collections.abc import AsyncGenerator
+from typing import Union
+
 from illuminate.adapter.adapter import Adapter
+from illuminate.observation.http import HTTPObservation
 
 from exporters.example import ExporterExample
 from findings.example import FindingExample
@@ -15,7 +21,7 @@ class AdapterExample(Adapter):
     enrichment of data, calling external services with some async library. If
     additional data can be used to construct URL, you can yield additional
     Observations. For more information how to yield Observation object, check
-    {name}/observers/example.py.
+    imdb/observers/example.py.
 
     Attribute subscribers is a collection of Finding classes that will be
     processed by Adapter. If Finding is subscribed to two or more Adapters,
@@ -27,7 +33,9 @@ class AdapterExample(Adapter):
     priority = 10
     subscribers = (FindingExample,)
 
-    async def adapt(self, finding, *args, **kwargs):
+    async def adapt(
+        self, finding: FindingExample, *args, **kwargs
+    ) -> AsyncGenerator[Union[ExporterExample, HTTPObservation], None]:
         yield ExporterExample(
             model=ModelExample(title=finding.title, url=finding.url)
         )
@@ -164,10 +172,11 @@ class ExporterExample(SQLExporter):
     to initialize SQLExporter class, check {name}/adapters/example.py
     \"\"\"
 
+    name = "main"
+    type = "postgresql"
+
     def __init__(self, model):
         super().__init__(model)
-        self.name = "main"
-        self.type = "postgresql"
 
 """
 
@@ -304,24 +313,31 @@ class FindingExample(Finding):
 """
 
 _OBSERVER_EXAMPLE = """
+from __future__ import annotations
+
+from collections.abc import AsyncGenerator
+from typing import Union
 from urllib.parse import urldefrag
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 from illuminate.observation.http import HTTPObservation
-from illuminate.manager.manager import Manager
 from illuminate.observer.observer import Observer
+from tornado.httpclient import HTTPResponse
 
+from exporters.example import ExporterExample
 from findings.example import FindingExample
 
 
-async def _create_soup(response):
+async def _create_soup(response: HTTPResponse) -> BeautifulSoup:
     html = response.body.decode(errors="ignore")
     soup = BeautifulSoup(html, "html.parser")
     return soup
 
 
-async def _extract_hrefs(soup, url):
+async def _extract_hrefs(
+    soup: BeautifulSoup, url: str
+) -> AsyncGenerator[str, None]:
     links = soup.find_all("a")
     for link in links:
         _url = link.get("href")
@@ -354,7 +370,6 @@ class ObserverExample(Observer):
         \"\"\"
 
         super().__init__()
-        self._manager = Manager()
         self.initial_observations = [
             HTTPObservation(
                 "https://webscraper.io/",
@@ -363,7 +378,11 @@ class ObserverExample(Observer):
             ),
         ]
 
-    async def observe(self, response, *args, **kwargs):
+    async def observe(
+        self, response: HTTPResponse, *args, **kwargs
+    ) -> AsyncGenerator[
+        Union[ExporterExample, FindingExample, HTTPObservation], None
+    ]:
         \"\"\"
         ETL flow is regulated by a yielded object type of Observation's
         callback method. Each object type corresponds to ETL stage:
