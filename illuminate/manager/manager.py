@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import asyncio
 import inspect
 import json
 import os
 from glob import glob
 from pydoc import locate
+from types import ModuleType
+from typing import Any, Optional, Type, Union
 
 from alembic import command
 from alembic.migration import MigrationContext
@@ -15,6 +19,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
+from illuminate.adapter.adapter import Adapter
 from illuminate.common.project_templates import FILES
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
@@ -27,6 +32,7 @@ from illuminate.meta.singleton import Singleton
 from illuminate.observation.http import HTTPObservation
 from illuminate.observation.http import Observation
 from illuminate.observer.finding import Finding
+from illuminate.observer.observer import Observer
 
 
 class Manager(IManager, metaclass=Singleton):
@@ -34,11 +40,11 @@ class Manager(IManager, metaclass=Singleton):
 
     def __init__(
         self,
-        adapters=None,
-        name=None,
-        observers=None,
-        path=None,
-        settings=None,
+        adapters: list[Type[Adapter]],
+        name: str,
+        observers: list[Type[Observer]],
+        path: str,
+        settings: ModuleType,
         *args,
         **kwargs,
     ):
@@ -46,32 +52,36 @@ class Manager(IManager, metaclass=Singleton):
         self.name = name
         self.observers = observers
         self.path = path
-        self.sessions = (
-            None if not settings else self._create_sessions(settings)
-        )
+        self.sessions = self._create_sessions(settings)
         self.settings = settings
-        self.__observe_queue = queues.Queue()
-        self.__adapt_queue = queues.Queue()
-        self.__export_queue = queues.Queue()
-        self.__exported = set()
-        self.__failed = set()
-        self.__requested = set()
-        self.__requesting = set()
+        self.__observe_queue: queues.Queue = queues.Queue()
+        self.__adapt_queue: queues.Queue = queues.Queue()
+        self.__export_queue: queues.Queue = queues.Queue()
+        self.__exported: set = set()
+        self.__failed: set = set()
+        self.__requested: set = set()
+        self.__requesting: set = set()
 
     @property
-    def failed(self):
+    def failed(self) -> set:
         return self.__failed
 
     @property
-    def exported(self):
+    def exported(self) -> set:
         return self.__exported
 
     @property
-    def requested(self):
+    def requested(self) -> set:
         return self.__requested
 
     @staticmethod
-    def db_populate(fixtures, selector, url=None, *args, **kwargs):
+    def db_populate(
+        fixtures: tuple[str],
+        selector: str,
+        url: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         """Populates db with Alembic framework"""
         settings = Assistant.import_settings()
         if not url:
@@ -86,23 +96,31 @@ class Manager(IManager, metaclass=Singleton):
         for file in files:
             logger.info(f"Database fixtures file discovered {file}")
         for _file in files:
-            with open(_file, "r") as file:
-                content = json.load(file)
+            with open(_file, "r") as file:  # type: ignore
+                content = json.load(file)  # type: ignore
                 for table in content:
                     table_data.update({table["name"]: table["data"]})
         models = [locate(i) for i in settings.MODELS]
         for model in models:
-            if model.__tablename__ in table_data:
-                data = table_data[model.__tablename__]
-                op.bulk_insert(model.__table__, data)
+            if model.__tablename__ in table_data:  # type: ignore
+                data = table_data[model.__tablename__]  # type: ignore
+                op.bulk_insert(model.__table__, data)  # type: ignore
                 for record in data:
                     logger.debug(
-                        f"Row {record} added to table {model.__tablename__}"
+                        f"Row {record} added to "  # type: ignore
+                        f"table {model.__tablename__}"
                     )
         logger.success(f"Database {selector} populated")
 
     @staticmethod
-    def db_revision(path, revision, selector, url=None, *args, **kwargs):
+    def db_revision(
+        path: str,
+        revision: str,
+        selector: str,
+        url: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         """Creates db revision with Alembic framework"""
         settings = Assistant.import_settings()
         if not url:
@@ -117,7 +135,14 @@ class Manager(IManager, metaclass=Singleton):
         logger.success("Revision created")
 
     @staticmethod
-    def db_upgrade(path, revision, selector, url=None, *args, **kwargs):
+    def db_upgrade(
+        path: str,
+        revision: str,
+        selector: str,
+        url: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         """Performs db migration with Alembic framework"""
         settings = Assistant.import_settings()
         if not url:
@@ -127,7 +152,7 @@ class Manager(IManager, metaclass=Singleton):
         logger.success(f"Database {selector} upgraded")
 
     @staticmethod
-    def project_setup(name, path, *args, **kwargs):
+    def project_setup(name: str, path: str, *args, **kwargs) -> None:
         """Create project directory and populates it with project files"""
 
         if path != ".":
@@ -154,15 +179,15 @@ class Manager(IManager, metaclass=Singleton):
 
     @show_logo
     @show_info
-    def observe_start(self):
+    def observe_start(self) -> None:
         """Start producer/consumer ETL process based on project files"""
         io_loop = ioloop.IOLoop.current()
         io_loop.run_sync(self._observe_start)
 
     @staticmethod
-    def _create_sessions(settings):
+    def _create_sessions(settings: ModuleType) -> dict[str, dict[str, Any]]:
         """Create sessions dictionary from settings"""
-        _sessions = {
+        _sessions: dict[str, dict[str, Any]] = {
             "mysql": {},
             "postgresql": {},
         }
@@ -188,7 +213,7 @@ class Manager(IManager, metaclass=Singleton):
                 _sessions[settings.DB[db]["type"]] = {db: session}
         return _sessions
 
-    async def __start(self):
+    async def __start(self) -> None:
         """Initialize observers and schedule initial observations"""
         for observer in self.observers:
             instance = observer()
@@ -198,7 +223,9 @@ class Manager(IManager, metaclass=Singleton):
             for _observation in instance.initial_observations:
                 await self.__observation(_observation)
 
-    async def __router(self, item):
+    async def __router(
+        self, item: Union[Exporter, Finding, Observation]
+    ) -> None:
         """Route item based on its class to proper queue"""
         if isinstance(item, Exporter):
             await self.__export_queue.put(item)
@@ -219,7 +246,7 @@ class Manager(IManager, metaclass=Singleton):
                 f"item type {type(item)}"
             )
 
-    async def __observe(self):
+    async def __observe(self) -> None:
         """Take item from observe queue and schedule observation after delay"""
         async for item in self.__observe_queue:
             if not item:
@@ -232,12 +259,12 @@ class Manager(IManager, metaclass=Singleton):
             del item
             self.__observe_queue.task_done()
 
-    async def __observation(self, item):
+    async def __observation(self, item: Observation) -> None:
         """Pass item based on its type to proper observation function"""
         if isinstance(item, HTTPObservation):
             await self.__observation_http(item)
 
-    async def __observation_http(self, item):
+    async def __observation_http(self, item: HTTPObservation) -> None:
         """Configure HTTP observation and perform observe with a callback"""
         item.configuration = {
             **self.settings.OBSERVATION_CONFIGURATION["http"],
@@ -254,7 +281,7 @@ class Manager(IManager, metaclass=Singleton):
         async for _item in items:
             await self.__router(_item)
 
-    async def __adapt(self):
+    async def __adapt(self) -> None:
         """Take item from adapt queue and schedule adaptions"""
         async for item in self.__adapt_queue:
             if not item:
@@ -264,17 +291,18 @@ class Manager(IManager, metaclass=Singleton):
             del item
             self.__adapt_queue.task_done()
 
-    async def __adaptation(self, item):
+    async def __adaptation(self, item: Finding) -> None:
         """Instance adapters and perform adapt on item"""
         for adapter in self.adapters:
             instance = adapter()
+
             for subscriber in instance.subscribers:
                 if isinstance(item, subscriber):
                     items = instance.adapt(item)
-                    async for _item in items:
+                    async for _item in items:  # type: ignore
                         await self.__router(_item)
 
-    async def __export(self):
+    async def __export(self) -> None:
         """Take item from export queue and schedule exportation"""
         async for item in self.__export_queue:
             if not item:
@@ -284,12 +312,12 @@ class Manager(IManager, metaclass=Singleton):
             del item
             self.__export_queue.task_done()
 
-    async def __exportation(self, item):
+    async def __exportation(self, item: Exporter) -> None:
         """Pass item based on its type to proper exportation function"""
         if isinstance(item, SQLExporter):
             await self.__exportation_sql(item)
 
-    async def __exportation_sql(self, item):
+    async def __exportation_sql(self, item: SQLExporter) -> None:
         """Perform SQL export on item"""
         try:
             session = self.sessions[item.type][item.name]
@@ -302,7 +330,7 @@ class Manager(IManager, metaclass=Singleton):
             )
 
     @logger.catch
-    async def _observe_start(self):
+    async def _observe_start(self) -> None:
         """Main async function"""
         self.adapters.sort(key=lambda x: x.priority, reverse=True)
 
