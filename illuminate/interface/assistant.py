@@ -17,6 +17,6 @@ class IAssistant:
         raise NotImplementedError
 
     @staticmethod
-    def provide_context():
+    def provide_context(_filter):
         """Provides context for the current runtime"""
         raise NotImplementedError
