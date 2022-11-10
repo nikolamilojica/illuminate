@@ -1,16 +1,22 @@
+from __future__ import annotations
+
 import functools
 from pydoc import locate
 from timeit import default_timer
+from typing import Callable, TYPE_CHECKING
 
 from loguru import logger
 
 from illuminate.common.project_logging import LOGO
 from illuminate.common.project_logging import LOGO_COLOR
 
+if TYPE_CHECKING:
+    from illuminate.manager.manager import Manager
 
-def show_info(func):
+
+def show_info(func: Callable) -> Callable:
     @functools.wraps(func)
-    def wrapper(self):
+    def wrapper(self: Manager) -> None:
         logger.info("Process started")
         start = default_timer()
         log_context(self)
@@ -22,7 +28,7 @@ def show_info(func):
             f"Process finished in <yellow>{end:.2f}</yellow> seconds"
         )
 
-    def log_context(self):
+    def log_context(self: Manager) -> None:
         logger.opt(colors=True).info(
             f"Project files for project "
             f"<yellow>{self.name}</yellow> loaded into context"
@@ -33,7 +39,7 @@ def show_info(func):
         )
         logger.info(f"Observers discovered {[i for i in self.observers]}")
 
-    def log_results(self):
+    def log_results(self: Manager) -> None:
         logger.success("Results gathered")
         logger.opt(colors=True).info(
             f"<yellow>Unsuccessful</yellow> observations: "
@@ -49,7 +55,7 @@ def show_info(func):
             f"<magenta>{len(self.exported)}</magenta>"
         )
 
-    def log_settings(self):
+    def log_settings(self: Manager) -> None:
         settings_conn = self.settings.CONCURRENCY
         settings_db = self.settings.DB.copy()
         settings_db["password"] = "****"  # nosec
@@ -61,9 +67,9 @@ def show_info(func):
     return wrapper
 
 
-def show_logo(func):
+def show_logo(func: Callable) -> Callable:
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         logo = f"<fg {LOGO_COLOR}>{LOGO}</fg {LOGO_COLOR}>"
         logger.opt(colors=True).success(logo)
         func(*args, **kwargs)
@@ -71,9 +77,9 @@ def show_logo(func):
     return wrapper
 
 
-def show_observer_catalogue(func):
+def show_observer_catalogue(func: Callable) -> Callable:
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         context = func(*args, **kwargs)
         if not context["observers"]:
             logger.info("No observers found")
