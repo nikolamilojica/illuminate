@@ -1,13 +1,19 @@
+from __future__ import annotations
+
 import importlib.util
 import inspect
 import os
 import sys
+from types import ModuleType
+from typing import Optional, Type, Union
 
 from alembic.config import Config
 from loguru import logger
 
+from illuminate.adapter.adapter import Adapter
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.interface.assistant import IAssistant
+from illuminate.observer.observer import Observer
 
 
 class Assistant(IAssistant):
@@ -15,7 +21,7 @@ class Assistant(IAssistant):
 
     @staticmethod
     @logger.catch
-    def create_alembic_config(path, url):
+    def create_alembic_config(path: str, url: str) -> Config:
         """Creates config object needed to perform Alembic commands"""
         config = Config()
         config.set_main_option(
@@ -25,7 +31,9 @@ class Assistant(IAssistant):
         return config
 
     @staticmethod
-    def create_db_url(selector, settings, _async=False):
+    def create_db_url(
+        selector: str, settings: ModuleType, _async: bool = False
+    ) -> str:
         """Creates db url from data in settings.py module"""
         db = settings.DB[selector]
         db["db"] = settings.NAME
@@ -38,7 +46,7 @@ class Assistant(IAssistant):
         return "{type}://{user}:{pass}@{host}/{db}".format(**db)
 
     @staticmethod
-    def import_settings():
+    def import_settings() -> ModuleType:
         """Tries to import project settings.py module and returns it"""
         try:
             import settings  # type: ignore
@@ -50,7 +58,11 @@ class Assistant(IAssistant):
             )
 
     @staticmethod
-    def provide_context(_filter=None):
+    def provide_context(
+        _filter: Optional[tuple[str]] = None,
+    ) -> dict[
+        str, Union[str, list[Union[Type[Observer], Type[Adapter]]], ModuleType]
+    ]:
         """Provides context for the current run"""
         settings = Assistant.import_settings()
         context = {
@@ -73,9 +85,9 @@ class Assistant(IAssistant):
                 spec = importlib.util.spec_from_file_location(
                     _module, os.path.join(directory, file)
                 )
-                module = importlib.util.module_from_spec(spec)
+                module = importlib.util.module_from_spec(spec)  # type: ignore
                 sys.modules[_module] = module
-                spec.loader.exec_module(module)
+                spec.loader.exec_module(module)  # type: ignore
 
                 for name, cls in inspect.getmembers(module, inspect.isclass):
                     proper_class = name.startswith(folder.capitalize()[:-1])
@@ -86,7 +98,8 @@ class Assistant(IAssistant):
         if _filter:
             context["observers"] = list(
                 filter(
-                    lambda x: x.NAME in _filter or x.__name__ in _filter,
+                    lambda x: x.NAME in _filter  # type: ignore
+                    or x.__name__ in _filter,
                     context["observers"],
                 )
             )
