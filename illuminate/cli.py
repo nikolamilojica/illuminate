@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import sys
 
@@ -22,7 +24,7 @@ from illuminate.manager.manager import Manager
     show_default=True,
 )
 @click.pass_context
-def cli(ctx, verbosity):
+def cli(ctx: dict, verbosity: str):
     """Framework entrypoint"""
     logger.remove()
     logger.add(sys.stdout, level=verbosity)
@@ -31,28 +33,28 @@ def cli(ctx, verbosity):
 
 @cli.group("manage")
 @click.pass_context
-def manage(ctx):
+def manage(ctx: dict):
     """Framework manage group of commands"""
     pass
 
 
 @cli.group("observe")
 @click.pass_context
-def observe(ctx):
+def observe(ctx: dict):
     """Framework observe group of commands"""
     pass
 
 
 @manage.group("db")
 @click.pass_context
-def db(ctx):
+def db(ctx: dict):
     """Prepares relational db for ETL operations"""
     pass
 
 
 @manage.group("project")
 @click.pass_context
-def project(ctx):
+def project(ctx: dict):
     """Performs project operations"""
     pass
 
@@ -74,7 +76,7 @@ def project(ctx):
 )
 @click.argument("url", default=None, required=False, type=str)
 @click.pass_context
-def db_populate(ctx, selector, url, *args, **kwargs):
+def db_populate(ctx: dict, selector: str, url: str, *args, **kwargs):
     """Populate db with fixtures"""
     kwargs["context"] = ctx
     Manager.db_populate(kwargs.pop("fixtures"), selector, url, *args, **kwargs)
@@ -100,7 +102,15 @@ def db_populate(ctx, selector, url, *args, **kwargs):
 )
 @click.argument("url", default=None, required=False, type=str)
 @click.pass_context
-def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
+def db_revision(
+    ctx: dict,
+    path: str,
+    revision: str,
+    selector: str,
+    url: str,
+    *args,
+    **kwargs
+):
     """Creates revision files"""
     kwargs["context"] = ctx
     Manager.db_revision(path, revision, selector, url, *args, **kwargs)
@@ -126,7 +136,15 @@ def db_revision(ctx, path, revision, selector, url, *args, **kwargs):
 )
 @click.argument("url", default=None, required=False, type=str)
 @click.pass_context
-def db_upgrade(ctx, path, revision, selector, url, *args, **kwargs):
+def db_upgrade(
+    ctx: dict,
+    path: str,
+    revision: str,
+    selector: str,
+    url: str,
+    *args,
+    **kwargs
+):
     """Performs migration based on revision files"""
     kwargs["context"] = ctx
     Manager.db_upgrade(path, revision, selector, url, *args, **kwargs)
@@ -138,7 +156,7 @@ def db_upgrade(ctx, path, revision, selector, url, *args, **kwargs):
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
 )
 @click.pass_context
-def setup(ctx, name, path, *args, **kwargs):
+def setup(ctx: dict, name: str, path: str, *args, **kwargs):
     """Creates project structure with example files"""
     kwargs["context"] = ctx
     Manager.project_setup(name, path, *args, **kwargs)
@@ -147,7 +165,7 @@ def setup(ctx, name, path, *args, **kwargs):
 @observe.command("catalogue")
 @click.pass_context
 @show_observer_catalogue
-def catalogue(ctx, *args, **kwargs):
+def catalogue(ctx: dict, *args, **kwargs):
     """List observers found in project files"""
     return Assistant.provide_context()
 
@@ -159,11 +177,11 @@ def catalogue(ctx, *args, **kwargs):
     multiple=True,
 )
 @click.pass_context
-def start(ctx, observer, *args, **kwargs):
+def start(ctx: dict, observer: tuple[str], *args, **kwargs):
     """Start producer/consumer ETL process based on project files"""
     kwargs["context"] = ctx
     context = Assistant.provide_context(observer)
-    manager = Manager(**context)
+    manager = Manager(**context)  # type: ignore
     manager.observe_start()
 
 
