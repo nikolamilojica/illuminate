@@ -11,15 +11,41 @@ from illuminate.observer.finding import Finding
 
 
 class Adapter(IAdapter):
-    """Adapter class, responsible for producing exporters"""
+    """
+    Adapter class, generates Exporter and Observation objects using Finding
+    instances with optional transformation. Class must be inherited and method
+    adapt must be implemented in a child class.
+    """
 
     priority: int
+    """
+    Place in Adapter list. If two Adapters have the same Finding in subscriber
+    tuple, one with the higher priority will call method adapt first on
+    Finding object.
+    """
+
     subscribers: tuple[Type[Finding]]
+    """
+    Tuple of Finding class children used to determent if Adapter object should
+    call method adapt on Finding instance.
+    """
 
     async def adapt(
         self, finding: Finding, *args, **kwargs
     ) -> AsyncGenerator[Union[Exporter, Observation], None]:
-        """Transform finding and produce exporters"""
+        """
+        Generates Exporter and Observation objects. Must be implemented in a
+        child class.
+
+        It is meant to be a scope where additional transformation up on
+        finding objects should be performed (like data enrichment from
+        additional data source) before yielding Exporter or Observation
+        instances.
+
+        :param finding: Finding object
+        :return: Async Exporter and Observation object generator
+        :raises BasicAdapterException:
+        """
         raise BasicAdapterException(
             "Method adapt must be implemented in child class"
         )
