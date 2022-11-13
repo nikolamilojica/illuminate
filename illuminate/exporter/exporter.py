@@ -3,10 +3,18 @@ from illuminate.interface.exporter import IExporter
 
 
 class Exporter(IExporter):
-    """Exporter class, responsible for writing to destination"""
+    """
+    Exporter class, writes data to destination. Class must be inherited and
+    method adapt must be implemented in a child class.
+    """
 
     async def export(self, *args, **kwargs):
-        """Load to destination"""
+        """
+        Writes data to destination. Must be implemented in a child class.
+
+        :return: None
+        :raises BasicExporterException:
+        """
         raise BasicExporterException(
             "Method export must be implemented in child class"
         )
