@@ -17,12 +17,23 @@ from illuminate.observer.observer import Observer
 
 
 class Assistant(IAssistant):
-    """Assistant class, responsible for assisting Manager class"""
+    """
+    Assistant class, creates objects from project files.
+
+    Used by Manager class in its static methods and cli start function to
+    initialize Manager.
+    """
 
     @staticmethod
     @logger.catch
     def create_alembic_config(path: str, url: str) -> Config:
-        """Creates config object needed to perform Alembic commands"""
+        """
+        Creates Alembic's configuration object.
+
+        :param path: Migration directory path
+        :param url: SQLAlchemy Database URL
+        :return: Alembic configuration object
+        """
         config = Config()
         config.set_main_option(
             "script_location", os.path.join(path, "migrations")
@@ -34,7 +45,14 @@ class Assistant(IAssistant):
     def create_db_url(
         selector: str, settings: ModuleType, _async: bool = False
     ) -> str:
-        """Creates db url from data in settings.py module"""
+        """
+        Creates database URL.
+
+        :param selector: Database name in settings.py module DB attribute
+        :param settings: Project's settings.py module
+        :param _async: Async URL flag
+        :return: Database URL string
+        """
         db = settings.DB[selector]
         db["db"] = settings.NAME
         if _async:
@@ -47,7 +65,12 @@ class Assistant(IAssistant):
 
     @staticmethod
     def import_settings() -> ModuleType:
-        """Tries to import project settings.py module and returns it"""
+        """
+        Imports project's settings.py module and returns it.
+
+        :return: Project's settings.py module
+        :raises BasicManagerException:
+        """
         try:
             import settings  # type: ignore
 
@@ -63,7 +86,13 @@ class Assistant(IAssistant):
     ) -> dict[
         str, Union[str, list[Union[Type[Observer], Type[Adapter]]], ModuleType]
     ]:
-        """Provides context for the current run"""
+        """
+        Creates Manager's constructor kwargs.
+
+        :param _filter: Optional tuple of Observer's names or class names
+        :return: Manager's contractor parameters
+        :raises BasicManagerException:
+        """
         settings = Assistant.import_settings()
         context = {
             "adapters": [],
