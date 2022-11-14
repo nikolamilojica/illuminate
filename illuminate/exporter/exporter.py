@@ -5,7 +5,7 @@ from illuminate.interface.exporter import IExporter
 class Exporter(IExporter):
     """
     Exporter class, writes data to destination. Class must be inherited and
-    method adapt must be implemented in a child class.
+    method export must be implemented in a child class.
     """
 
     async def export(self, *args, **kwargs):
