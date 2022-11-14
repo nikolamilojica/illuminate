@@ -1,2 +1,2 @@
 class BasicIlluminateException(Exception):
-    """Base illuminate exception class"""
+    """Base Illuminate exception class."""
