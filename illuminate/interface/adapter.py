@@ -1,6 +1,6 @@
 class IAdapter:
-    """Interface for Adapter class"""
+    """Interface for Adapter class."""
 
     async def adapt(self, finding, *args, **kwargs):
-        """Transform finding and produce exporters"""
+        """Generates Exporter and Observation objects."""
         raise NotImplementedError

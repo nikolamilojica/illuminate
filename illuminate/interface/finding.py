@@ -1,2 +1,2 @@
 class IFinding:
-    """Interface for Finding class"""
+    """Interface for Finding class."""

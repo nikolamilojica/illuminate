@@ -1,6 +1,6 @@
 class IObservation:
-    """Interface for Observation class"""
+    """Interface for Observation class."""
 
     async def observe(self, *args, **kwargs):
-        """Read source and use observer's callback function against response"""
+        """Reads data from the source."""
         raise NotImplementedError
