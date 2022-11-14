@@ -17,10 +17,10 @@ class AdapterExample(Adapter):
     Adapter class is responsible for turning Finding objects into Exporter or
     Observation objects, and yielding them when adapt method is called.
 
-    It is also designated to be a place where you should perform any additional
-    enrichment of data, calling external services with some async library. If
-    additional data can be used to construct URL, you can yield additional
-    Observations. For more information how to yield Observation object, check
+    It is also designated to be a place where any additional enrichment of data
+    should be performed, calling external services with some async library. If
+    additional data can be used to construct URL, additional Observations can
+    be yielded. For more information how to yield Observation object, check
     {name}/observers/example.py.
 
     Attribute subscribers is a collection of Finding classes that will be
@@ -354,7 +354,7 @@ class ObserverExample(Observer):
     objects from Observer's initial_observation collection, starting the whole
     process.
 
-    Note: You can have multiple Observers in your project.
+    Note: Multiple Observers can exist in the same project.
     \"\"\"
 
     ALLOWED = ("https://webscraper.io/",)
