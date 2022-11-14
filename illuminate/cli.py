@@ -24,7 +24,7 @@ from illuminate.manager.manager import Manager
     show_default=True,
 )
 @click.pass_context
-def cli(ctx: dict, verbosity: str):
+def cli(ctx: dict, verbosity: str) -> None:
     """Framework entrypoint."""
     logger.remove()
     logger.add(sys.stdout, level=verbosity)
@@ -33,28 +33,28 @@ def cli(ctx: dict, verbosity: str):
 
 @cli.group("manage")
 @click.pass_context
-def manage(ctx: dict):
+def manage(ctx: dict) -> None:
     """Framework manage group of commands."""
     pass
 
 
 @cli.group("observe")
 @click.pass_context
-def observe(ctx: dict):
+def observe(ctx: dict) -> None:
     """Framework observe group of commands."""
     pass
 
 
 @manage.group("db")
 @click.pass_context
-def db(ctx: dict):
+def db(ctx: dict) -> None:
     """Prepares relational db for ETL operations."""
     pass
 
 
 @manage.group("project")
 @click.pass_context
-def project(ctx: dict):
+def project(ctx: dict) -> None:
     """Performs project operations."""
     pass
 
@@ -76,7 +76,7 @@ def project(ctx: dict):
 )
 @click.argument("url", default=None, required=False, type=str)
 @click.pass_context
-def db_populate(ctx: dict, selector: str, url: str, *args, **kwargs):
+def db_populate(ctx: dict, selector: str, url: str, *args, **kwargs) -> None:
     """Populates database with fixtures."""
     kwargs["context"] = ctx
     Manager.db_populate(kwargs.pop("fixtures"), selector, url, *args, **kwargs)
@@ -110,7 +110,7 @@ def db_revision(
     url: str,
     *args,
     **kwargs
-):
+) -> None:
     """Creates Alembic's revision file in migration directory."""
     kwargs["context"] = ctx
     Manager.db_revision(path, revision, selector, url, *args, **kwargs)
@@ -144,7 +144,7 @@ def db_upgrade(
     url: str,
     *args,
     **kwargs
-):
+) -> None:
     """Applies migration file to a database."""
     kwargs["context"] = ctx
     Manager.db_upgrade(path, revision, selector, url, *args, **kwargs)
@@ -156,7 +156,7 @@ def db_upgrade(
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
 )
 @click.pass_context
-def setup(ctx: dict, name: str, path: str, *args, **kwargs):
+def setup(ctx: dict, name: str, path: str, *args, **kwargs) -> None:
     """Creates a project directory with all needed files."""
     kwargs["context"] = ctx
     Manager.project_setup(name, path, *args, **kwargs)
@@ -165,7 +165,7 @@ def setup(ctx: dict, name: str, path: str, *args, **kwargs):
 @observe.command("catalogue")
 @click.pass_context
 @show_observer_catalogue
-def catalogue(ctx: dict, *args, **kwargs):
+def catalogue(ctx: dict, *args, **kwargs) -> dict:
     """Lists observers found in project files."""
     return Assistant.provide_context()
 
@@ -179,7 +179,7 @@ def catalogue(ctx: dict, *args, **kwargs):
     type=str,
 )
 @click.pass_context
-def start(ctx: dict, observer: tuple[str], *args, **kwargs):
+def start(ctx: dict, observer: tuple[str], *args, **kwargs) -> None:
     """Starts producer/consumer ETL process."""
     context = Assistant.provide_context(observer)
     manager = Manager(**context)  # type: ignore
