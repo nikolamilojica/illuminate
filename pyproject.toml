@@ -29,6 +29,7 @@ version = "0.1.0"
 [tool.poetry.dependencies]
 python = "^3.8"
 alembic = "^1.7.7"
+asyncmy = "^0.2.5"
 asyncpg = "^0.26.0"
 click = "^8.1.2"
 loguru = "^0.6.0"
