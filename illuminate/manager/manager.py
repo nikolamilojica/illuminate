@@ -36,7 +36,13 @@ from illuminate.observer.observer import Observer
 
 
 class Manager(IManager, metaclass=Singleton):
-    """Manager class, responsible for framework cli commands"""
+    """
+    Manager class, executes framework's cli commands.
+
+    All public methods correspond to cli commands. It should only be
+    instantiated when 'illuminate observe start' command is used with kwargs
+    provided by Assistant class.
+    """
 
     def __init__(
         self,
@@ -48,6 +54,16 @@ class Manager(IManager, metaclass=Singleton):
         *args,
         **kwargs,
     ):
+        """
+        Manager's __init__ method.
+
+        :param adapters: List of Adapters found in project files
+        :param name: Project's name
+        :param observers: List of Observers found in project files after
+        filtering
+        :param path: Path to project files
+        :param settings: Project's settings.py module
+        """
         self.adapters = adapters
         self.name = name
         self.observers = observers
@@ -82,7 +98,14 @@ class Manager(IManager, metaclass=Singleton):
         *args,
         **kwargs,
     ) -> None:
-        """Populates db with Alembic framework"""
+        """
+        Populates database with fixtures.
+
+        :param fixtures: Tuple of fixture files
+        :param selector: Database name in settings.py module
+        :param url: SQLAlchemy URL
+        :return: None
+        """
         settings = Assistant.import_settings()
         if not url:
             url = Assistant.create_db_url(selector, settings)
@@ -121,7 +144,15 @@ class Manager(IManager, metaclass=Singleton):
         *args,
         **kwargs,
     ) -> None:
-        """Creates db revision with Alembic framework"""
+        """
+        Creates Alembic's revision file in migration directory.
+
+        :param path: Path to migrations directory
+        :param revision: Parent revision
+        :param selector: Database name in settings.py module
+        :param url: SQLAlchemy URL
+        :return: None
+        """
         settings = Assistant.import_settings()
         if not url:
             url = Assistant.create_db_url(selector, settings)
@@ -143,7 +174,15 @@ class Manager(IManager, metaclass=Singleton):
         *args,
         **kwargs,
     ) -> None:
-        """Performs db migration with Alembic framework"""
+        """
+        Applies migration file to a database.
+
+        :param path: Path to migrations directory
+        :param revision: Revision to apply to database
+        :param selector: Database name in settings.py module
+        :param url: SQLAlchemy URL
+        :return: None
+        """
         settings = Assistant.import_settings()
         if not url:
             url = Assistant.create_db_url(selector, settings)
@@ -153,7 +192,14 @@ class Manager(IManager, metaclass=Singleton):
 
     @staticmethod
     def project_setup(name: str, path: str, *args, **kwargs) -> None:
-        """Create project directory and populates it with project files"""
+        """
+        Creates a project directory with all needed files.
+
+        :param name: Project's name
+        :param path: Path to project files
+        :return: None
+        :raises BasicManagerException:
+        """
 
         if path != ".":
             path = os.path.join(path, name)
@@ -180,13 +226,22 @@ class Manager(IManager, metaclass=Singleton):
     @show_logo
     @show_info
     def observe_start(self) -> None:
-        """Start producer/consumer ETL process based on project files"""
+        """
+        Starts producer/consumer ETL process.
+
+        :return: None
+        """
         io_loop = ioloop.IOLoop.current()
         io_loop.run_sync(self._observe_start)
 
     @staticmethod
     def _create_sessions(settings: ModuleType) -> dict[str, dict[str, Any]]:
-        """Create sessions dictionary from settings"""
+        """
+        Creates a dictionary of established database sessions.
+
+        :param settings: Project's settings.py module
+        :return: None
+        """
         _sessions: dict[str, dict[str, Any]] = {
             "mysql": {},
             "postgresql": {},
@@ -214,7 +269,12 @@ class Manager(IManager, metaclass=Singleton):
         return _sessions
 
     async def __start(self) -> None:
-        """Initialize observers and schedule initial observations"""
+        """
+        Initializes Observers and pass initial Observation objects to
+        self.__observation.
+
+        :return: None
+        """
         for observer in self.observers:
             instance = observer()
             logger.opt(colors=True).info(
@@ -226,7 +286,12 @@ class Manager(IManager, metaclass=Singleton):
     async def __router(
         self, item: Union[Exporter, Finding, Observation]
     ) -> None:
-        """Route item based on its class to proper queue"""
+        """
+        Routes object based on its class to proper queue.
+
+        :param item: Exporter, Finding or Observation object
+        :return: None
+        """
         if isinstance(item, Exporter):
             await self.__export_queue.put(item)
         elif isinstance(item, Finding):
@@ -247,7 +312,12 @@ class Manager(IManager, metaclass=Singleton):
             )
 
     async def __observe(self) -> None:
-        """Take item from observe queue and schedule observation after delay"""
+        """
+        Takes Observation object from self.__observe_queue and, after delay,
+        pass it to self.__observation method.
+
+        :return: None
+        """
         async for item in self.__observe_queue:
             if not item:
                 return
@@ -260,12 +330,23 @@ class Manager(IManager, metaclass=Singleton):
             self.__observe_queue.task_done()
 
     async def __observation(self, item: Observation) -> None:
-        """Pass item based on its type to proper observation function"""
+        """
+        Passes Observation object to proper method based on its class.
+
+        :param item: Observation object
+        :return: None
+        """
         if isinstance(item, HTTPObservation):
             await self.__observation_http(item)
 
     async def __observation_http(self, item: HTTPObservation) -> None:
-        """Configure HTTP observation and perform observe with a callback"""
+        """
+        Prepares HTTP request kwargs and, if URL is not yet requested, calls
+        HTTPObservation's observe method.
+
+        :param item: HTTPObservation object
+        :return: None
+        """
         item.configuration = {
             **self.settings.OBSERVATION_CONFIGURATION["http"],
             **item.configuration,
@@ -282,7 +363,12 @@ class Manager(IManager, metaclass=Singleton):
             await self.__router(_item)
 
     async def __adapt(self) -> None:
-        """Take item from adapt queue and schedule adaptions"""
+        """
+        Takes Finding object from self.__adapt_queue and pass it to
+        self.__adaptation method.
+
+        :return: None
+        """
         async for item in self.__adapt_queue:
             if not item:
                 return
@@ -292,7 +378,12 @@ class Manager(IManager, metaclass=Singleton):
             self.__adapt_queue.task_done()
 
     async def __adaptation(self, item: Finding) -> None:
-        """Instance adapters and perform adapt on item"""
+        """
+        Passes Finding object to Adapter's instance adapt method.
+
+        :param item: Finding object
+        :return: None
+        """
         for adapter in self.adapters:
             instance = adapter()
 
@@ -303,7 +394,12 @@ class Manager(IManager, metaclass=Singleton):
                         await self.__router(_item)
 
     async def __export(self) -> None:
-        """Take item from export queue and schedule exportation"""
+        """
+        Takes Exporter object from self.__export_queue and pass it to
+        self.__exportation method.
+
+        :return: None
+        """
         async for item in self.__export_queue:
             if not item:
                 return
@@ -313,12 +409,23 @@ class Manager(IManager, metaclass=Singleton):
             self.__export_queue.task_done()
 
     async def __exportation(self, item: Exporter) -> None:
-        """Pass item based on its type to proper exportation function"""
+        """
+        Passes Exporter object to proper method based on its class.
+
+        :param item: Exporter object
+        :return: None
+        """
         if isinstance(item, SQLExporter):
             await self.__exportation_sql(item)
 
     async def __exportation_sql(self, item: SQLExporter) -> None:
-        """Perform SQL export on item"""
+        """
+        Acquires database session based on Exporter's attributes and pass it to
+        SQLExporter's export method.
+
+        :param item: SQLExporter object
+        :return: None
+        """
         try:
             session = self.sessions[item.type][item.name]
             await item.export(session)
@@ -331,7 +438,11 @@ class Manager(IManager, metaclass=Singleton):
 
     @logger.catch
     async def _observe_start(self) -> None:
-        """Main async function"""
+        """
+        Starts producer/consumer ETL process.
+
+        :return: None
+        """
         self.adapters.sort(key=lambda x: x.priority, reverse=True)
 
         _observers = self.settings.CONCURRENCY["observers"]
