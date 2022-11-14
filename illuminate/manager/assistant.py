@@ -56,7 +56,10 @@ class Assistant(IAssistant):
         db = settings.DB[selector]
         db["db"] = settings.NAME
         if _async:
-            async_drivers = {"postgresql": "asyncpg"}
+            async_drivers = {
+                "mysql": "asyncmy",
+                "postgresql": "asyncpg",
+            }
             driver = async_drivers[db["type"]]
             return "{type}+{driver}://{user}:{pass}@{host}/{db}".format(
                 driver=driver, **db
