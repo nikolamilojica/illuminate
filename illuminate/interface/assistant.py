@@ -1,22 +1,22 @@
 class IAssistant:
-    """Interface for Assistant class"""
+    """Interface for Assistant class."""
 
     @staticmethod
     def create_alembic_config(path, url):
-        """Creates config object needed to perform Alembic commands"""
+        """Creates Alembic's configuration object."""
         raise NotImplementedError
 
     @staticmethod
     def create_db_url(selector, settings):
-        """Creates db url from data in settings.py module"""
+        """Creates database URL."""
         raise NotImplementedError
 
     @staticmethod
     def import_settings():
-        """Tries to import project settings.py module and returns it"""
+        """Imports project's settings.py module and returns it."""
         raise NotImplementedError
 
     @staticmethod
     def provide_context(_filter):
-        """Provides context for the current runtime"""
+        """Creates Manager's constructor kwargs."""
         raise NotImplementedError

@@ -1,6 +1,9 @@
 class IObserver:
-    """Interface for Observer class"""
+    """Interface for Observer class."""
 
     async def observe(self, response, *args, **kwargs):
-        """Extract observations and/or findings from response"""
+        """
+        Manipulates response object and yields Exporter, Finding and
+        Observation objects.
+        """
         raise NotImplementedError

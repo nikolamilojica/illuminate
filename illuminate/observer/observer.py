@@ -13,9 +13,14 @@ from illuminate.observer.finding import Finding
 
 
 class Observer(IObserver):
-    """Observer class, responsible for producing observations and findings"""
+    """
+    Observer class, controls ETL process by implementing observe and other
+    methods that will be used as callbacks in Observation class children's
+    observe method.
+    """
 
     NAME: str
+    """Observer name."""
 
     def __init__(self):
         self.initial_observations: list[Observation] = []
@@ -23,7 +28,13 @@ class Observer(IObserver):
     async def observe(
         self, response: HTTPResponse, *args, **kwargs
     ) -> AsyncGenerator[Union[Exporter, Finding, Observation], None]:
-        """Extract observations and/or findings from response"""
+        """
+        Manipulates response object and yields Exporter, Finding and
+        Observation objects.
+
+        :param response: HTTP response object
+        :return: Async Exporter, Finding, and Observation object generator
+        """
         raise BasicObserverException(
             "Method observe must be implemented in child class"
         )

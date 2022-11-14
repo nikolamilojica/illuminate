@@ -15,8 +15,21 @@ if TYPE_CHECKING:
 
 
 def show_info(func: Callable) -> Callable:
+    """
+    Displays ETL process information.
+
+    :param func: Manager's public method
+    :return: Manager's public method wrapper
+    """
+
     @functools.wraps(func)
     def wrapper(self: Manager) -> None:
+        """
+        Displays ETL process information.
+
+        :param self: Manager object
+        :return: None
+        """
         logger.info("Process started")
         start = default_timer()
         log_context(self)
@@ -29,6 +42,12 @@ def show_info(func: Callable) -> Callable:
         )
 
     def log_context(self: Manager) -> None:
+        """
+        Displays ETL context information.
+
+        :param self: Manager object
+        :return: None
+        """
         logger.opt(colors=True).info(
             f"Project files for project "
             f"<yellow>{self.name}</yellow> loaded into context"
@@ -40,6 +59,12 @@ def show_info(func: Callable) -> Callable:
         logger.info(f"Observers discovered {[i for i in self.observers]}")
 
     def log_results(self: Manager) -> None:
+        """
+        Displays ETL results information.
+
+        :param self: Manager object
+        :return: None
+        """
         logger.success("Results gathered")
         logger.opt(colors=True).info(
             f"<yellow>Unsuccessful</yellow> observations: "
@@ -56,6 +81,12 @@ def show_info(func: Callable) -> Callable:
         )
 
     def log_settings(self: Manager) -> None:
+        """
+        Displays ETL settings information.
+
+        :param self: Manager object
+        :return: None
+        """
         settings_conn = self.settings.CONCURRENCY
         settings_db = self.settings.DB.copy()
         settings_db["password"] = "****"  # nosec
@@ -68,8 +99,20 @@ def show_info(func: Callable) -> Callable:
 
 
 def show_logo(func: Callable) -> Callable:
+    """
+    Displays framework's logo.
+
+    :param func: Manager's public method
+    :return: Manager's public method wrapper
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> None:
+        """
+        Displays framework's logo.
+
+        :return: None
+        """
         logo = f"<fg {LOGO_COLOR}>{LOGO}</fg {LOGO_COLOR}>"
         logger.opt(colors=True).success(logo)
         func(*args, **kwargs)
@@ -78,8 +121,20 @@ def show_logo(func: Callable) -> Callable:
 
 
 def show_observer_catalogue(func: Callable) -> Callable:
+    """
+    Displays Observers found in project files.
+
+    :param func: CLI's function
+    :return: CLI's function wrapper
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> None:
+        """
+        Displays Observers found in project files.
+
+        :return: None
+        """
         context = func(*args, **kwargs)
         if not context["observers"]:
             logger.info("No observers found")

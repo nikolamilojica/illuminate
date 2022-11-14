@@ -1,6 +1,6 @@
 class IExporter:
-    """Interface for Exporter class"""
+    """Interface for Exporter class."""
 
     async def export(self, *args, **kwargs):
-        """Load to destination"""
+        """Writes data to destination."""
         raise NotImplementedError
