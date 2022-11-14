@@ -21,7 +21,7 @@ class AdapterExample(Adapter):
     enrichment of data, calling external services with some async library. If
     additional data can be used to construct URL, you can yield additional
     Observations. For more information how to yield Observation object, check
-    imdb/observers/example.py.
+    {name}/observers/example.py.
 
     Attribute subscribers is a collection of Finding classes that will be
     processed by Adapter. If Finding is subscribed to two or more Adapters,
