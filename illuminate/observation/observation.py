@@ -3,10 +3,18 @@ from illuminate.interface.observation import IObservation
 
 
 class Observation(IObservation):
-    """Observation class, responsible for reading source with callback"""
+    """
+    Observation class, reads data from the source. Class must be inherited and
+    method observe must be implemented in a child class.
+    """
 
     async def observe(self, *args, **kwargs):
-        """Read source and use observer's callback function against response"""
+        """
+        Reads data from the source. Must be implemented in a child class.
+
+        :return: None
+        :raises BasicObservationException:
+        """
         raise BasicObservationException(
             "Method observe must be implemented in child class"
         )
