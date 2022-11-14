@@ -15,7 +15,10 @@ from illuminate.observer.finding import Finding
 
 
 class HTTPObservation(Observation):
-    """HTTPObservation class, responsible for reading source with callback"""
+    """
+    HTTPObservation class, reads data from HTTP server asynchronously. Inherits
+    Observation class and implements observe method.
+    """
 
     def __init__(
         self,
@@ -29,6 +32,15 @@ class HTTPObservation(Observation):
         *args,
         **kwargs,
     ):
+        """
+        HTTPObservation's __init__ method.
+
+        :param url: Data's HTTP URL
+        :param allowed: Collection of strings evaluated against self.url to
+        determent if URL is allowed
+        :param callback: Async function/method that will manipulate response
+        object and yield Exporter, Finding and Observation objects
+        """
         self.url = url
         self._allowed = allowed
         self._callback = callback
@@ -44,7 +56,15 @@ class HTTPObservation(Observation):
     async def observe(
         self, *args, **kwargs
     ) -> Optional[AsyncGenerator[Union[Exporter, Finding, Observation], None]]:
-        """Read source and use observer's callback function against response"""
+        """
+        Requests data from HTTP server, passes response object to a callback
+        and returns async Exporter, Finding, and Observation object generator
+        if request is successful.
+
+        :return: Async Exporter, Finding, and Observation object generator or
+        None
+        :raises BasicObservationException, Exception, HTTPClientError:
+        """
         try:
             response = await httpclient.AsyncHTTPClient().fetch(
                 self.url, **self.configuration
@@ -59,4 +79,9 @@ class HTTPObservation(Observation):
             raise BasicObservationException
 
     def __repr__(self):
+        """
+        HTTPObservation's __repr__ method.
+
+        :return: String representation of an instance
+        """
         return f'HTTPObservation("{self.url}",callback="{self._callback}")'
