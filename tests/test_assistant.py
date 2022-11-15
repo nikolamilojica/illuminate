@@ -16,8 +16,7 @@ class TestAssistantClass(Test):
         with self.path() as path:
             name = "example"
             Manager.project_setup(name, ".")
-            settings = Assistant.import_settings()
-            url = Assistant.create_db_url("main", settings)
+            url = Assistant.create_db_url("main")
             config = Assistant.create_alembic_config(path, url)
             assert config.get_main_option("sqlalchemy.url") == url
 
@@ -30,8 +29,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            settings = Assistant.import_settings()
-            url = Assistant.create_db_url("main", settings)
+            url = Assistant.create_db_url("main")
             assert url == "postgresql://illuminate:password@localhost/example"
 
     def test_create_async_db_url_successfully(self):
@@ -43,8 +41,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            settings = Assistant.import_settings()
-            url = Assistant.create_db_url("main", settings, _async=True)
+            url = Assistant.create_db_url("main", _async=True)
             assert (
                 url
                 == "postgresql+asyncpg://illuminate:password@localhost/example"
