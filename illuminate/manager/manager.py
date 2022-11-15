@@ -147,7 +147,7 @@ class Manager(IManager, metaclass=Singleton):
         :return: None
         """
         settings = Assistant.import_settings()
-        config = Assistant.create_alembic_config(path, selector, url)
+        config = Assistant.provide_alembic_config(path, selector, url)
         command.revision(
             config,
             message=settings.NAME,
@@ -174,7 +174,7 @@ class Manager(IManager, metaclass=Singleton):
         :param url: SQLAlchemy URL
         :return: None
         """
-        config = Assistant.create_alembic_config(path, selector, url)
+        config = Assistant.provide_alembic_config(path, selector, url)
         command.upgrade(config, revision)
         logger.success(f"Database {selector} upgraded")
 

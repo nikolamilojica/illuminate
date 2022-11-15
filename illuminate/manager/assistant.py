@@ -31,7 +31,7 @@ class Assistant(IAssistant):
     """
 
     @staticmethod
-    def create_alembic_config(
+    def provide_alembic_config(
         path: str, selector: str, url: Optional[str] = None
     ) -> Config:
         """

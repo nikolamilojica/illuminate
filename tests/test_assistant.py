@@ -8,17 +8,17 @@ from tests.shared.unit import Test
 
 
 class TestAssistantClass(Test):
-    def test_create_alembic_config_successfully(self):
+    def test_provide_alembic_config_successfully(self):
         """
         Given: Current directory is a project directory
-        When: Calling Assistant.create_alembic_config
+        When: Calling Assistant.provide_alembic_config
         Expected: Returns config instance
         """
         with self.path() as path:
             name = "example"
             Manager.project_setup(name, ".")
             url = Assistant.create_db_url("main")
-            config = Assistant.create_alembic_config(path, "main", url)
+            config = Assistant.provide_alembic_config(path, "main", url)
             assert config.get_main_option("sqlalchemy.url") == url
 
     def test_create_db_url_successfully(self):
