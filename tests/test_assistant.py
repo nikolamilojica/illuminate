@@ -127,3 +127,24 @@ class TestAssistantClass(Test):
                 Assistant.provide_alembic_operations("main", self.url),
                 Operations,
             )
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_provide_models_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Calling Assistant.provide_models
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            Assistant.provide_models()
+
+    def test_provide_models_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant.provide_models
+        Expected: Returns list of models
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            assert Assistant.provide_models()[0]
