@@ -7,16 +7,13 @@ import os
 from glob import glob
 from pydoc import locate
 from types import ModuleType
-from typing import Any, Optional, Type, Union
+from typing import Optional, Type, Union
 
 from alembic import command
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from loguru import logger
 from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import sessionmaker
 from tornado import gen, ioloop, queues
 
 from illuminate.adapter.adapter import Adapter
@@ -233,40 +230,6 @@ class Manager(IManager, metaclass=Singleton):
         """
         io_loop = ioloop.IOLoop.current()
         io_loop.run_sync(self._observe_start)
-
-    @staticmethod
-    def _create_sessions(settings: ModuleType) -> dict[str, dict[str, Any]]:
-        """
-        Creates a dictionary of established database sessions.
-
-        :param settings: Project's settings.py module
-        :return: None
-        """
-        _sessions: dict[str, dict[str, Any]] = {
-            "mysql": {},
-            "postgresql": {},
-        }
-        logger.opt(colors=True).info(
-            f"Number of expected db connections: "
-            f"<yellow>{len(settings.DB)}</yellow>"
-        )
-        for db in settings.DB:
-            if settings.DB[db]["type"] in ("mysql", "postgresql"):
-                url = Assistant.create_db_url(db, settings, _async=True)
-                engine = create_async_engine(url)
-                session = sessionmaker(
-                    engine,
-                    class_=AsyncSession,
-                    expire_on_commit=False,
-                )
-                host = settings.DB[db]["host"]
-                port = settings.DB[db]["port"]
-                logger.opt(colors=True).info(
-                    f"Adding session with <yellow>{db}</yellow> at "
-                    f"<magenta>{host}:{port}</magenta> to context"
-                )
-                _sessions[settings.DB[db]["type"]] = {db: session}
-        return _sessions
 
     async def __start(self) -> None:
         """
