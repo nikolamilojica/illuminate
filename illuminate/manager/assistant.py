@@ -32,7 +32,7 @@ class Assistant(IAssistant):
 
     @staticmethod
     def create_alembic_config(
-        path: str, selector: str, url: Optional[str]
+        path: str, selector: str, url: Optional[str] = None
     ) -> Config:
         """
         Creates Alembic's configuration object.
@@ -189,7 +189,7 @@ class Assistant(IAssistant):
 
     @staticmethod
     def provide_alembic_operations(
-        selector: str, url: Optional[str]
+        selector: str, url: Optional[str] = None
     ) -> Operations:
         """
         Creates Alembic's operations object.
