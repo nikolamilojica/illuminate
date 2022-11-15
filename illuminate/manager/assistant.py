@@ -59,9 +59,15 @@ class Assistant(IAssistant):
         :param selector: Database name in settings.py module DB attribute
         :param _async: Async URL flag
         :return: Database URL string
+        :raises BasicManagerException:
         """
         settings = Assistant.import_settings()
-        db = settings.DB[selector]
+        try:
+            db = settings.DB[selector]
+        except KeyError:
+            raise BasicManagerException(
+                f"Database {selector} is not defined in settings.py"
+            )
         db["db"] = settings.NAME
         if _async:
             async_drivers = {
