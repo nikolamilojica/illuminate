@@ -10,10 +10,7 @@ from types import ModuleType
 from typing import Optional, Type, Union
 
 from alembic import command
-from alembic.migration import MigrationContext
-from alembic.operations import Operations
 from loguru import logger
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from tornado import gen, ioloop, queues
 
@@ -107,11 +104,7 @@ class Manager(IManager, metaclass=Singleton):
         :return: None
         """
         settings = Assistant.import_settings()
-        if not url:
-            url = Assistant.create_db_url(selector)
-        engine = create_engine(url)
-        context = MigrationContext.configure(engine.connect())
-        op = Operations(context)
+        op = Assistant.provide_alembic_operations(selector, url)
         table_data = {}
         files = (
             fixtures if fixtures else glob("fixtures/*.json", recursive=True)
