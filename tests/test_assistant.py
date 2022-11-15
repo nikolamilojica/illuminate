@@ -17,7 +17,7 @@ class TestAssistantClass(Test):
         with self.path() as path:
             name = "example"
             Manager.project_setup(name, ".")
-            url = Assistant.create_db_url("main")
+            url = Assistant._create_db_url("main")
             config = Assistant.provide_alembic_config(path, "main", url)
             assert config.get_main_option("sqlalchemy.url") == url
 
@@ -30,7 +30,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            url = Assistant.create_db_url("main")
+            url = Assistant._create_db_url("main")
             assert url == "postgresql://illuminate:password@localhost/example"
 
     def test_create_async_db_url_successfully(self):
@@ -42,7 +42,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            url = Assistant.create_db_url("main", _async=True)
+            url = Assistant._create_db_url("main", _async=True)
             assert (
                 url
                 == "postgresql+asyncpg://illuminate:password@localhost/example"
@@ -57,7 +57,7 @@ class TestAssistantClass(Test):
         """
         with pytest.raises(BasicManagerException):
             with self.path():
-                Assistant.import_settings()
+                Assistant._import_settings()
 
     def test_import_settings_successfully(self):
         """
@@ -68,7 +68,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            settings = Assistant.import_settings()
+            settings = Assistant._import_settings()
             assert settings.NAME == name
 
     def test_provide_context_successfully(self):
@@ -95,7 +95,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            assert Assistant.provide_sessions()["postgresql"]
+            assert Assistant._provide_sessions()["postgresql"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_provide_alembic_operations_unsuccessfully(self):

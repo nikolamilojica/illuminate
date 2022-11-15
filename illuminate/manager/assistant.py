@@ -44,7 +44,7 @@ class Assistant(IAssistant):
         :return: Alembic configuration object
         """
         if not url:
-            url = Assistant.create_db_url(selector)
+            url = Assistant._create_db_url(selector)
         config = Config()
         config.set_main_option(
             "script_location", os.path.join(path, "migrations")
@@ -53,7 +53,7 @@ class Assistant(IAssistant):
         return config
 
     @staticmethod
-    def create_db_url(selector: str, _async: bool = False) -> str:
+    def _create_db_url(selector: str, _async: bool = False) -> str:
         """
         Creates database URL.
 
@@ -62,7 +62,7 @@ class Assistant(IAssistant):
         :return: Database URL string
         :raises BasicManagerException:
         """
-        settings = Assistant.import_settings()
+        settings = Assistant._import_settings()
         try:
             db = settings.DB[selector]
         except KeyError:
@@ -82,7 +82,7 @@ class Assistant(IAssistant):
         return "{type}://{user}:{pass}@{host}/{db}".format(**db)
 
     @staticmethod
-    def import_settings() -> ModuleType:
+    def _import_settings() -> ModuleType:
         """
         Imports project's settings.py module and returns it.
 
@@ -111,13 +111,13 @@ class Assistant(IAssistant):
         :return: Manager's constractor parameters
         :raises BasicManagerException:
         """
-        settings = Assistant.import_settings()
+        settings = Assistant._import_settings()
         context = {
             "adapters": [],
             "name": settings.NAME,
             "observers": [],
             "path": os.getcwd(),
-            "sessions": Assistant.provide_sessions(),
+            "sessions": Assistant._provide_sessions(),
             "settings": settings,
         }
 
@@ -160,7 +160,7 @@ class Assistant(IAssistant):
         return context
 
     @staticmethod
-    def provide_sessions() -> dict[str, dict[str, Type[AsyncSession]]]:
+    def _provide_sessions() -> dict[str, dict[str, Type[AsyncSession]]]:
         """
         Creates a dictionary of database sessions.
 
@@ -170,7 +170,7 @@ class Assistant(IAssistant):
             "mysql": {},
             "postgresql": {},
         }
-        settings = Assistant.import_settings()
+        settings = Assistant._import_settings()
         logger.opt(colors=True).info(
             f"Number of expected db connections: "
             f"<yellow>{len(settings.DB)}</yellow>"
@@ -178,7 +178,7 @@ class Assistant(IAssistant):
         for db in settings.DB:
             _type = settings.DB[db]["type"]
             if _type in ("mysql", "postgresql"):
-                url = Assistant.create_db_url(db, _async=True)
+                url = Assistant._create_db_url(db, _async=True)
                 engine = create_async_engine(url)
                 session = sessionmaker(
                     engine,
@@ -206,7 +206,7 @@ class Assistant(IAssistant):
         :return: Alembic operations object
         """
         if not url:
-            url = Assistant.create_db_url(selector)
+            url = Assistant._create_db_url(selector)
         engine = create_engine(url)
         context = MigrationContext.configure(engine.connect())
         return Operations(context)
@@ -218,5 +218,5 @@ class Assistant(IAssistant):
 
         :return: Models list
         """
-        settings = Assistant.import_settings()
+        settings = Assistant._import_settings()
         return [locate(i) for i in settings.MODELS]
