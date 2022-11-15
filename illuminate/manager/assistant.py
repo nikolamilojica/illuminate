@@ -29,14 +29,17 @@ class Assistant(IAssistant):
 
     @staticmethod
     @logger.catch
-    def create_alembic_config(path: str, url: str) -> Config:
+    def create_alembic_config(path: str, selector: str, url: str) -> Config:
         """
         Creates Alembic's configuration object.
 
         :param path: Migration directory path
+        :param selector: Database name in settings.py module DB attribute
         :param url: SQLAlchemy Database URL
         :return: Alembic configuration object
         """
+        if not url:
+            Assistant.create_db_url(selector)
         config = Config()
         config.set_main_option(
             "script_location", os.path.join(path, "migrations")
