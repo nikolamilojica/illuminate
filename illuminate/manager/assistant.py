@@ -28,7 +28,6 @@ class Assistant(IAssistant):
     """
 
     @staticmethod
-    @logger.catch
     def create_alembic_config(path: str, selector: str, url: str) -> Config:
         """
         Creates Alembic's configuration object.
