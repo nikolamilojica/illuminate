@@ -62,7 +62,7 @@ class TestCLI(Test):
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
                 result = runner.invoke(
-                    cli, ["manage", "db", "revision", tmp, self.url]
+                    cli, ["manage", "db", "revision", "--url", self.url, tmp]
                 )
                 assert "Revision created" in result.output
 
@@ -89,9 +89,11 @@ class TestCLI(Test):
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                runner.invoke(cli, ["manage", "db", "revision", tmp, self.url])
+                runner.invoke(
+                    cli, ["manage", "db", "revision", "--url", self.url, tmp]
+                )
                 result = runner.invoke(
-                    cli, ["manage", "db", "upgrade", tmp, self.url]
+                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
                 )
                 assert "Database main upgraded" in result.output
 
@@ -118,10 +120,14 @@ class TestCLI(Test):
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                runner.invoke(cli, ["manage", "db", "revision", tmp, self.url])
-                runner.invoke(cli, ["manage", "db", "upgrade", tmp, self.url])
+                runner.invoke(
+                    cli, ["manage", "db", "revision", "--url", self.url, tmp]
+                )
+                runner.invoke(
+                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
+                )
                 result = runner.invoke(
-                    cli, ["manage", "db", "populate", self.url]
+                    cli, ["manage", "db", "populate", "--url", self.url]
                 )
                 assert "Database main populated" in result.output
 
