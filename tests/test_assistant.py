@@ -97,6 +97,23 @@ class TestAssistantClass(Test):
             Manager.project_setup(name, ".")
             assert Assistant.provide_sessions()["postgresql"]
 
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_provide_alembic_operations_unsuccessfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant.provide_alembic_operations with none defined
+        database selector
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            with self.path():
+                name = "example"
+                Manager.project_setup(name, ".")
+                assert isinstance(
+                    Assistant.provide_alembic_operations("backup"),
+                    Operations,
+                )
+
     def test_provide_alembic_operations_successfully(self):
         """
         Given: Current directory is a project directory
