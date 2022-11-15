@@ -73,6 +73,7 @@ def project(ctx: dict) -> None:
     help="Database connection selector.",
     required=False,
     show_default=True,
+    type=str,
 )
 @click.argument("url", default=None, required=False, type=str)
 @click.pass_context
@@ -89,6 +90,7 @@ def db_populate(ctx: dict, selector: str, url: str, *args, **kwargs) -> None:
     help="Alembic revision selector.",
     required=False,
     show_default=True,
+    type=str,
 )
 @click.option(
     "--selector",
@@ -96,6 +98,7 @@ def db_populate(ctx: dict, selector: str, url: str, *args, **kwargs) -> None:
     help="Database connection selector.",
     required=False,
     show_default=True,
+    type=str,
 )
 @click.argument(
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
@@ -123,6 +126,7 @@ def db_revision(
     help="Alembic revision selector.",
     required=False,
     show_default=True,
+    type=str,
 )
 @click.option(
     "--selector",
@@ -130,6 +134,7 @@ def db_revision(
     help="Database connection selector.",
     required=False,
     show_default=True,
+    type=str,
 )
 @click.argument(
     "path", default=os.getcwd(), required=False, type=click.Path(exists=True)
