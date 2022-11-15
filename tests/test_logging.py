@@ -16,7 +16,7 @@ from tests.shared.mock import Settings
 def __get_manager(name, observers=None):
     """Manager setup function"""
     Manager._instances = {}
-    manager = Manager([], name, [], "", Settings(name))
+    manager = Manager([], name, [], "", {}, Settings(name))
     manager.adapters = []
     manager.observers = observers or []
     manager.settings = Settings(name)

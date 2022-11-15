@@ -87,3 +87,14 @@ class TestAssistantClass(Test):
             assert len(context["adapters"]) == 1
             assert len(context["observers"]) == 1
             assert context["name"] == name
+
+    def test_provide_sessions_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant.provide_sessions
+        Expected: Returns sessions dict
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            assert Assistant.provide_sessions()["postgresql"]
