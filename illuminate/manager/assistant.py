@@ -101,7 +101,7 @@ class Assistant(IAssistant):
         Creates Manager's constructor kwargs.
 
         :param _filter: Optional tuple of Observer's names or class names
-        :return: Manager's contractor parameters
+        :return: Manager's constractor parameters
         :raises BasicManagerException:
         """
         settings = Assistant.import_settings()
