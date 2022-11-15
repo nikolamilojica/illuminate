@@ -157,7 +157,7 @@ class Assistant(IAssistant):
         """
         Creates a dictionary of database sessions.
 
-        :return: None
+        :return: Database sessions
         """
         _sessions: dict[str, dict[str, Type[AsyncSession]]] = {
             "mysql": {},
