@@ -8,7 +8,10 @@ from types import ModuleType
 from typing import Optional, Type, Union
 
 from alembic.config import Config
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
 from loguru import logger
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -181,3 +184,18 @@ class Assistant(IAssistant):
                 )
                 _sessions[_type] = {db: session}  # type: ignore
         return _sessions
+
+    @staticmethod
+    def provide_alembic_operations(selector: str, url: str) -> Operations:
+        """
+        Creates Alembic's operations object.
+
+        :param selector: Database name in settings.py module DB attribute
+        :param url: SQLAlchemy Database URL
+        :return: Alembic operations object
+        """
+        if not url:
+            url = Assistant.create_db_url(selector)
+        engine = create_engine(url)
+        context = MigrationContext.configure(engine.connect())
+        return Operations(context)
