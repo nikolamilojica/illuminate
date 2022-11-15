@@ -17,85 +17,9 @@ class TestAssistantClass(Test):
         with self.path() as path:
             name = "example"
             Manager.project_setup(name, ".")
-            url = Assistant._create_db_url("main")
+            url = Assistant._provide_db_url("main")
             config = Assistant.provide_alembic_config(path, "main", url)
             assert config.get_main_option("sqlalchemy.url") == url
-
-    def test_create_db_url_successfully(self):
-        """
-        Given: Current directory is a project directory
-        When: Calling Assistant.create_db_url
-        Expected: Returns database URL
-        """
-        with self.path():
-            name = "example"
-            Manager.project_setup(name, ".")
-            url = Assistant._create_db_url("main")
-            assert url == "postgresql://illuminate:password@localhost/example"
-
-    def test_create_async_db_url_successfully(self):
-        """
-        Given: Current directory is a project directory
-        When: Calling Assistant.create_db_url with _async=True option
-        Expected: Returns async database URL
-        """
-        with self.path():
-            name = "example"
-            Manager.project_setup(name, ".")
-            url = Assistant._create_db_url("main", _async=True)
-            assert (
-                url
-                == "postgresql+asyncpg://illuminate:password@localhost/example"
-            )
-
-    @pytest.mark.xfail(raises=BasicManagerException)
-    def test_import_settings_unsuccessfully(self):
-        """
-        Given: Current directory is a not project directory
-        When: Calling Assistant.import_settings
-        Expected: BasicManagerException is raised
-        """
-        with pytest.raises(BasicManagerException):
-            with self.path():
-                Assistant._import_settings()
-
-    def test_import_settings_successfully(self):
-        """
-        Given: Current directory is a project directory
-        When: Calling Assistant.import_settings
-        Expected: Returns module
-        """
-        with self.path():
-            name = "example"
-            Manager.project_setup(name, ".")
-            settings = Assistant._import_settings()
-            assert settings.NAME == name
-
-    def test_provide_context_successfully(self):
-        """
-        Given: Current directory is a project directory
-        When: Calling Assistant.provide_context
-        Expected: Returns context dict
-        """
-        with self.path():
-            name = "example"
-            Manager.project_setup(name, ".")
-            context = Assistant.provide_context()
-            assert type(context) == dict
-            assert len(context["adapters"]) == 1
-            assert len(context["observers"]) == 1
-            assert context["name"] == name
-
-    def test_provide_sessions_successfully(self):
-        """
-        Given: Current directory is a project directory
-        When: Calling Assistant.provide_sessions
-        Expected: Returns sessions dict
-        """
-        with self.path():
-            name = "example"
-            Manager.project_setup(name, ".")
-            assert Assistant._provide_sessions()["postgresql"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_provide_alembic_operations_unsuccessfully(self):
@@ -128,6 +52,21 @@ class TestAssistantClass(Test):
                 Operations,
             )
 
+    def test_provide_context_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant.provide_context
+        Expected: Returns context dict
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            context = Assistant.provide_context()
+            assert type(context) == dict
+            assert len(context["adapters"]) == 1
+            assert len(context["observers"]) == 1
+            assert context["name"] == name
+
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_provide_models_unsuccessfully(self):
         """
@@ -148,3 +87,64 @@ class TestAssistantClass(Test):
             name = "example"
             Manager.project_setup(name, ".")
             assert Assistant.provide_models()[0]
+
+    def test__provide_db_url_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant._provide_db_url
+        Expected: Returns database URL
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            url = Assistant._provide_db_url("main")
+            assert url == "postgresql://illuminate:password@localhost/example"
+
+    def test__provide_db_url_async_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant._provide_db_url with _async=True option
+        Expected: Returns async database URL
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            url = Assistant._provide_db_url("main", _async=True)
+            assert (
+                url
+                == "postgresql+asyncpg://illuminate:password@localhost/example"
+            )
+
+    def test__provide_sessions_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant._provide_sessions
+        Expected: Returns sessions dict
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            assert Assistant._provide_sessions()["postgresql"]
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test__provide_settings_unsuccessfully(self):
+        """
+        Given: Current directory is a not project directory
+        When: Calling Assistant._provide_settings
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            with self.path():
+                Assistant._provide_settings()
+
+    def test__provide_settings_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant._provide_settings
+        Expected: Returns module
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            settings = Assistant._provide_settings()
+            assert settings.NAME == name

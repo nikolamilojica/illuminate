@@ -44,7 +44,7 @@ class Assistant(IAssistant):
         :return: Alembic configuration object
         """
         if not url:
-            url = Assistant._create_db_url(selector)
+            url = Assistant._provide_db_url(selector)
         config = Config()
         config.set_main_option(
             "script_location", os.path.join(path, "migrations")
@@ -53,50 +53,21 @@ class Assistant(IAssistant):
         return config
 
     @staticmethod
-    def _create_db_url(selector: str, _async: bool = False) -> str:
+    def provide_alembic_operations(
+        selector: str, url: Optional[str] = None
+    ) -> Operations:
         """
-        Creates database URL.
+        Creates Alembic's operations object.
 
         :param selector: Database name in settings.py module DB attribute
-        :param _async: Async URL flag
-        :return: Database URL string
-        :raises BasicManagerException:
+        :param url: SQLAlchemy Database URL
+        :return: Alembic operations object
         """
-        settings = Assistant._import_settings()
-        try:
-            db = settings.DB[selector]
-        except KeyError:
-            raise BasicManagerException(
-                f"Database {selector} is not defined in settings.py"
-            )
-        db["db"] = settings.NAME
-        if _async:
-            async_drivers = {
-                "mysql": "asyncmy",
-                "postgresql": "asyncpg",
-            }
-            driver = async_drivers[db["type"]]
-            return "{type}+{driver}://{user}:{pass}@{host}/{db}".format(
-                driver=driver, **db
-            )
-        return "{type}://{user}:{pass}@{host}/{db}".format(**db)
-
-    @staticmethod
-    def _import_settings() -> ModuleType:
-        """
-        Imports project's settings.py module and returns it.
-
-        :return: Project's settings.py module
-        :raises BasicManagerException:
-        """
-        try:
-            import settings  # type: ignore
-
-            return settings
-        except ImportError:
-            raise BasicManagerException(
-                "Framework did not found settings.py in the current directory"
-            )
+        if not url:
+            url = Assistant._provide_db_url(selector)
+        engine = create_engine(url)
+        context = MigrationContext.configure(engine.connect())
+        return Operations(context)
 
     @staticmethod
     def provide_context(
@@ -111,7 +82,7 @@ class Assistant(IAssistant):
         :return: Manager's constractor parameters
         :raises BasicManagerException:
         """
-        settings = Assistant._import_settings()
+        settings = Assistant._provide_settings()
         context = {
             "adapters": [],
             "name": settings.NAME,
@@ -160,6 +131,46 @@ class Assistant(IAssistant):
         return context
 
     @staticmethod
+    def provide_models() -> list[object]:
+        """
+        Gathers project models.
+
+        :return: Models list
+        """
+        settings = Assistant._provide_settings()
+        return [locate(i) for i in settings.MODELS]
+
+    @staticmethod
+    def _provide_db_url(selector: str, _async: bool = False) -> str:
+        """
+        Creates database URL.
+
+        :param selector: Database name in settings.py module DB attribute
+        :param _async: Async URL flag
+        :return: Database URL string
+        :raises BasicManagerException:
+        """
+        settings = Assistant._provide_settings()
+        try:
+            db = settings.DB[selector]
+        except KeyError:
+            raise BasicManagerException(
+                f"Database {selector} is not defined in settings.py"
+            )
+        db["db"] = settings.NAME
+        if _async:
+            async_drivers = {
+                "mysql": "asyncmy",
+                "postgresql": "asyncpg",
+            }
+            driver = async_drivers[db["type"]]
+            return "{type}+{driver}://{user}:{pass}@{host}/{db}".format(
+                driver=driver, **db
+            )
+
+        return "{type}://{user}:{pass}@{host}/{db}".format(**db)
+
+    @staticmethod
     def _provide_sessions() -> dict[str, dict[str, Type[AsyncSession]]]:
         """
         Creates a dictionary of database sessions.
@@ -170,7 +181,7 @@ class Assistant(IAssistant):
             "mysql": {},
             "postgresql": {},
         }
-        settings = Assistant._import_settings()
+        settings = Assistant._provide_settings()
         logger.opt(colors=True).info(
             f"Number of expected db connections: "
             f"<yellow>{len(settings.DB)}</yellow>"
@@ -178,7 +189,7 @@ class Assistant(IAssistant):
         for db in settings.DB:
             _type = settings.DB[db]["type"]
             if _type in ("mysql", "postgresql"):
-                url = Assistant._create_db_url(db, _async=True)
+                url = Assistant._provide_db_url(db, _async=True)
                 engine = create_async_engine(url)
                 session = sessionmaker(
                     engine,
@@ -192,31 +203,22 @@ class Assistant(IAssistant):
                     f"<magenta>{host}:{port}</magenta> to context"
                 )
                 _sessions[_type] = {db: session}  # type: ignore
+
         return _sessions
 
     @staticmethod
-    def provide_alembic_operations(
-        selector: str, url: Optional[str] = None
-    ) -> Operations:
+    def _provide_settings() -> ModuleType:
         """
-        Creates Alembic's operations object.
+        Imports project's settings.py module and returns it.
 
-        :param selector: Database name in settings.py module DB attribute
-        :param url: SQLAlchemy Database URL
-        :return: Alembic operations object
+        :return: Project's settings.py module
+        :raises BasicManagerException:
         """
-        if not url:
-            url = Assistant._create_db_url(selector)
-        engine = create_engine(url)
-        context = MigrationContext.configure(engine.connect())
-        return Operations(context)
+        try:
+            import settings  # type: ignore
 
-    @staticmethod
-    def provide_models() -> list[object]:
-        """
-        Gathers project models.
-
-        :return: Models list
-        """
-        settings = Assistant._import_settings()
-        return [locate(i) for i in settings.MODELS]
+            return settings
+        except ImportError:
+            raise BasicManagerException(
+                "Framework did not found settings.py in the current directory"
+            )
