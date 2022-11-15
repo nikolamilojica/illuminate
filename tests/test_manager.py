@@ -25,10 +25,10 @@ class TestManagerClassInstance:
         Expected: Instances are the same
         """
         manager_1 = Manager(
-            [Adapter], "example1", [Observer], "/opt/example1", os
+            [Adapter], "example1", [Observer], "/opt/example1", {}, os
         )
         manager_2 = Manager(
-            [Adapter], "example2", [Observer], "/opt/example2", os
+            [Adapter], "example2", [Observer], "/opt/example2", {}, os
         )
         assert manager_1 == manager_2
         Manager._instances = {}
