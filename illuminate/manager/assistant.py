@@ -105,7 +105,7 @@ class Assistant(IAssistant):
             "name": settings.NAME,
             "observers": [],
             "path": os.getcwd(),
-            "sessions": Assistant._create_sessions(),
+            "sessions": Assistant.provide_sessions(),
             "settings": settings,
         }
 
@@ -148,7 +148,7 @@ class Assistant(IAssistant):
         return context
 
     @staticmethod
-    def _create_sessions() -> dict[str, dict[str, Type[AsyncSession]]]:
+    def provide_sessions() -> dict[str, dict[str, Type[AsyncSession]]]:
         """
         Creates a dictionary of database sessions.
 
