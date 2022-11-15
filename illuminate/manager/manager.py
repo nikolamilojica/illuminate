@@ -5,7 +5,6 @@ import inspect
 import json
 import os
 from glob import glob
-from pydoc import locate
 from types import ModuleType
 from typing import Optional, Type, Union
 
@@ -103,8 +102,9 @@ class Manager(IManager, metaclass=Singleton):
         :param url: SQLAlchemy URL
         :return: None
         """
-        settings = Assistant.import_settings()
-        op = Assistant.provide_alembic_operations(selector, url)
+        models = Assistant.provide_models()
+        operations = Assistant.provide_alembic_operations(selector, url)
+
         table_data = {}
         files = (
             fixtures if fixtures else glob("fixtures/*.json", recursive=True)
@@ -116,11 +116,10 @@ class Manager(IManager, metaclass=Singleton):
                 content = json.load(file)  # type: ignore
                 for table in content:
                     table_data.update({table["name"]: table["data"]})
-        models = [locate(i) for i in settings.MODELS]
         for model in models:
             if model.__tablename__ in table_data:  # type: ignore
                 data = table_data[model.__tablename__]  # type: ignore
-                op.bulk_insert(model.__table__, data)  # type: ignore
+                operations.bulk_insert(model.__table__, data)  # type: ignore
                 for record in data:
                     logger.debug(
                         f"Row {record} added to "  # type: ignore
