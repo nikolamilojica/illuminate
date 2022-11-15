@@ -8,6 +8,20 @@ from tests.shared.unit import Test
 
 
 class TestAssistantClass(Test):
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_provide_alembic_config_unsuccessfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant.provide_alembic_config with none defined
+        database selector
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                name = "example"
+                Manager.project_setup(name, ".")
+                Assistant.provide_alembic_config(path, "backup")
+
     def test_provide_alembic_config_successfully(self):
         """
         Given: Current directory is a project directory
@@ -52,6 +66,16 @@ class TestAssistantClass(Test):
                 Operations,
             )
 
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_provide_context_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Calling Assistant.provide_context
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            Assistant.provide_context()
+
     def test_provide_context_successfully(self):
         """
         Given: Current directory is a project directory
@@ -88,6 +112,26 @@ class TestAssistantClass(Test):
             Manager.project_setup(name, ".")
             assert Assistant.provide_models()[0]
 
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test__provide_db_url_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Calling Assistant._provide_db_url
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            Assistant._provide_db_url("main")
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test__provide_db_url_async_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Calling Assistant._provide_db_url
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            Assistant._provide_db_url("main", _async=True)
+
     def test__provide_db_url_successfully(self):
         """
         Given: Current directory is a project directory
@@ -114,6 +158,15 @@ class TestAssistantClass(Test):
                 url
                 == "postgresql+asyncpg://illuminate:password@localhost/example"
             )
+
+    def test__provide_sessions_unsuccessfully(self):
+        """
+        Given: Current directory is not a project directory
+        When: Calling Assistant._provide_sessions
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            Assistant._provide_sessions()
 
     def test__provide_sessions_successfully(self):
         """
