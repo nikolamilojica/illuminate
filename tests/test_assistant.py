@@ -1,4 +1,5 @@
 import pytest
+from alembic.operations import Operations
 
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.manager.assistant import Assistant
@@ -95,3 +96,17 @@ class TestAssistantClass(Test):
             name = "example"
             Manager.project_setup(name, ".")
             assert Assistant.provide_sessions()["postgresql"]
+
+    def test_provide_alembic_operations_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Calling Assistant.provide_alembic_operations
+        Expected: Returns Operations object
+        """
+        with self.path():
+            name = "example"
+            Manager.project_setup(name, ".")
+            assert isinstance(
+                Assistant.provide_alembic_operations("main", self.url),
+                Operations,
+            )
