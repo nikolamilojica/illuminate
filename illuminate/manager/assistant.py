@@ -4,6 +4,7 @@ import importlib.util
 import inspect
 import os
 import sys
+from pydoc import locate
 from types import ModuleType
 from typing import Optional, Type, Union
 
@@ -209,3 +210,13 @@ class Assistant(IAssistant):
         engine = create_engine(url)
         context = MigrationContext.configure(engine.connect())
         return Operations(context)
+
+    @staticmethod
+    def provide_models() -> list[object]:
+        """
+        Gathers project models.
+
+        :return: Models list
+        """
+        settings = Assistant.import_settings()
+        return [locate(i) for i in settings.MODELS]
