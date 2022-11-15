@@ -45,17 +45,15 @@ class Assistant(IAssistant):
         return config
 
     @staticmethod
-    def create_db_url(
-        selector: str, settings: ModuleType, _async: bool = False
-    ) -> str:
+    def create_db_url(selector: str, _async: bool = False) -> str:
         """
         Creates database URL.
 
         :param selector: Database name in settings.py module DB attribute
-        :param settings: Project's settings.py module
         :param _async: Async URL flag
         :return: Database URL string
         """
+        settings = Assistant.import_settings()
         db = settings.DB[selector]
         db["db"] = settings.NAME
         if _async:
@@ -166,7 +164,7 @@ class Assistant(IAssistant):
         for db in settings.DB:
             _type = settings.DB[db]["type"]
             if _type in ("mysql", "postgresql"):
-                url = Assistant.create_db_url(db, settings, _async=True)
+                url = Assistant.create_db_url(db, _async=True)
                 engine = create_async_engine(url)
                 session = sessionmaker(
                     engine,
