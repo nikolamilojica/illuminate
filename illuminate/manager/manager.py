@@ -145,11 +145,9 @@ class Manager(IManager, metaclass=Singleton):
         :param url: SQLAlchemy URL
         :return: None
         """
-        settings = Assistant._import_settings()
         config = Assistant.provide_alembic_config(path, selector, url)
         command.revision(
             config,
-            message=settings.NAME,
             autogenerate=True,
             head=revision,
         )
