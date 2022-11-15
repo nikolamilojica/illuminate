@@ -31,7 +31,9 @@ class Assistant(IAssistant):
     """
 
     @staticmethod
-    def create_alembic_config(path: str, selector: str, url: str) -> Config:
+    def create_alembic_config(
+        path: str, selector: str, url: Optional[str]
+    ) -> Config:
         """
         Creates Alembic's configuration object.
 
@@ -41,7 +43,7 @@ class Assistant(IAssistant):
         :return: Alembic configuration object
         """
         if not url:
-            Assistant.create_db_url(selector)
+            url = Assistant.create_db_url(selector)
         config = Config()
         config.set_main_option(
             "script_location", os.path.join(path, "migrations")
@@ -186,7 +188,9 @@ class Assistant(IAssistant):
         return _sessions
 
     @staticmethod
-    def provide_alembic_operations(selector: str, url: str) -> Operations:
+    def provide_alembic_operations(
+        selector: str, url: Optional[str]
+    ) -> Operations:
         """
         Creates Alembic's operations object.
 
