@@ -14,6 +14,7 @@ from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from loguru import logger
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 from tornado import gen, ioloop, queues
 
 from illuminate.adapter.adapter import Adapter
@@ -47,6 +48,7 @@ class Manager(IManager, metaclass=Singleton):
         name: str,
         observers: list[Type[Observer]],
         path: str,
+        sessions: dict[str, dict[str, Type[AsyncSession]]],
         settings: ModuleType,
         *args,
         **kwargs,
@@ -59,13 +61,14 @@ class Manager(IManager, metaclass=Singleton):
         :param observers: List of Observers found in project files after
         filtering
         :param path: Path to project files
+        :param sessions: Database sessions
         :param settings: Project's settings.py module
         """
         self.adapters = adapters
         self.name = name
         self.observers = observers
         self.path = path
-        self.sessions = self._create_sessions(settings)
+        self.sessions = sessions
         self.settings = settings
         self.__observe_queue: queues.Queue = queues.Queue()
         self.__adapt_queue: queues.Queue = queues.Queue()
