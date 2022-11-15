@@ -105,6 +105,7 @@ class Assistant(IAssistant):
             "name": settings.NAME,
             "observers": [],
             "path": os.getcwd(),
+            "sessions": Assistant._create_sessions(),
             "settings": settings,
         }
 
@@ -163,7 +164,8 @@ class Assistant(IAssistant):
             f"<yellow>{len(settings.DB)}</yellow>"
         )
         for db in settings.DB:
-            if settings.DB[db]["type"] in ("mysql", "postgresql"):
+            _type = settings.DB[db]["type"]
+            if _type in ("mysql", "postgresql"):
                 url = Assistant.create_db_url(db, settings, _async=True)
                 engine = create_async_engine(url)
                 session = sessionmaker(
@@ -177,5 +179,5 @@ class Assistant(IAssistant):
                     f"Adding session with <yellow>{db}</yellow> at "
                     f"<magenta>{host}:{port}</magenta> to context"
                 )
-                _sessions[settings.DB[db]["type"]] = {db: session}
+                _sessions[_type] = {db: session}  # type: ignore
         return _sessions
