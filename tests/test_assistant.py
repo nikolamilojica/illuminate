@@ -17,7 +17,7 @@ class TestAssistantClass(Test):
             name = "example"
             Manager.project_setup(name, ".")
             url = Assistant.create_db_url("main")
-            config = Assistant.create_alembic_config(path, url)
+            config = Assistant.create_alembic_config(path, "main", url)
             assert config.get_main_option("sqlalchemy.url") == url
 
     def test_create_db_url_successfully(self):
