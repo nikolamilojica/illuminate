@@ -2,7 +2,7 @@ class IAssistant:
     """Interface for Assistant class."""
 
     @staticmethod
-    def create_alembic_config(path, selector, url):
+    def provide_alembic_config(path, selector, url):
         """Creates Alembic's configuration object."""
         raise NotImplementedError
 

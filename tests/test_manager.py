@@ -72,7 +72,7 @@ class TestManagerDBCommandGroup(Test):
         """
         Given: Current directory is a project directory
         When: Creating revision of a db with Alembic
-        Expected: File migrations/versions/<REV_ID>_<PROJECT_NAME>.py exists
+        Expected: File migrations/versions/<REV_ID>.py exists
         """
         with self.path() as path:
             name = "example"
