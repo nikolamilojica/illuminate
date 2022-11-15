@@ -81,7 +81,7 @@ class TestManagerDBCommandGroup(Test):
             versions = os.path.join(path, "migrations/versions/")
             assert os.path.isdir(versions)
             for file in next(walk(versions), (None, None, []))[2]:
-                if name in file:
+                if file.endswith(".py"):
                     assert True
                     return
             assert False

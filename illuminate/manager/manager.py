@@ -5,15 +5,11 @@ import inspect
 import json
 import os
 from glob import glob
-from pydoc import locate
 from types import ModuleType
 from typing import Optional, Type, Union
 
 from alembic import command
-from alembic.migration import MigrationContext
-from alembic.operations import Operations
 from loguru import logger
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from tornado import gen, ioloop, queues
 
@@ -106,12 +102,9 @@ class Manager(IManager, metaclass=Singleton):
         :param url: SQLAlchemy URL
         :return: None
         """
-        settings = Assistant.import_settings()
-        if not url:
-            url = Assistant.create_db_url(selector, settings)
-        engine = create_engine(url)
-        context = MigrationContext.configure(engine.connect())
-        op = Operations(context)
+        models = Assistant.provide_models()
+        operations = Assistant.provide_alembic_operations(selector, url)
+
         table_data = {}
         files = (
             fixtures if fixtures else glob("fixtures/*.json", recursive=True)
@@ -123,11 +116,10 @@ class Manager(IManager, metaclass=Singleton):
                 content = json.load(file)  # type: ignore
                 for table in content:
                     table_data.update({table["name"]: table["data"]})
-        models = [locate(i) for i in settings.MODELS]
         for model in models:
             if model.__tablename__ in table_data:  # type: ignore
                 data = table_data[model.__tablename__]  # type: ignore
-                op.bulk_insert(model.__table__, data)  # type: ignore
+                operations.bulk_insert(model.__table__, data)  # type: ignore
                 for record in data:
                     logger.debug(
                         f"Row {record} added to "  # type: ignore
@@ -153,13 +145,9 @@ class Manager(IManager, metaclass=Singleton):
         :param url: SQLAlchemy URL
         :return: None
         """
-        settings = Assistant.import_settings()
-        if not url:
-            url = Assistant.create_db_url(selector, settings)
-        config = Assistant.create_alembic_config(path, url)
+        config = Assistant.provide_alembic_config(path, selector, url)
         command.revision(
             config,
-            message=settings.NAME,
             autogenerate=True,
             head=revision,
         )
@@ -183,10 +171,7 @@ class Manager(IManager, metaclass=Singleton):
         :param url: SQLAlchemy URL
         :return: None
         """
-        settings = Assistant.import_settings()
-        if not url:
-            url = Assistant.create_db_url(selector, settings)
-        config = Assistant.create_alembic_config(path, url)
+        config = Assistant.provide_alembic_config(path, selector, url)
         command.upgrade(config, revision)
         logger.success(f"Database {selector} upgraded")
 
