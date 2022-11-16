@@ -6,22 +6,24 @@ import json
 import os
 from glob import glob
 from types import ModuleType
-from typing import Optional, Type, Union
+from typing import Type, Union
 
 from alembic import command
+from alembic.config import Config
+from alembic.operations import Operations
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from tornado import gen, ioloop, queues
 
 from illuminate.adapter.adapter import Adapter
 from illuminate.common.project_templates import FILES
+from illuminate.decorators.cli import adapt
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.exporter.exporter import Exporter
 from illuminate.exporter.sql import SQLExporter
 from illuminate.interface.manager import IManager
-from illuminate.manager.assistant import Assistant
 from illuminate.meta.singleton import Singleton
 from illuminate.observation.http import HTTPObservation
 from illuminate.observation.http import Observation
@@ -87,10 +89,12 @@ class Manager(IManager, metaclass=Singleton):
         return self.__requested
 
     @staticmethod
+    @adapt
     def db_populate(
         fixtures: tuple[str],
+        models: list[object],
+        operations: Operations,
         selector: str,
-        url: Optional[str] = None,
         *args,
         **kwargs,
     ) -> None:
@@ -98,12 +102,11 @@ class Manager(IManager, metaclass=Singleton):
         Populates database with fixtures.
 
         :param fixtures: Tuple of fixture files
+        :param models: Models list
+        :param operations: Alembic's operations object
         :param selector: Database name in settings.py module
-        :param url: SQLAlchemy URL
         :return: None
         """
-        models = Assistant.provide_models()
-        operations = Assistant.provide_alembic_operations(selector, url)
 
         table_data = {}
         files = (
@@ -128,24 +131,21 @@ class Manager(IManager, metaclass=Singleton):
         logger.success(f"Database {selector} populated")
 
     @staticmethod
+    @adapt
     def db_revision(
-        path: str,
+        config: Config,
         revision: str,
-        selector: str,
-        url: Optional[str] = None,
         *args,
         **kwargs,
     ) -> None:
         """
         Creates Alembic's revision file in migration directory.
 
-        :param path: Path to migrations directory
+        :param config: Alembic's configuration object
         :param revision: Parent revision
-        :param selector: Database name in settings.py module
-        :param url: SQLAlchemy URL
+
         :return: None
         """
-        config = Assistant.provide_alembic_config(path, selector, url)
         command.revision(
             config,
             autogenerate=True,
@@ -154,24 +154,22 @@ class Manager(IManager, metaclass=Singleton):
         logger.success("Revision created")
 
     @staticmethod
+    @adapt
     def db_upgrade(
-        path: str,
+        config: Config,
         revision: str,
         selector: str,
-        url: Optional[str] = None,
         *args,
         **kwargs,
     ) -> None:
         """
         Applies migration file to a database.
 
-        :param path: Path to migrations directory
+        :param config: Alembic's configuration object
         :param revision: Revision to apply to database
         :param selector: Database name in settings.py module
-        :param url: SQLAlchemy URL
         :return: None
         """
-        config = Assistant.provide_alembic_config(path, selector, url)
         command.upgrade(config, revision)
         logger.success(f"Database {selector} upgraded")
 

@@ -11,7 +11,7 @@ from tornado.httpclient import HTTPResponse
 from illuminate.adapter.adapter import Adapter
 from illuminate.common.project_templates import FILES
 from illuminate.exceptions.manager import BasicManagerException
-from illuminate.manager.manager import Assistant
+from illuminate.manager.assistant import Assistant
 from illuminate.manager.manager import Manager
 from illuminate.observer.observer import Observer
 from tests.shared.unit import Test

@@ -9,7 +9,7 @@ from loguru import logger
 from illuminate import __version__
 from illuminate.common.project_logging import LOGGING_LEVELS
 from illuminate.decorators.logging import show_observer_catalogue
-from illuminate.manager.manager import Assistant
+from illuminate.manager.assistant import Assistant
 from illuminate.manager.manager import Manager
 
 

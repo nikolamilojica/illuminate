@@ -2,17 +2,17 @@ class IManager:
     """Interface for Manager class."""
 
     @staticmethod
-    def db_populate(fixtures, selector, url=None):
+    def db_populate(fixtures, models, operations, selector):
         """Populates database with fixtures."""
         raise NotImplementedError
 
     @staticmethod
-    def db_revision(path, revision, selector, url=None, *args, **kwargs):
+    def db_revision(config, revision):
         """Creates Alembic's revision file in migration directory."""
         raise NotImplementedError
 
     @staticmethod
-    def db_upgrade(path, revision, selector, url=None):
+    def db_upgrade(config, revision, selector):
         """Applies migration file to a database."""
         raise NotImplementedError
 
