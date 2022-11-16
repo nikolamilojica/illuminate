@@ -9,9 +9,9 @@ from loguru import logger
 from illuminate.manager.assistant import Assistant
 
 
-def overload(func: Callable) -> Callable:
+def adapt(func: Callable) -> Callable:
     """
-    Overrides Manager's static methods to accept cli arguments.
+    Adapts Manager's static methods to accept cli arguments.
 
     :param func: Manager's static method
     :return: Manager's static method wrapper
@@ -27,7 +27,7 @@ def overload(func: Callable) -> Callable:
             fixtures: tuple[str], selector: str, url: str, *args, **kwargs
         ) -> None:
             """
-            Overrides Manager's db_populate method to accept cli arguments.
+            Adapts Manager's db_populate method to accept cli arguments.
 
             :param fixtures: Tuple of fixture files
             :param selector: Database name in settings.py module
@@ -45,7 +45,7 @@ def overload(func: Callable) -> Callable:
             path: str, revision: str, selector: str, url: str, *args, **kwargs
         ) -> None:
             """
-            Overrides Manager's db_revision method to accept cli arguments.
+            Adapts Manager's db_revision method to accept cli arguments.
 
             :param path: Migration directory path
             :param revision: Parent revision
@@ -63,7 +63,7 @@ def overload(func: Callable) -> Callable:
             path: str, revision: str, selector: str, url: str, *args, **kwargs
         ) -> None:
             """
-            Overrides Manager's db_upgrade method to accept cli arguments.
+            Adapts Manager's db_upgrade method to accept cli arguments.
 
             :param path: Migration directory path
             :param revision: Parent revision

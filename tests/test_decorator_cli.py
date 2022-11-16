@@ -1,7 +1,7 @@
 from alembic.config import Config
 from alembic.operations import Operations
 
-from illuminate.decorators.cli import overload
+from illuminate.decorators.cli import adapt
 from illuminate.manager.manager import Manager
 from tests.shared.unit import Test
 
@@ -10,7 +10,7 @@ class DummyManager:
     """Dummy Manager class"""
 
     @staticmethod
-    @overload
+    @adapt
     def db_populate(fixtures, models, operations, selector):
         """Dummy db_populate"""
         assert len(models) == 1
@@ -19,14 +19,14 @@ class DummyManager:
         assert selector == "main"
 
     @staticmethod
-    @overload
+    @adapt
     def db_revision(config, revision):
         """Dummy db_revision"""
         assert isinstance(config, Config)
         assert revision == "head"
 
     @staticmethod
-    @overload
+    @adapt
     def db_upgrade(config, revision, selector):
         """Dummy db_upgrade"""
         assert isinstance(config, Config)
@@ -34,12 +34,12 @@ class DummyManager:
         assert selector == "main"
 
 
-class TestOverload(Test):
+class TestAdapt(Test):
     def test_db_populate(self):
         """
         Given: Current directory is a project directory
         When: Calling Manager.db_revision with cli arguments
-        Expected: Manager.db_populate is overridden
+        Expected: Manager.db_populate is adapted
         """
         with self.path():
             Manager.project_setup("example", ".")
@@ -51,7 +51,7 @@ class TestOverload(Test):
         """
         Given: Current directory is a project directory
         When: Calling Manager.db_revision with cli arguments
-        Expected: Manager.db_revision is overridden
+        Expected: Manager.db_revision is adapted
         """
         with self.path() as path:
             Manager.project_setup("example", ".")
@@ -61,7 +61,7 @@ class TestOverload(Test):
         """
         Given: Current directory is a project directory
         When: Calling Manager.db_revision with cli arguments
-        Expected: Manager.db_upgrade is overridden
+        Expected: Manager.db_upgrade is adapted
         """
         with self.path() as path:
             Manager.project_setup("example", ".")
