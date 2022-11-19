@@ -68,6 +68,8 @@ class Manager(IManager, metaclass=Singleton):
         self.path = path
         self.sessions = sessions
         self.settings = settings
+        self._adapters: list[Adapter] = []
+        self._observers: list[Observer] = []
         self.__observe_queue: queues.Queue = queues.Queue()
         self.__adapt_queue: queues.Queue = queues.Queue()
         self.__export_queue: queues.Queue = queues.Queue()
@@ -219,15 +221,22 @@ class Manager(IManager, metaclass=Singleton):
 
     async def __start(self) -> None:
         """
-        Initializes Observers and pass initial Observation objects to
-        self.__observation.
+        Initializes Adapters and Observers and pass initial Observation
+        objects to self.__observation.
 
         :return: None
         """
+        for adapter in self.adapters:
+            self._adapters.append(adapter())
+            logger.opt(colors=True).info(
+                f"Adapter <yellow>{adapter.__name__}</yellow> initialized"
+            )
+
         for observer in self.observers:
             instance = observer()
+            self._observers.append(instance)
             logger.opt(colors=True).info(
-                f"Observer <yellow>{instance.NAME}</yellow> initialized"
+                f"Observer <yellow>{observer.__name__}</yellow> initialized"
             )
             for _observation in instance.initial_observations:
                 await self.__observation(_observation)
@@ -333,12 +342,10 @@ class Manager(IManager, metaclass=Singleton):
         :param item: Finding object
         :return: None
         """
-        for adapter in self.adapters:
-            instance = adapter()
-
-            for subscriber in instance.subscribers:
+        for adapter in self._adapters:
+            for subscriber in adapter.subscribers:
                 if isinstance(item, subscriber):
-                    items = instance.adapt(item)
+                    items = adapter.adapt(item)
                     async for _item in items:  # type: ignore
                         await self.__router(_item)
 
