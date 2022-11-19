@@ -24,14 +24,13 @@ from illuminate.exceptions.manager import BasicManagerException
 from illuminate.exporter.exporter import Exporter
 from illuminate.exporter.sql import SQLExporter
 from illuminate.interface.manager import IManager
-from illuminate.meta.singleton import Singleton
 from illuminate.observation.http import HTTPObservation
 from illuminate.observation.http import Observation
 from illuminate.observer.finding import Finding
 from illuminate.observer.observer import Observer
 
 
-class Manager(IManager, metaclass=Singleton):
+class Manager(IManager):
     """
     Manager class, executes framework's cli commands.
 

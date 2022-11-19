@@ -8,30 +8,11 @@ from sqlalchemy import inspect
 from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
-from illuminate.adapter.adapter import Adapter
 from illuminate.common.project_templates import FILES
 from illuminate.exceptions.manager import BasicManagerException
 from illuminate.manager.assistant import Assistant
 from illuminate.manager.manager import Manager
-from illuminate.observer.observer import Observer
 from tests.shared.unit import Test
-
-
-class TestManagerClassInstance:
-    def test_singleton_behaviour_successfully(self):
-        """
-        Given: None
-        When: Creating instance of Manager class twice with different arguments
-        Expected: Instances are the same
-        """
-        manager_1 = Manager(
-            [Adapter], "example1", [Observer], "/opt/example1", {}, os
-        )
-        manager_2 = Manager(
-            [Adapter], "example2", [Observer], "/opt/example2", {}, os
-        )
-        assert manager_1 == manager_2
-        Manager._instances = {}
 
 
 class TestManagerDBCommandGroup(Test):
@@ -220,5 +201,3 @@ class TestManagerObserveCommandGroup(Test):
             assert len(query) == 1
             assert query[0].url == "https://example.com"
             assert query[0].title == "Example"
-
-        Manager._instances = {}
