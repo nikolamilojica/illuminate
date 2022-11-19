@@ -201,5 +201,3 @@ class TestManagerObserveCommandGroup(Test):
             assert len(query) == 1
             assert query[0].url == "https://example.com"
             assert query[0].title == "Example"
-
-        Manager._instances = {}
