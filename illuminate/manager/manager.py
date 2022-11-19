@@ -234,8 +234,9 @@ class Manager(IManager, metaclass=Singleton):
 
         for observer in self.observers:
             instance = observer()
+            self._observers.append(instance)
             logger.opt(colors=True).info(
-                f"Observer <yellow>{instance.NAME}</yellow> initialized"
+                f"Observer <yellow>{observer.__name__}</yellow> initialized"
             )
             for _observation in instance.initial_observations:
                 await self.__observation(_observation)
