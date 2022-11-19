@@ -221,11 +221,17 @@ class Manager(IManager, metaclass=Singleton):
 
     async def __start(self) -> None:
         """
-        Initializes Observers and pass initial Observation objects to
-        self.__observation.
+        Initializes Adapters and Observers and pass initial Observation
+        objects to self.__observation.
 
         :return: None
         """
+        for adapter in self.adapters:
+            self._adapters.append(adapter())
+            logger.opt(colors=True).info(
+                f"Adapter <yellow>{adapter.__name__}</yellow> initialized"
+            )
+
         for observer in self.observers:
             instance = observer()
             logger.opt(colors=True).info(
@@ -335,12 +341,10 @@ class Manager(IManager, metaclass=Singleton):
         :param item: Finding object
         :return: None
         """
-        for adapter in self.adapters:
-            instance = adapter()
-
-            for subscriber in instance.subscribers:
+        for adapter in self._adapters:
+            for subscriber in adapter.subscribers:
                 if isinstance(item, subscriber):
-                    items = instance.adapt(item)
+                    items = adapter.adapt(item)
                     async for _item in items:  # type: ignore
                         await self.__router(_item)
 
