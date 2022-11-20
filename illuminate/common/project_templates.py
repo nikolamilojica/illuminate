@@ -6,6 +6,7 @@ from typing import Union
 
 from illuminate.adapter.adapter import Adapter
 from illuminate.observation.http import HTTPObservation
+from illuminate.observer.finding import Finding
 
 from exporters.example import ExporterExample
 from findings.example import FindingExample
@@ -37,8 +38,8 @@ class AdapterExample(Adapter):
     Note: Method adapt can not yield Findings.
     \"\"\"
 
-    priority = 10
-    subscribers = (FindingExample,)
+    priority: int = 10
+    subscribers: tuple[Type[Finding]] = (FindingExample,)
 
     async def adapt(
         self, finding: FindingExample, *args, **kwargs
