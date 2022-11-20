@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import Type, Union
+from typing import Optional, Type, TYPE_CHECKING, Union
 
 from illuminate.exceptions.adapter import BasicAdapterException
 from illuminate.exporter.exporter import Exporter
 from illuminate.interface.adapter import IAdapter
 from illuminate.observation.observation import Observation
 from illuminate.observer.finding import Finding
+
+if TYPE_CHECKING:
+    from illuminate.manager.manager import Manager
 
 
 class Adapter(IAdapter):
@@ -29,6 +32,14 @@ class Adapter(IAdapter):
     Tuple of Finding class children used to determent if Adapter object should
     call method adapt on Finding instance.
     """
+
+    def __init__(self, manager: Optional[Manager] = None):
+        """
+        Adapter's __init__ method.
+
+        :param manager: Manager object
+        """
+        self.manager = manager
 
     async def adapt(
         self, finding: Finding, *args, **kwargs
