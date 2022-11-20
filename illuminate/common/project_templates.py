@@ -91,8 +91,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection,
-            target_metadata=target_metadata
+            connection=connection, target_metadata=target_metadata
         )
 
         with context.begin_transaction():
@@ -285,7 +284,7 @@ MODELS = [
 NAME = "{name}"
 
 OBSERVATION_CONFIGURATION = {{
-    "delay": .1,
+    "delay": 0.1,
     "http": {{
         "auth_username": None,
         "auth_password": None,
