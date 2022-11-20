@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import Union
+from typing import Optional, Union, TYPE_CHECKING
 
 from tornado.httpclient import HTTPResponse
 
@@ -10,6 +10,9 @@ from illuminate.exporter.exporter import Exporter
 from illuminate.interface.observer import IObserver
 from illuminate.observation.observation import Observation
 from illuminate.observer.finding import Finding
+
+if TYPE_CHECKING:
+    from illuminate.manager.manager import Manager
 
 
 class Observer(IObserver):
@@ -22,8 +25,14 @@ class Observer(IObserver):
     NAME: str
     """Observer name."""
 
-    def __init__(self):
+    def __init__(self, manager: Optional[Manager] = None):
+        """
+        Observer's __init__ method.
+
+        :param manager: Manager object
+        """
         self.initial_observations: list[Observation] = []
+        self.manager = manager
 
     async def observe(
         self, response: HTTPResponse, *args, **kwargs
