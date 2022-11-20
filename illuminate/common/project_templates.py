@@ -27,6 +27,13 @@ class AdapterExample(Adapter):
     processed by Adapter. If Finding is subscribed to two or more Adapters,
     priority in adaptation will be give to Adapter with higher priority score.
 
+    Manager's instance (object that is running whole process) is passed as
+    an argument when initializing Adapters. This allows Adapter object to
+    interact with Manager object attributes, like database sessions or
+    queues for advanced ETL flows, by simply asking for
+    self.manager.sessions["postgresql"]["main"] to acquire async database
+    session defined in settings.py.
+
     Note: Method adapt can not yield Findings.
     \"\"\"
 
@@ -316,11 +323,12 @@ _OBSERVER_EXAMPLE = """
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import Union
+from typing import Optional, Union
 from urllib.parse import urldefrag
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
+from illuminate.manager.manager import Manager
 from illuminate.observation.http import HTTPObservation
 from illuminate.observer.observer import Observer
 from tornado.httpclient import HTTPResponse
@@ -360,16 +368,23 @@ class ObserverExample(Observer):
     ALLOWED = ("https://webscraper.io/",)
     NAME = "example"
 
-    def __init__(self):
+    def __init__(self, manager: Optional[Manager] = None):
         \"\"\"
         Collection initial_observations is de facto entry point. It must
         contain Observation objects initialized with URL, allowed list of
         strings and callback method. If Observation's URL starts with element
         in allowed collection, it will be performed. Otherwise, it is
         rejected.
+
+        Manager's instance (object that is running whole process) is passed as
+        an argument when initializing Observers. This allows Observer object to
+        interact with Manager object attributes, like database sessions or
+        queues for advanced ETL flows, by simply asking for
+        self.manager.sessions["postgresql"]["main"] to acquire async database
+        session defined in settings.py.
         \"\"\"
 
-        super().__init__()
+        super().__init__(manager)
         self.initial_observations = [
             HTTPObservation(
                 "https://webscraper.io/",
