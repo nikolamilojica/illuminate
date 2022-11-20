@@ -2,7 +2,7 @@ _ADAPTER_EXAMPLE = """
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import Union
+from typing import Type, Union
 
 from illuminate.adapter.adapter import Adapter
 from illuminate.observation.http import HTTPObservation
