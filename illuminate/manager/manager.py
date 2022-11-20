@@ -226,13 +226,13 @@ class Manager(IManager):
         :return: None
         """
         for adapter in self.adapters:
-            self._adapters.append(adapter())
+            self._adapters.append(adapter(manager=self))
             logger.opt(colors=True).info(
                 f"Adapter <yellow>{adapter.__name__}</yellow> initialized"
             )
 
         for observer in self.observers:
-            instance = observer()
+            instance = observer(manager=self)
             self._observers.append(instance)
             logger.opt(colors=True).info(
                 f"Observer <yellow>{observer.__name__}</yellow> initialized"
