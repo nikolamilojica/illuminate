@@ -2,10 +2,11 @@ _ADAPTER_EXAMPLE = """
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import Union
+from typing import Type, Union
 
 from illuminate.adapter.adapter import Adapter
 from illuminate.observation.http import HTTPObservation
+from illuminate.observer.finding import Finding
 
 from exporters.example import ExporterExample
 from findings.example import FindingExample
@@ -32,13 +33,13 @@ class AdapterExample(Adapter):
     interact with Manager object attributes, like database sessions or
     queues for advanced ETL flows, by simply asking for
     self.manager.sessions["postgresql"]["main"] to acquire async database
-    session defined in settings.py.
+    session defined in {name}/settings.py.
 
     Note: Method adapt can not yield Findings.
     \"\"\"
 
-    priority = 10
-    subscribers = (FindingExample,)
+    priority: int = 10
+    subscribers: tuple[Type[Finding]] = (FindingExample,)
 
     async def adapt(
         self, finding: FindingExample, *args, **kwargs
@@ -90,8 +91,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection,
-            target_metadata=target_metadata
+            connection=connection, target_metadata=target_metadata
         )
 
         with context.begin_transaction():
@@ -169,6 +169,8 @@ _EMPTY = """
 _EXPORTER_EXAMPLE = """
 from illuminate.exporter.sql import SQLExporter
 
+from models.example import ModelExample
+
 
 class ExporterExample(SQLExporter):
     \"\"\"
@@ -179,10 +181,10 @@ class ExporterExample(SQLExporter):
     to initialize SQLExporter class, check {name}/adapters/example.py
     \"\"\"
 
-    name = "main"
-    type = "postgresql"
+    name: str = "main"
+    type: str = "postgresql"
 
-    def __init__(self, model):
+    def __init__(self, model: ModelExample):
         super().__init__(model)
 
 """
@@ -219,11 +221,12 @@ class ModelExample(Base):
     \"\"\"
 
     __tablename__ = "{name}"
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    url = Column(String)
+    id: int = Column(Integer, primary_key=True)
+    title: str = Column(String)
+    url: str = Column(String)
 
     def __repr__(self):
+        \"\"\"ModelExample's __repr__ method.\"\"\"
         return f'ModelExample(title="{{self.title}}",url="{{self.url}}")'
 
 """
@@ -281,7 +284,7 @@ MODELS = [
 NAME = "{name}"
 
 OBSERVATION_CONFIGURATION = {{
-    "delay": .1,
+    "delay": 0.1,
     "http": {{
         "auth_username": None,
         "auth_password": None,
@@ -365,8 +368,13 @@ class ObserverExample(Observer):
     Note: Multiple Observers can exist in the same project.
     \"\"\"
 
-    ALLOWED = ("https://webscraper.io/",)
-    NAME = "example"
+    ALLOWED: Union[list[str], tuple[str]] = ("https://webscraper.io/",)
+    \"\"\"
+    Collection of strings evaluated against URL to determent if URL is allowed
+    to be observed. If empty, no Observation wide restrictions are forced.
+    \"\"\"
+    NAME: str = "example"
+    \"\"\"Observer's name.\"\"\"
 
     def __init__(self, manager: Optional[Manager] = None):
         \"\"\"
@@ -381,7 +389,7 @@ class ObserverExample(Observer):
         interact with Manager object attributes, like database sessions or
         queues for advanced ETL flows, by simply asking for
         self.manager.sessions["postgresql"]["main"] to acquire async database
-        session defined in settings.py.
+        session defined in {name}/settings.py.
         \"\"\"
 
         super().__init__(manager)
@@ -438,7 +446,6 @@ class ObserverExample(Observer):
 """
 
 FILES = {
-    "__init__.py": _EMPTY,
     "docker-compose.yaml": _DOCKER_COMPOSE,
     "settings.py": _ILLUMINATE_SETTINGS,
     "adapters/__init__.py": _EMPTY,
