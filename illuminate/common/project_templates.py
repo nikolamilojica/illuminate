@@ -222,11 +222,12 @@ class ModelExample(Base):
     \"\"\"
 
     __tablename__ = "{name}"
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    url = Column(String)
+    id: int = Column(Integer, primary_key=True)
+    title: str = Column(String)
+    url: str = Column(String)
 
     def __repr__(self):
+        \"\"\"ModelExample's __repr__ method.\"\"\"
         return f'ModelExample(title="{{self.title}}",url="{{self.url}}")'
 
 """
