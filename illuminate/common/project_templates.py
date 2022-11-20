@@ -33,7 +33,7 @@ class AdapterExample(Adapter):
     interact with Manager object attributes, like database sessions or
     queues for advanced ETL flows, by simply asking for
     self.manager.sessions["postgresql"]["main"] to acquire async database
-    session defined in settings.py.
+    session defined in {name}/settings.py.
 
     Note: Method adapt can not yield Findings.
     \"\"\"
@@ -390,7 +390,7 @@ class ObserverExample(Observer):
         interact with Manager object attributes, like database sessions or
         queues for advanced ETL flows, by simply asking for
         self.manager.sessions["postgresql"]["main"] to acquire async database
-        session defined in settings.py.
+        session defined in {name}/settings.py.
         \"\"\"
 
         super().__init__(manager)
