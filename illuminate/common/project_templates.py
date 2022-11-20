@@ -170,6 +170,8 @@ _EMPTY = """
 _EXPORTER_EXAMPLE = """
 from illuminate.exporter.sql import SQLExporter
 
+from models.example import ModelExample
+
 
 class ExporterExample(SQLExporter):
     \"\"\"
@@ -180,10 +182,10 @@ class ExporterExample(SQLExporter):
     to initialize SQLExporter class, check {name}/adapters/example.py
     \"\"\"
 
-    name = "main"
-    type = "postgresql"
+    name: str = "main"
+    type: str = "postgresql"
 
-    def __init__(self, model):
+    def __init__(self, model: ModelExample):
         super().__init__(model)
 
 """
