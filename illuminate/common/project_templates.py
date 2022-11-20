@@ -446,7 +446,6 @@ class ObserverExample(Observer):
 """
 
 FILES = {
-    "__init__.py": _EMPTY,
     "docker-compose.yaml": _DOCKER_COMPOSE,
     "settings.py": _ILLUMINATE_SETTINGS,
     "adapters/__init__.py": _EMPTY,
