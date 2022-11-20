@@ -366,8 +366,13 @@ class ObserverExample(Observer):
     Note: Multiple Observers can exist in the same project.
     \"\"\"
 
-    ALLOWED = ("https://webscraper.io/",)
-    NAME = "example"
+    ALLOWED: Union[list[str], tuple[str]] = ("https://webscraper.io/",)
+    \"\"\"
+    Collection of strings evaluated against URL to determent if URL is allowed
+    to be observed. If empty, no Observation wide restrictions are forced.
+    \"\"\"
+    NAME: str = "example"
+    \"\"\"Observer's name.\"\"\"
 
     def __init__(self, manager: Optional[Manager] = None):
         \"\"\"
