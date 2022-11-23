@@ -58,7 +58,11 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from models.example import Base
 from settings import MODELS
+
+for model in MODELS:
+    locate(model)
 
 config = context.config
 
@@ -66,14 +70,12 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = [locate(i).metadata for i in MODELS]
-
 
 def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
-        target_metadata=target_metadata,
+        target_metadata=Base.metadata,
         literal_binds=True,
         dialect_opts={{"paramstyle": "named"}},
     )
@@ -91,7 +93,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, target_metadata=Base.metadata
         )
 
         with context.begin_transaction():
@@ -207,11 +209,17 @@ _FIXTURE_EXAMPLE = """
 ]
 """
 
-_MODEL_EXAMPLE = """
-from sqlalchemy import Column, Integer, String
+_MODELS = """
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
+
+"""
+
+_MODEL_EXAMPLE = """
+from sqlalchemy import Column, Integer, String
+
+from models import Base
 
 
 class ModelExample(Base):
@@ -247,7 +255,7 @@ Manager class and access sessions attribute.
 
 * MODELS
 List of SQLAlchemy models affected by illuminate cli when invoking
-'db revision' and 'db upgrade' commands.
+'db revision', 'db upgrade' and 'db populate' commands.
 
 * NAME
 Project name.
@@ -453,7 +461,7 @@ FILES = {
     "exporters/__init__.py": _EMPTY,
     "exporters/example.py": _EXPORTER_EXAMPLE,
     "fixtures/example.json": _FIXTURE_EXAMPLE,
-    "models/__init__.py": _EMPTY,
+    "models/__init__.py": _MODELS,
     "models/example.py": _MODEL_EXAMPLE,
     "migrations/env.py": _ALEMBIC_ENV_PY,
     "migrations/script.py.mako": _ALEMBIC_SCRIPT_PY_MAKO,
