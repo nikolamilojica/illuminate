@@ -96,8 +96,6 @@ class Manager(IManager):
         models: list[object],
         operations: Operations,
         selector: str,
-        *args,
-        **kwargs,
     ) -> None:
         """
         Populates database with fixtures.
@@ -136,8 +134,6 @@ class Manager(IManager):
     def db_revision(
         config: Config,
         revision: str,
-        *args,
-        **kwargs,
     ) -> None:
         """
         Creates Alembic's revision file in migration directory.
@@ -160,8 +156,6 @@ class Manager(IManager):
         config: Config,
         revision: str,
         selector: str,
-        *args,
-        **kwargs,
     ) -> None:
         """
         Applies migration file to a database.
@@ -175,7 +169,7 @@ class Manager(IManager):
         logger.success(f"Database {selector} upgraded")
 
     @staticmethod
-    def project_setup(name: str, path: str, *args, **kwargs) -> None:
+    def project_setup(name: str, path: str) -> None:
         """
         Creates a project directory with all needed files.
 
