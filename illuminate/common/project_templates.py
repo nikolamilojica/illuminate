@@ -51,7 +51,6 @@ class AdapterExample(Adapter):
 """
 
 _ALEMBIC_ENV_PY = """
-from logging.config import fileConfig
 from pydoc import locate
 
 from alembic import context
@@ -65,10 +64,6 @@ for model in MODELS:
     locate(model)
 
 config = context.config
-
-
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
 
 
 def run_migrations_offline():
