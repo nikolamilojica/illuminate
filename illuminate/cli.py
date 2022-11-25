@@ -190,7 +190,7 @@ def setup(ctx: dict, name: str, path: str, *args, **kwargs) -> None:
 @show_observer_catalogue
 def catalogue(ctx: dict, *args, **kwargs) -> dict:
     """Lists observers found in project files."""
-    return Assistant.provide_context()
+    return Assistant.provide_context(sessions=False)
 
 
 @observe.command("start")
@@ -204,7 +204,7 @@ def catalogue(ctx: dict, *args, **kwargs) -> dict:
 @click.pass_context
 def start(ctx: dict, observer: tuple[str], *args, **kwargs) -> None:
     """Starts producer/consumer ETL process."""
-    context = Assistant.provide_context(observer)
+    context = Assistant.provide_context(_filter=observer)
     manager = Manager(**context)  # type: ignore
     manager.observe_start()
 

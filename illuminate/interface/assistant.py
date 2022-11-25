@@ -12,7 +12,7 @@ class IAssistant:
         raise NotImplementedError
 
     @staticmethod
-    def provide_context(_filter):
+    def provide_context(sessions, _filter):
         """Creates Manager's constructor kwargs."""
         raise NotImplementedError
 
