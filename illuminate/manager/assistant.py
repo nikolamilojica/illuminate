@@ -71,13 +71,21 @@ class Assistant(IAssistant):
 
     @staticmethod
     def provide_context(
+        sessions: bool = True,
         _filter: Optional[tuple[str]] = None,
     ) -> dict[
-        str, Union[str, list[Union[Type[Observer], Type[Adapter]]], ModuleType]
+        str,
+        Union[
+            dict[str, dict[str, Type[AsyncSession]]],
+            str,
+            list[Union[Type[Observer], Type[Adapter]]],
+            ModuleType,
+        ],
     ]:
         """
         Creates Manager's constructor kwargs.
 
+        :param sessions: Sessions option
         :param _filter: Optional tuple of Observer's names or class names
         :return: Manager's constractor parameters
         :raises BasicManagerException:
@@ -88,9 +96,10 @@ class Assistant(IAssistant):
             "name": settings.NAME,
             "observers": [],
             "path": os.getcwd(),
-            "sessions": Assistant._provide_sessions(),
             "settings": settings,
         }
+        if sessions:
+            context["sessions"] = Assistant._provide_sessions()
 
         for folder in ("adapters", "observers"):
             directory = os.path.join(os.getcwd(), folder)
