@@ -90,6 +90,7 @@ class TestAssistantClass(Test):
             assert len(context["adapters"]) == 1
             assert len(context["observers"]) == 1
             assert context["name"] == name
+            assert context["sessions"]["postgresql"]["main"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_provide_models_unsuccessfully(self):
