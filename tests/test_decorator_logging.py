@@ -9,16 +9,45 @@ from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.decorators.logging import show_observer_catalogue
 from illuminate.manager.manager import Manager
-from tests.shared.mock import Observer
-from tests.shared.mock import Settings
+from illuminate.observation.http import HTTPObservation
+
+
+class DummyObserver:
+    """Dummy Observer"""
+
+    NAME = "example"
+
+    def __init__(self):
+        super().__init__()
+        self.initial_observations = [
+            HTTPObservation(
+                "https://webscraper.io/",
+                allowed=("https://webscraper.io/",),
+                callback=self.observe,
+            ),
+        ]
+
+    def observe(self, response, *args, **kwargs):
+        """Abstract method implementation"""
+
+
+class DummySettings:
+    """Dummy Manager settings"""
+
+    def __init__(self, name):
+        self.CONCURRENCY = {}
+        self.DB = {}
+        self.MODELS = []
+        self.NAME = name
+        self.OBSERVATION_CONFIGURATION = {}
 
 
 def __get_manager(name, observers=None):
     """Manager setup function"""
-    manager = Manager([], name, [], "", {}, Settings(name))
+    manager = Manager([], name, [], "", {}, DummySettings(name))
     manager.adapters = []
     manager.observers = observers or []
-    manager.settings = Settings(name)
+    manager.settings = DummySettings(name)
     manager.__exported = []
     manager.__failed = []
     manager.__requested = []
@@ -37,7 +66,7 @@ def _cli_observe_catalogue():
         """Dummy Assistant function"""
         return _context
 
-    f({"observers": [Observer]})
+    f({"observers": [DummyObserver]})
 
 
 @click.command()
@@ -64,7 +93,10 @@ class TestLogging:
         """
         runner = CliRunner()
         result = runner.invoke(_cli_observe_catalogue)
-        assert "<class 'tests.shared.mock.Observer'>" in result.output
+        assert (
+            "<class 'tests.test_decorator_logging.DummyObserver'>"
+            in result.output
+        )
         assert "[('https://webscraper.io/', 'observe')]" in result.output
 
     def test_observe_start(self):
