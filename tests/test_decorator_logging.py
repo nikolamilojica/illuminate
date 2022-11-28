@@ -10,38 +10,7 @@ from illuminate.decorators.logging import show_logo
 from illuminate.decorators.logging import show_observer_catalogue
 from illuminate.manager.assistant import Assistant
 from illuminate.manager.manager import Manager
-from illuminate.observation.http import HTTPObservation
 from tests.shared.unit import Test
-
-
-class DummyObserver:
-    """Dummy Observer"""
-
-    NAME = "example"
-
-    def __init__(self):
-        super().__init__()
-        self.initial_observations = [
-            HTTPObservation(
-                "https://webscraper.io/",
-                allowed=("https://webscraper.io/",),
-                callback=self.observe,
-            ),
-        ]
-
-    def observe(self, response, *args, **kwargs):
-        """Abstract method implementation"""
-
-
-class DummySettings:
-    """Dummy Manager settings"""
-
-    def __init__(self, name):
-        self.CONCURRENCY = {}
-        self.DB = {}
-        self.MODELS = []
-        self.NAME = name
-        self.OBSERVATION_CONFIGURATION = {}
 
 
 def __get_context(name):
