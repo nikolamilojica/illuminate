@@ -8,48 +8,54 @@ from illuminate import __version__
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.decorators.logging import show_observer_catalogue
+from illuminate.manager.assistant import Assistant
 from illuminate.manager.manager import Manager
-from tests.shared.mock import Observer
-from tests.shared.mock import Settings
+from tests.shared.unit import Test
 
 
-def __get_manager(name, observers=None):
-    """Manager setup function"""
-    manager = Manager([], name, [], "", {}, Settings(name))
-    manager.adapters = []
-    manager.observers = observers or []
-    manager.settings = Settings(name)
-    manager.__exported = []
-    manager.__failed = []
-    manager.__requested = []
-    manager.__requesting = []
+def __get_context(name):
+    """Context fetch function."""
+    test = Test()
+    with test.path():
+        Manager.project_setup(name, ".")
+        context = Assistant.provide_context()
+    return context
+
+
+def __get_manager(name):
+    """Manager setup function."""
+    test = Test()
+    with test.path():
+        Manager.project_setup(name, ".")
+        context = Assistant.provide_context()
+        manager = Manager(**context)
     return manager
 
 
 @click.command()
 def _cli_observe_catalogue():
-    """Dummy Manager command"""
+    """Dummy Manager command."""
     logger.remove()
     logger.add(sys.stdout, level="INFO")
 
     @show_observer_catalogue
     def f(_context):
-        """Dummy Assistant function"""
+        """Dummy Assistant function."""
         return _context
 
-    f({"observers": [Observer]})
+    f(__get_context("example"))
 
 
 @click.command()
 def _cli_observe_start():
-    """Dummy Manager command"""
+    """Dummy Manager command."""
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
 
     @show_logo
     @show_info
     def f(_manager):
-        """Dummy Manager function"""
+        """Dummy Manager function."""
         return _manager
 
     f(__get_manager("example"))
@@ -64,7 +70,9 @@ class TestLogging:
         """
         runner = CliRunner()
         result = runner.invoke(_cli_observe_catalogue)
-        assert "<class 'tests.shared.mock.Observer'>" in result.output
+        assert (
+            "<class 'observers.example.py.ObserverExample'>" in result.output
+        )
         assert "[('https://webscraper.io/', 'observe')]" in result.output
 
     def test_observe_start(self):
@@ -85,7 +93,6 @@ class TestLogging:
         assert "Models discovered" in result.output
         assert "Observers discovered" in result.output
         assert "Concurrency settings" in result.output
-        assert "Database settings {'password': '****'}" in result.output
         assert "Observation settings" in result.output
         assert "Results gathered" in result.output
         assert "Unsuccessful observations" in result.output

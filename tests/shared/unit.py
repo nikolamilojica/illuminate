@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 class Test:
     """
     Test class with path context manager that provides tests with temporary
-    directory placed on PYTHONPATH with sqlite database attached
+    directory placed on PYTHONPATH with sqlite database attached.
     """
 
     db = "test"
@@ -22,7 +22,8 @@ class Test:
     @staticmethod
     def assert_project_structure(name, files, path, cwd=False):
         """
-        Assert project structure
+        Assert project structure.
+
         :param name: str
         :param files: dir
         :param path: str
@@ -40,7 +41,8 @@ class Test:
     @property
     def engine(self):
         """
-        Creates database engine
+        Creates database engine.
+
         :return: sqlalchemy.engine.Engine or None
         """
         return create_engine(self.url) if self.url else None
@@ -48,7 +50,8 @@ class Test:
     @property
     def engine_async(self):
         """
-        Creates async database engine
+        Creates async database engine.
+
         :return: sqlalchemy.ext.asyncio.engine.AsyncEngine or None
         """
         return create_async_engine(self.url_async) if self.url_async else None
@@ -57,7 +60,8 @@ class Test:
     def path(self):
         """
         Put temporary directory path to PYTHONPATH, set it as cwd and clean
-        imports once the test is finished
+        imports once the test is finished.
+
         :yields: _GeneratorContextManager, TemporaryDirectory
         """
 
@@ -83,7 +87,8 @@ class Test:
     @property
     def session(self):
         """
-        Create database session
+        Create database session.
+
         :return: sqlalchemy.orm.Session or None
         """
         return sessionmaker(self.engine)() if self.url else None
@@ -91,7 +96,8 @@ class Test:
     @property
     def session_async(self):
         """
-        Create async database session
+        Create async database session.
+
         :return: sqlalchemy.ext.asyncio.session.AsyncSession or None
         """
         return (
@@ -107,7 +113,8 @@ class Test:
     @property
     def url(self):
         """
-        Create database URL
+        Create database URL.
+
         :return: str or None
         """
         _url = f"sqlite:///{self.folder}/{self.db}.db" if self.folder else None
@@ -116,7 +123,8 @@ class Test:
     @property
     def url_async(self):
         """
-        Create async database URL
+        Create async database URL.
+
         :return: str or None
         """
         _url = (

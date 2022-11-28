@@ -7,12 +7,12 @@ from tests.shared.unit import Test
 
 
 class DummyManager:
-    """Dummy Manager class"""
+    """Dummy Manager class."""
 
     @staticmethod
     @adapt
     def db_populate(fixtures, models, operations, selector):
-        """Dummy db_populate"""
+        """Dummy db_populate."""
         assert len(models) == 1
         assert len(fixtures) == 1
         assert isinstance(operations, Operations)
@@ -21,14 +21,14 @@ class DummyManager:
     @staticmethod
     @adapt
     def db_revision(config, revision):
-        """Dummy db_revision"""
+        """Dummy db_revision."""
         assert isinstance(config, Config)
         assert revision == "head"
 
     @staticmethod
     @adapt
     def db_upgrade(config, revision, selector):
-        """Dummy db_upgrade"""
+        """Dummy db_upgrade."""
         assert isinstance(config, Config)
         assert revision == "head"
         assert selector == "main"
