@@ -112,7 +112,6 @@ class TestManagerProjectCommandGroup(Test):
         Given: Directory of file exists with the same name as project
         When: Setting up new project
         Expected: Raise exception
-        NOTE: This test will clean files from test_setup_successfully
         """
         with pytest.raises(BasicManagerException):
             with self.path() as path:
