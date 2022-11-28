@@ -44,6 +44,15 @@ class DummySettings:
         self.OBSERVATION_CONFIGURATION = {}
 
 
+def __get_context(name):
+    """Context fetch function"""
+    test = Test()
+    with test.path():
+        Manager.project_setup(name, ".")
+        context = Assistant.provide_context()
+    return context
+
+
 def __get_manager(name):
     """Manager setup function"""
     test = Test()
@@ -65,7 +74,7 @@ def _cli_observe_catalogue():
         """Dummy Assistant function"""
         return _context
 
-    f({"observers": [DummyObserver]})
+    f(__get_context("example"))
 
 
 @click.command()
@@ -93,8 +102,7 @@ class TestLogging:
         runner = CliRunner()
         result = runner.invoke(_cli_observe_catalogue)
         assert (
-            "<class 'tests.test_decorator_logging.DummyObserver'>"
-            in result.output
+            "<class 'observers.example.py.ObserverExample'>" in result.output
         )
         assert "[('https://webscraper.io/', 'observe')]" in result.output
 
