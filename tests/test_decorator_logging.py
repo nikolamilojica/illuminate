@@ -8,8 +8,10 @@ from illuminate import __version__
 from illuminate.decorators.logging import show_info
 from illuminate.decorators.logging import show_logo
 from illuminate.decorators.logging import show_observer_catalogue
+from illuminate.manager.assistant import Assistant
 from illuminate.manager.manager import Manager
 from illuminate.observation.http import HTTPObservation
+from tests.shared.unit import Test
 
 
 class DummyObserver:
@@ -42,16 +44,13 @@ class DummySettings:
         self.OBSERVATION_CONFIGURATION = {}
 
 
-def __get_manager(name, observers=None):
+def __get_manager(name):
     """Manager setup function"""
-    manager = Manager([], name, [], "", {}, DummySettings(name))
-    manager.adapters = []
-    manager.observers = observers or []
-    manager.settings = DummySettings(name)
-    manager.__exported = []
-    manager.__failed = []
-    manager.__requested = []
-    manager.__requesting = []
+    test = Test()
+    with test.path():
+        Manager.project_setup(name, ".")
+        context = Assistant.provide_context()
+        manager = Manager(**context)
     return manager
 
 
@@ -117,7 +116,6 @@ class TestLogging:
         assert "Models discovered" in result.output
         assert "Observers discovered" in result.output
         assert "Concurrency settings" in result.output
-        assert "Database settings {'password': '****'}" in result.output
         assert "Observation settings" in result.output
         assert "Results gathered" in result.output
         assert "Unsuccessful observations" in result.output
