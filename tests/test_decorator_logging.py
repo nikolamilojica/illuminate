@@ -92,6 +92,9 @@ class TestLogging:
         assert "Adapters discovered" in result.output
         assert "Models discovered" in result.output
         assert "Observers discovered" in result.output
+        assert "Database settings" in result.output
+        assert "'pass': '****'" in result.output
+        assert "'auth_password': '****'" in result.output
         assert "Concurrency settings" in result.output
         assert "Observation settings" in result.output
         assert "Results gathered" in result.output

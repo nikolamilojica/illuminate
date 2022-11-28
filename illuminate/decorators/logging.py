@@ -89,8 +89,10 @@ def show_info(func: Callable) -> Callable:
         """
         settings_conn = self.settings.CONCURRENCY
         settings_db = self.settings.DB.copy()
-        settings_db["password"] = "****"  # nosec
-        settings_obs = self.settings.OBSERVATION_CONFIGURATION
+        for db in settings_db:
+            settings_db[db]["pass"] = "****"  # nosec
+        settings_obs = self.settings.OBSERVATION_CONFIGURATION.copy()
+        settings_obs["http"]["auth_password"] = "****"  # nosec
         logger.debug(f"Concurrency settings {settings_conn}")
         logger.debug(f"Database settings {settings_db}")
         logger.debug(f"Observation settings {settings_obs}")
