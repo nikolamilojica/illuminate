@@ -150,7 +150,7 @@ class TestManagerObserveCommandGroup(Test):
     @pytest.fixture(scope="function")
     def async_http_responses_ok(mocker):
         """
-        Patch fetch function to return predefined response object
+        Patch fetch function to return predefined response object.
         """
         body = b"""
         <!DOCTYPE HTML>

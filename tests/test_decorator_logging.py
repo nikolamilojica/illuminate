@@ -14,7 +14,7 @@ from tests.shared.unit import Test
 
 
 def __get_context(name):
-    """Context fetch function"""
+    """Context fetch function."""
     test = Test()
     with test.path():
         Manager.project_setup(name, ".")
@@ -23,7 +23,7 @@ def __get_context(name):
 
 
 def __get_manager(name):
-    """Manager setup function"""
+    """Manager setup function."""
     test = Test()
     with test.path():
         Manager.project_setup(name, ".")
@@ -34,13 +34,13 @@ def __get_manager(name):
 
 @click.command()
 def _cli_observe_catalogue():
-    """Dummy Manager command"""
+    """Dummy Manager command."""
     logger.remove()
     logger.add(sys.stdout, level="INFO")
 
     @show_observer_catalogue
     def f(_context):
-        """Dummy Assistant function"""
+        """Dummy Assistant function."""
         return _context
 
     f(__get_context("example"))
@@ -48,14 +48,14 @@ def _cli_observe_catalogue():
 
 @click.command()
 def _cli_observe_start():
-    """Dummy Manager command"""
+    """Dummy Manager command."""
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
 
     @show_logo
     @show_info
     def f(_manager):
-        """Dummy Manager function"""
+        """Dummy Manager function."""
         return _manager
 
     f(__get_manager("example"))
