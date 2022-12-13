@@ -7,7 +7,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License"
-
 ]
 description = "Lightwieght ETL Framework"
 homepage = "https://github.com/nikolamilojica/illuminate"
@@ -43,6 +42,10 @@ bandit = "^1.7.4"
 black = "^22.3.0"
 beautifulsoup4 = "^4.11.1"
 flake8 = "^5.0.4"
+markdown-include = "^0.8.0"
+mkdocs = "^1.4.2"
+mkdocs-material = "^8.5.10"
+mkdocstrings = {extras = ["python"], version = "^0.19.0"}
 mypy = "^0.982"
 pre-commit = "^2.20.0"
 pytest = ">=5.2"
