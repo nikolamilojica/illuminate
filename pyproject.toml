@@ -9,6 +9,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License"
 ]
 description = "Lightwieght ETL Framework"
+documentation = "https://nikolamilojica.github.io/illuminate/"
 homepage = "https://github.com/nikolamilojica/illuminate"
 include = [
     "LICENSE",
