@@ -4,6 +4,30 @@ on:
   workflow_dispatch:
 
 jobs:
+  documentation:
+    strategy:
+      matrix:
+        python-version: [ "3.8" ]
+        poetry-version: [ "1.1.15" ]
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install Documentation Dependencies
+        run: poetry install --only dev
+      - name: Build and Deploy Documentation
+        run: poetry run mkdocs gh-deploy --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   package:
     strategy:
       matrix:
