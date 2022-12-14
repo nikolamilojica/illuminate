@@ -107,3 +107,6 @@ docker run -it --rm --network=host \
    -v .:/root/illuminate \
    nikolamilojica/illuminate illuminate observe start
 ```
+
+<p style="text-align: justify">The rest of framework documentation can be
+found <a href="https://nikolamilojica.github.io/illuminate/">here</a>!</p>
