@@ -21,12 +21,10 @@ integration with cloud service providers, to include their services as
     * [ ] AWSS3Exporter - AWS S3 cloud service integration exporter
     * [ ] FileExporter - File exporter
     * [ ] HTTPExporter - HTTP exporter
-    * [ ] NoSQLExporter - NoSQL database exporter
     * [ ] SplashExporter - Web 2.0 proxy js renderer exporter
 - [ ] `Observation` Classes
     * [ ] AWSS3Observation - AWS S3 cloud service integration observation
     * [ ] FileObservation - File observation
-    * [ ] NoSQLObservation - NoSQL database observation
     * [ ] SplashObservation - Web 2.0 proxy js renderer observation
     * [ ] SQLObservation - SQL observation
 
