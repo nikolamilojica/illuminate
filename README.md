@@ -10,7 +10,7 @@ https://coveralls.io/github/nikolamilojica/illuminate?branch=develop)
 https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml/badge.svg?branch=develop)](
 https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml)
 ___
-<img align="left" style="margin:8px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Accueil_scribe_invert.png/241px-Accueil_scribe_invert.png">
+<img align="left" style="margin:6px" width="200" height="200" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Accueil_scribe_invert.png/241px-Accueil_scribe_invert.png">
 
 > <p align="justify"><i>Data is like garbage.
 > You’d better know what you are going to do with it before you
