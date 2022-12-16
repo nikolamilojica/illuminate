@@ -42,10 +42,11 @@ mkdir tutorial
 cd tutorial
 python3 -m venv venv
 source venv/bin/activate
-pip install illuminated
+pip install beautifulsoup4 illuminated
 ```
 
-> **NOTE**: Package name on PyPI is illuminated.
+> **NOTE**: Package name on PyPI is `illuminated`. Illuminate is not dependent
+> on `beautifulsoup4`, but this example is.
 
 <p style="text-align: justify">If installation is successful, you can verify
 by typing:</p>
