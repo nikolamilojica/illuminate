@@ -1,6 +1,7 @@
 __pycache__/
 coverage/
 dist/
+site/
 venv/
 .idea/
 .tox/

@@ -1,0 +1,71 @@
+copyright: Copyright &copy; 2022 Nikola Milojica
+extra:
+  consent:
+    title: Cookie Consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+  extra:
+    analytics:
+      provider: google
+      property: G-HN73LLNV26
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_section_style: spacy
+            docstring_style: sphinx
+            heading_level: 3
+            show_signature_annotations: true
+            show_root_heading: true
+            show_source: true
+  - search:
+markdown_extensions:
+  - markdown_include.include:
+        base_path: docs
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite:
+  - pymdownx.snippets:
+  - pymdownx.superfences:
+  - def_list:
+  - pymdownx.tasklist:
+      custom_checkbox: true
+nav:
+  - Illuminate: index.md
+  - Commands: commands.md
+  - Structure: structure.md
+  - Behind the Scene:
+     - Core Classes: core.md
+     - Support Classes: support.md
+     - Decorators: decorators.md
+     - Exceptions: exceptions.md
+  - Future?: future.md
+repo_url: https://github.com/nikolamilojica/illuminate
+site_name: Illuminate
+theme:
+  features:
+    - content.code.annotate
+    - navigation.expand
+    - navigation.tabs
+    - navigation.tabs.sticky
+  logo: images/candle.gif
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: slate
+      primary: black
+      accent: yellow
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
