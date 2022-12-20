@@ -9,8 +9,9 @@ boxes that apply: -->
 - [ ] I have followed instructions in the [**CONTRIBUTING**](https://github.com/nikolamilojica/illuminate/blob/develop/CONTRIBUTING.md) document.
 - [ ] My change requires a change to the documentation.
   - [ ] I have updated the documentation accordingly.
-- [ ] I have added tests and type hints to cover my changes.
-  - [ ] All new and existing tests passed locally. Coverage did not drop more than 5% compared to `develop` branch.
+- [ ] My change requires to be covered with tests and type hints.
+  - [ ] I have added tests and type hints to cover my change.
+    - [ ] All new and existing tests passed locally. Coverage did not drop more than 5% compared to `develop` branch.
 ### Additional notes
 ___
 <!--- Add any additional notes here: -->
