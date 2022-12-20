@@ -254,7 +254,12 @@ class Manager(IManager):
                     f"thus rejecting item {item}"
                 )
         elif isinstance(item, Observation):
-            if isinstance(item, HTTPObservation) and item.allowed:
+            if (
+                isinstance(item, HTTPObservation)
+                and item.allowed
+                and item.url not in self.__requesting
+            ):
+                self.__requesting.add(item.url)
                 await self.__observe_queue.put(item)
         else:
             logger.warning(
@@ -302,9 +307,6 @@ class Manager(IManager):
             **self.settings.OBSERVATION_CONFIGURATION["http"],
             **item.configuration,
         }
-        if item.url in self.__requesting:
-            return
-        self.__requesting.add(item.url)
         items = await item.observe()
         if not items:
             self.__failed.add(item.url)
