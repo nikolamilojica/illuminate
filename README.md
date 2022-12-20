@@ -105,7 +105,7 @@ project directory, type the following:</p>
 ```shell
 docker run -it --rm --network=host \
    -e ILLUMINATE_MAIN_DB_PASSWORD=illuminate \
-   -v .:/root/illuminate \
+   -v $(pwd):/root/illuminate \
    nikolamilojica/illuminate illuminate observe start
 ```
 
