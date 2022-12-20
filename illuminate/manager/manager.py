@@ -232,7 +232,7 @@ class Manager(IManager):
                 f"Observer <yellow>{observer.__name__}</yellow> initialized"
             )
             for _observation in instance.initial_observations:
-                await self.__observation(_observation)
+                await self.__router(_observation)
 
     async def __router(
         self, item: Union[Exporter, Finding, Observation]
