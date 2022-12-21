@@ -73,7 +73,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Invoke Publish Workflow
-      run: gh workflow run publish.yaml --ref master
+      run: gh workflow run Publish --ref master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

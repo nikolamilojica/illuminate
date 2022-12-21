@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: master
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -23,11 +25,12 @@ jobs:
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Documentation Dependencies
-        run: poetry install --only dev
+        run: poetry install
       - name: Build and Deploy Documentation
         run: poetry run mkdocs gh-deploy --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   package:
     strategy:
       matrix:
@@ -38,6 +41,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: master
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
