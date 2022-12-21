@@ -1,0 +1,83 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  documentation:
+    strategy:
+      matrix:
+        python-version: [ "3.8" ]
+        poetry-version: [ "1.1.15" ]
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install Documentation Dependencies
+        run: poetry install
+      - name: Build and Deploy Documentation
+        run: poetry run mkdocs gh-deploy --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  package:
+    strategy:
+      matrix:
+        python-version: [ "3.8" ]
+        poetry-version: [ "1.1.15" ]
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Info
+        id: info
+        run: |
+          echo "::set-output name=repository::$GITHUB_REPOSITORY"
+          echo "::set-output name=tag::v$(poetry version -s)"
+      - name: Publish Package on PyPI
+        env:
+          POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI }}
+          POETRY_HTTP_BASIC_PYPI_USERNAME: nikolamilojica
+        run: poetry publish --build
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: nikolamilojica
+          password: ${{ secrets.DOCKER }}
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ steps.info.outputs.repository }}:${{ steps.info.outputs.tag }}
+            ${{ steps.info.outputs.repository }}:latest
+      - name: Publish Package on GitHub
+        run: >
+          gh release create ${{ steps.info.outputs.tag }}
+           ./dist/*.whl -F changelog.md --target master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

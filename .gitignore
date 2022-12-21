@@ -1,0 +1,10 @@
+__pycache__/
+coverage/
+dist/
+site/
+venv/
+.idea/
+.tox/
+
+*.py[cod]
+.coverage

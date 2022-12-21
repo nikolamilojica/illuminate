@@ -1,0 +1,64 @@
+[tool.poetry]
+authors = ["Nikola Milojica <nikola.milojica@protonmail.com>"]
+classifiers = [
+    "Environment :: Console",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License"
+]
+description = "Lightwieght ETL Framework"
+documentation = "https://nikolamilojica.github.io/illuminate/"
+homepage = "https://github.com/nikolamilojica/illuminate"
+include = [
+    "LICENSE",
+]
+keywords = [
+    "ETL",
+    "Scraping"
+]
+license = "MIT"
+name = "illuminated"
+packages = [
+    { include = "illuminate" }
+]
+repository = "https://github.com/nikolamilojica/illuminate"
+version = "0.1.1"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+alembic = "^1.7.7"
+asyncmy = "^0.2.5"
+asyncpg = "^0.26.0"
+click = "^8.1.2"
+loguru = "^0.6.0"
+psycopg2 = "^2.9.3"
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.42"}
+tornado = "^6.1"
+
+[tool.poetry.dev-dependencies]
+aiosqlite = "^0.17.0"
+bandit = "^1.7.4"
+black = "^22.3.0"
+beautifulsoup4 = "^4.11.1"
+flake8 = "^5.0.4"
+markdown-include = "^0.8.0"
+mkdocs = "^1.4.2"
+mkdocs-material = "^8.5.10"
+mkdocstrings = {extras = ["python"], version = "^0.19.0"}
+mypy = "^0.982"
+pre-commit = "^2.20.0"
+pytest = ">=5.2"
+pytest-asyncio = "^0.19.0"
+pytest-cov = "^3.0.0"
+pytest-mock = "^3.8.2"
+sqlalchemy2-stubs = "^0.0.2-alpha.27"
+tox = "^3.25.1"
+
+[tool.poetry.scripts]
+illuminate = "illuminate.cli:cli"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

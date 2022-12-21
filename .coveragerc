@@ -1,0 +1,7 @@
+[report]
+exclude_lines =
+    raise AssertionError
+    raise NotImplementedError
+
+[html]
+directory = coverage

@@ -1,0 +1,81 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+  push:
+    branches:
+      - develop
+      - master
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10" ]
+        poetry-version: [ "1.1.15" ]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install Test Dependencies
+        run: poetry add tox@^3.25.1 tox-gh-actions
+      - name: Run Tests
+        run: poetry run tox
+
+  coverage:
+    strategy:
+      matrix:
+        python-version: [ "3.8"]
+        poetry-version: [ "1.1.15" ]
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install Coverage Dependencies
+        run: poetry add coveralls
+      - name: Run Tests
+        env:
+          ILLUMINATE_MAIN_DB_PASSWORD: password
+        run: |
+          poetry run coverage run -m pytest tests/
+      - name: Collect Coverage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          poetry run coveralls --service=github
+
+  publish:
+    needs: [ coverage, test ]
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Invoke Publish Workflow
+      run: gh workflow run Publish --ref master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
