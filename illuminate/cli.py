@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import sys
+import warnings
 
 import click
 from loguru import logger
@@ -28,6 +29,8 @@ def cli(verbosity: str) -> None:
     logger.remove()
     logger.add(sys.stdout, level=verbosity)
     sys.path.insert(0, os.getcwd())
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
 
 
 @cli.group("manage")
