@@ -312,8 +312,9 @@ class Manager(IManager):
             self.__failed.add(item.url)
             return
         self.__requested.add(item.url)
-        async for _item in items:
-            await self.__router(_item)
+        if hasattr(items, "__aiter__"):
+            async for _item in items:
+                await self.__router(_item)
 
     async def __adapt(self) -> None:
         """
