@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-from illuminate.exceptions.exporter import BasicExporterException
-from illuminate.exporter.sql import SQLExporter
-from illuminate.manager.manager import Manager
+from illuminate.exceptions import BasicExporterException
+from illuminate.exporter import SQLExporter
+from illuminate.manager import Manager
 from tests.shared.unit import Test
 
 

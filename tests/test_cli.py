@@ -2,7 +2,7 @@ from click.testing import CliRunner
 
 from illuminate import __version__
 from illuminate.cli import cli
-from illuminate.manager.manager import Manager
+from illuminate.manager import Manager
 from tests.shared.unit import Test
 
 

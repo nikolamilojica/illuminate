@@ -1,9 +1,9 @@
 import pytest
 from alembic.operations import Operations
 
-from illuminate.exceptions.manager import BasicManagerException
-from illuminate.manager.assistant import Assistant
-from illuminate.manager.manager import Manager
+from illuminate.exceptions import BasicManagerException
+from illuminate.manager import Assistant
+from illuminate.manager import Manager
 from tests.shared.unit import Test
 
 
