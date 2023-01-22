@@ -5,14 +5,14 @@ from typing import Optional, Union, TYPE_CHECKING
 
 from tornado.httpclient import HTTPResponse
 
-from illuminate.exceptions.observer import BasicObserverException
-from illuminate.exporter.exporter import Exporter
-from illuminate.interface.observer import IObserver
-from illuminate.observation.observation import Observation
-from illuminate.observer.finding import Finding
+from illuminate.exceptions import BasicObserverException
+from illuminate.exporter import Exporter
+from illuminate.interface import IObserver
+from illuminate.observation import Observation
+from illuminate.observer import Finding
 
 if TYPE_CHECKING:
-    from illuminate.manager.manager import Manager
+    from illuminate.manager import Manager
 
 
 class Observer(IObserver):

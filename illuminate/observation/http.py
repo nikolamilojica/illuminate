@@ -8,10 +8,10 @@ from tornado import httpclient
 from tornado.httpclient import HTTPClientError
 from tornado.httpclient import HTTPResponse
 
-from illuminate.exceptions.observation import BasicObservationException
-from illuminate.exporter.exporter import Exporter
-from illuminate.observation.observation import Observation
-from illuminate.observer.finding import Finding
+from illuminate.exceptions import BasicObservationException
+from illuminate.exporter import Exporter
+from illuminate.observation import Observation
+from illuminate.observer import Finding
 
 
 class HTTPObservation(Observation):

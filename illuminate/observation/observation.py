@@ -1,5 +1,5 @@
-from illuminate.exceptions.observation import BasicObservationException
-from illuminate.interface.observation import IObservation
+from illuminate.exceptions import BasicObservationException
+from illuminate.interface import IObservation
 
 
 class Observation(IObservation):
