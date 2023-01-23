@@ -4,9 +4,9 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 from typing import Type, Union
 
-from illuminate.adapter.adapter import Adapter
-from illuminate.observation.http import HTTPObservation
-from illuminate.observer.finding import Finding
+from illuminate.adapter import Adapter
+from illuminate.observation import HTTPObservation
+from illuminate.observer import Finding
 
 from exporters.example import ExporterExample
 from findings.example import FindingExample
@@ -164,7 +164,7 @@ _EMPTY = """
 """
 
 _EXPORTER_EXAMPLE = """
-from illuminate.exporter.sql import SQLExporter
+from illuminate.exporter import SQLExporter
 
 from models.example import ModelExample
 
@@ -307,7 +307,7 @@ _FINDING_EXAMPLE = """
 from dataclasses import dataclass
 from dataclasses import field
 
-from illuminate.observer.finding import Finding
+from illuminate.observer import Finding
 
 
 @dataclass(frozen=True, order=True)
@@ -334,9 +334,9 @@ from urllib.parse import urldefrag
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
-from illuminate.manager.manager import Manager
-from illuminate.observation.http import HTTPObservation
-from illuminate.observer.observer import Observer
+from illuminate.manager import Manager
+from illuminate.observation import HTTPObservation
+from illuminate.observer import Observer
 from tornado.httpclient import HTTPResponse
 
 from exporters.example import ExporterExample

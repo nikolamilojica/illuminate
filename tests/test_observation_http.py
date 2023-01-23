@@ -7,8 +7,8 @@ from tornado.httpclient import HTTPClientError
 from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
-from illuminate.exceptions.observation import BasicObservationException
-from illuminate.observation.http import HTTPObservation
+from illuminate.exceptions import BasicObservationException
+from illuminate.observation import HTTPObservation
 
 
 class TestSQLExporterClass:

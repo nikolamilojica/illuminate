@@ -1,4 +1,4 @@
-from illuminate.exceptions.basic import BasicIlluminateException
+from illuminate.exceptions import BasicIlluminateException
 
 
 class BasicAdapterException(BasicIlluminateException):

@@ -5,8 +5,8 @@ from typing import Type, TypeVar
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from illuminate.exceptions.exporter import BasicExporterException
-from illuminate.exporter.exporter import Exporter
+from illuminate.exceptions import BasicExporterException
+from illuminate.exporter import Exporter
 
 M = TypeVar("M")
 

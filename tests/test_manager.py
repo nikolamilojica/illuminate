@@ -8,11 +8,11 @@ from sqlalchemy import inspect
 from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
-from illuminate.common.project_templates import FILES
-from illuminate.exceptions.manager import BasicManagerException
-from illuminate.manager.assistant import Assistant
-from illuminate.manager.manager import Manager
-from tests.shared.unit import Test
+from illuminate.common import FILES
+from illuminate.exceptions import BasicManagerException
+from illuminate.manager import Assistant
+from illuminate.manager import Manager
+from tests.unit import Test
 
 
 class TestManagerDBCommandGroup(Test):

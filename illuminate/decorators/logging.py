@@ -7,11 +7,11 @@ from typing import Callable, TYPE_CHECKING
 
 from loguru import logger
 
-from illuminate.common.project_logging import LOGO
-from illuminate.common.project_logging import LOGO_COLOR
+from illuminate.common import LOGO
+from illuminate.common import LOGO_COLOR
 
 if TYPE_CHECKING:
-    from illuminate.manager.manager import Manager
+    from illuminate.manager import Manager
 
 
 def show_info(func: Callable) -> Callable:

@@ -17,10 +17,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from illuminate.adapter.adapter import Adapter
-from illuminate.exceptions.manager import BasicManagerException
-from illuminate.interface.assistant import IAssistant
-from illuminate.observer.observer import Observer
+from illuminate.adapter import Adapter
+from illuminate.exceptions import BasicManagerException
+from illuminate.interface import IAssistant
+from illuminate.observer import Observer
 
 
 class Assistant(IAssistant):

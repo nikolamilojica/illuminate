@@ -15,19 +15,19 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from tornado import gen, ioloop, queues
 
-from illuminate.adapter.adapter import Adapter
-from illuminate.common.project_templates import FILES
-from illuminate.decorators.cli import adapt
-from illuminate.decorators.logging import show_info
-from illuminate.decorators.logging import show_logo
-from illuminate.exceptions.manager import BasicManagerException
-from illuminate.exporter.exporter import Exporter
-from illuminate.exporter.sql import SQLExporter
-from illuminate.interface.manager import IManager
-from illuminate.observation.http import HTTPObservation
-from illuminate.observation.http import Observation
-from illuminate.observer.finding import Finding
-from illuminate.observer.observer import Observer
+from illuminate.adapter import Adapter
+from illuminate.common import FILES
+from illuminate.decorators import adapt
+from illuminate.decorators import show_info
+from illuminate.decorators import show_logo
+from illuminate.exceptions import BasicManagerException
+from illuminate.exporter import Exporter
+from illuminate.exporter import SQLExporter
+from illuminate.interface import IManager
+from illuminate.observation import HTTPObservation
+from illuminate.observation import Observation
+from illuminate.observer import Finding
+from illuminate.observer import Observer
 
 
 class Manager(IManager):
