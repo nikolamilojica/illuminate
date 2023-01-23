@@ -10,7 +10,7 @@ from illuminate.decorators import show_logo
 from illuminate.decorators import show_observer_catalogue
 from illuminate.manager import Assistant
 from illuminate.manager import Manager
-from tests.shared.unit import Test
+from tests.unit import Test
 
 
 def __get_context(name):

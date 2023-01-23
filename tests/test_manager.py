@@ -12,7 +12,7 @@ from illuminate.common import FILES
 from illuminate.exceptions import BasicManagerException
 from illuminate.manager import Assistant
 from illuminate.manager import Manager
-from tests.shared.unit import Test
+from tests.unit import Test
 
 
 class TestManagerDBCommandGroup(Test):
