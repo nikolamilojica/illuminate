@@ -7,6 +7,7 @@ from tornado.httpclient import HTTPClientError
 from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
+from illuminate import __version__
 from illuminate.exceptions import BasicObservationException
 from illuminate.observation import HTTPObservation
 
@@ -43,6 +44,81 @@ class TestSQLExporterClass:
         future = asyncio.Future()
         future.set_result(_side_effect)
         mocker.patch(TestSQLExporterClass.function, side_effect=_side_effect)
+
+    def test_hash_implementation_with_same_configuration(self):
+        """
+        Given: HTTPObservations are initialized with different URLs and
+        using the same configuration dict
+        When: Comparing hash values of HTTPObservation objects
+        Expected: They are not the same
+        """
+        config = {
+            "auth_username": None,
+            "auth_password": None,
+            "connect_timeout": 10.0,
+            "body": None,
+            "headers": None,
+            "method": "GET",
+            "request_timeout": 10.0,
+            "user_agent": f"Illuminate-bot/{__version__}",
+            "validate_cert": False,
+        }
+        observation_1 = HTTPObservation(
+            "https://example.com/api/v1",
+            allowed=(self.url,),
+            callback=int,
+            **config,
+        )
+        observation_2 = HTTPObservation(
+            "https://example.com/api/v2",
+            allowed=(self.url,),
+            callback=int,
+            **config,
+        )
+        assert hash(observation_1) != hash(observation_2)
+
+    def test_hash_implementation_with_same_url(self):
+        """
+        Given: HTTPObservations are initialized with same URLs and
+        using the different configuration dict
+        When: Comparing hash values of HTTPObservation objects
+        Expected: They are not the same
+        """
+        config_1 = {
+            "auth_username": None,
+            "auth_password": None,
+            "connect_timeout": 10.0,
+            "body": {"measurement": "°C"},
+            "headers": None,
+            "method": "POST",
+            "request_timeout": 10.0,
+            "user_agent": f"Illuminate-bot/{__version__}",
+            "validate_cert": False,
+        }
+        config_2 = {
+            "auth_username": None,
+            "auth_password": None,
+            "connect_timeout": 10.0,
+            "body": {"measurement": "K"},
+            "headers": None,
+            "method": "POST",
+            "request_timeout": 10.0,
+            "user_agent": f"Illuminate-bot/{__version__}",
+            "validate_cert": False,
+        }
+        observation_1 = HTTPObservation(
+            "https://example.com/api/v1",
+            allowed=(self.url,),
+            callback=int,
+            **config_1,
+        )
+        observation_2 = HTTPObservation(
+            "https://example.com/apiv1",
+            allowed=(self.url,),
+            callback=int,
+            **config_2,
+        )
+        assert hash(observation_1) != hash(observation_2)
 
     def test_not_allowed(self):
         """

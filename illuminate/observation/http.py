@@ -20,6 +20,16 @@ class HTTPObservation(Observation):
     Observation class and implements observe method.
     """
 
+    def __hash__(self) -> int:
+        """
+        HTTPObservation object hash value.
+
+        :return: int
+        """
+        body = self.configuration.get("body")
+        method = self.configuration.get("method")
+        return hash(f"{method}|{self.url}|:{body}")
+
     def __init__(
         self,
         url: str,
@@ -41,13 +51,18 @@ class HTTPObservation(Observation):
         :param callback: Async function/method that will manipulate response
         object and yield Exporter, Finding and Observation objects
         """
-        self.url = url
+        super().__init__(url)
         self._allowed = allowed
         self._callback = callback
         self.configuration = kwargs
 
     @property
     def allowed(self) -> bool:
+        """
+        Checks if HTTP URL is allowed to be requested.
+
+        :return: bool
+        """
         for allowed in self._allowed:
             if self.url.startswith(allowed):
                 return True
