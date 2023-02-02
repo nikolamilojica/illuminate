@@ -41,7 +41,7 @@ class HTTPObservation(Observation):
         :param callback: Async function/method that will manipulate response
         object and yield Exporter, Finding and Observation objects
         """
-        self.url = url
+        super().__init__(url)
         self._allowed = allowed
         self._callback = callback
         self.configuration = kwargs
