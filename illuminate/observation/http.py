@@ -20,6 +20,16 @@ class HTTPObservation(Observation):
     Observation class and implements observe method.
     """
 
+    def __hash__(self) -> int:
+        """
+        HTTPObservation object hash value.
+
+        :return: int
+        """
+        body = self.configuration.get("body")
+        method = self.configuration.get("method")
+        return hash(f"{method}|{self.url}|:{body}")
+
     def __init__(
         self,
         url: str,

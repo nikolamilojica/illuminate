@@ -12,6 +12,17 @@ class Observation(IObservation):
     method observe must be implemented in a child class.
     """
 
+    def __hash__(self):
+        """
+        Observation object hash value.
+
+        :return: None
+        :raises BasicObservationException:
+        """
+        raise BasicObservationException(
+            "Property hash must be implemented in child class"
+        )
+
     def __init__(self, url: Any):
         """
         Observation's __init__ method.
