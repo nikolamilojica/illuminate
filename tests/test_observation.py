@@ -13,5 +13,5 @@ class TestObservation:
         When: calling observe method
         Expected: BasicObservationException is raised
         """
-        observer = Observation()
+        observer = Observation("https://www.example.com")
         observer.observe()
