@@ -58,6 +58,11 @@ class HTTPObservation(Observation):
 
     @property
     def allowed(self) -> bool:
+        """
+        Checks if HTTP URL is allowed to be requested.
+
+        :return: bool
+        """
         for allowed in self._allowed:
             if self.url.startswith(allowed):
                 return True
