@@ -73,21 +73,21 @@ class Manager(IManager):
         self.__adapt_queue: queues.Queue = queues.Queue()
         self.__export_queue: queues.Queue = queues.Queue()
         self.__exported: set = set()
-        self.__failed: set = set()
-        self.__requested: set = set()
-        self.__requesting: set = set()
-
-    @property
-    def failed(self) -> set:
-        return self.__failed
+        self.__not_observed: set = set()
+        self.__observed: set = set()
+        self.__observing: set = set()
 
     @property
     def exported(self) -> set:
         return self.__exported
 
     @property
-    def requested(self) -> set:
-        return self.__requested
+    def not_observed(self) -> set:
+        return self.__not_observed
+
+    @property
+    def observed(self) -> set:
+        return self.__observed
 
     @staticmethod
     @adapt
@@ -255,8 +255,8 @@ class Manager(IManager):
                 )
         elif isinstance(item, Observation):
             _hash = hash(item)
-            if _hash not in self.__requesting:
-                self.__requesting.add(_hash)
+            if _hash not in self.__observing:
+                self.__observing.add(_hash)
                 if isinstance(item, HTTPObservation) and item.allowed:
                     await self.__observe_queue.put(item)
         else:
@@ -307,9 +307,9 @@ class Manager(IManager):
         }
         items = await item.observe()
         if not items:
-            self.__failed.add(item.url)
+            self.__not_observed.add(item.url)
             return
-        self.__requested.add(item.url)
+        self.__observed.add(item.url)
         if hasattr(items, "__aiter__"):
             async for _item in items:
                 await self.__router(_item)
