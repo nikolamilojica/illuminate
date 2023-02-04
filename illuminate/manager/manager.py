@@ -20,6 +20,7 @@ from illuminate.common import FILES
 from illuminate.decorators import adapt
 from illuminate.decorators import show_info
 from illuminate.decorators import show_logo
+from illuminate.decorators import show_observer_catalogue
 from illuminate.exceptions import BasicManagerException
 from illuminate.exporter import Exporter
 from illuminate.exporter import SQLExporter
@@ -200,6 +201,16 @@ class Manager(IManager):
                 file.write(f"{content.format(name=name).strip()}\n")
 
         logger.success(f"Project structure created for {name}")
+
+    @staticmethod
+    @show_observer_catalogue
+    def observe_catalogue(**context) -> dict:
+        """
+        Pass context dict to illuminate.decorators.cli.show_observe_catalogue.
+
+        :return: dict
+        """
+        return context
 
     @show_logo
     @show_info
