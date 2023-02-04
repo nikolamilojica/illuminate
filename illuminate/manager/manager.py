@@ -254,13 +254,11 @@ class Manager(IManager):
                     f"thus rejecting item {item}"
                 )
         elif isinstance(item, Observation):
-            if (
-                isinstance(item, HTTPObservation)
-                and item.allowed
-                and item.url not in self.__requesting
-            ):
-                self.__requesting.add(item.url)
-                await self.__observe_queue.put(item)
+            _hash = hash(item)
+            if _hash not in self.__requesting:
+                self.__requesting.add(_hash)
+                if isinstance(item, HTTPObservation) and item.allowed:
+                    await self.__observe_queue.put(item)
         else:
             logger.warning(
                 f"Manager rejected item {item} due to unsupported "
