@@ -9,7 +9,6 @@ from loguru import logger
 
 from illuminate import __version__
 from illuminate.common import LOGGING_LEVELS
-from illuminate.decorators import show_observer_catalogue
 from illuminate.manager import Assistant
 from illuminate.manager import Manager
 
@@ -170,10 +169,9 @@ def setup(name: str, path: str) -> None:
 
 
 @observe.command("catalogue")
-@show_observer_catalogue
-def catalogue() -> dict:
+def catalogue() -> None:
     """Lists observers found in project files."""
-    return Assistant.provide_context(sessions=False)
+    Manager.observe_catalogue(**Assistant.provide_context(sessions=False))
 
 
 @observe.command("start")
