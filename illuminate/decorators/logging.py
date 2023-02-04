@@ -68,12 +68,12 @@ def show_info(func: Callable) -> Callable:
         logger.success("Results gathered")
         logger.opt(colors=True).info(
             f"<yellow>Unsuccessful</yellow> observations: "
-            f"<magenta>{len(self.failed)}</magenta>"
+            f"<magenta>{len(self.not_observed)}</magenta>"
         )
-        logger.debug(f"Unsuccessful attempts {self.failed}")
+        logger.debug(f"Unsuccessful attempts {self.not_observed}")
         logger.opt(colors=True).info(
             f"<yellow>Successful</yellow> observations: "
-            f"<magenta>{len(self.requested) - len(self.failed)}</magenta>"
+            f"<magenta>{len(self.observed) - len(self.not_observed)}</magenta>"
         )
         logger.opt(colors=True).info(
             f"Number of <yellow>exports</yellow>: "

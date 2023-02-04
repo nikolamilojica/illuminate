@@ -196,7 +196,7 @@ class TestManagerObserveCommandGroup(Test):
 
             query = self.session.query(ModelExample).all()
             assert len(manager.exported) == 1
-            assert len(manager.requested) == 1
+            assert len(manager.observed) == 1
             assert len(query) == 1
             assert query[0].url == "https://example.com"
             assert query[0].title == "Example"
