@@ -172,14 +172,13 @@ from models.example import ModelExample
 class ExporterExample(SQLExporter):
     \"\"\"
     SQLExporter class will commit a model to database using session. Model is
-    passed at initialization, while database session is found by attributes
-    name and type in the pool of existing sessions. These attributes must
-    co-respond to DB section in {name}/settings.py. For more information how
-    to initialize SQLExporter class, check {name}/adapters/example.py
+    passed at initialization, while database session is found by name attribute
+    in the pool of existing sessions. Name must co-respond to DB section in
+    {name}/settings.py. For more information how to initialize SQLExporter
+    class, check {name}/adapters/example.py
     \"\"\"
 
     name: str = "main"
-    type: str = "postgresql"
 
     def __init__(self, model: ModelExample):
         super().__init__(model)
