@@ -210,6 +210,8 @@ class Assistant(IAssistant):
                     f"<magenta>{host}:{port}</magenta> to context"
                 )
                 _sessions.update({db: session})
+            else:
+                logger.warning(f"Database type {_type} is not supported")
 
         return _sessions
 
