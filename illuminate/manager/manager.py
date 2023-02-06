@@ -390,7 +390,7 @@ class Manager(IManager):
         try:
             session = self.sessions[item.name]
             await item.export(session)
-            self.__exported.add(item.model)
+            self.__exported.add(item)
         except KeyError:
             logger.critical(f"Database {item.name} of is not found in context")
 
