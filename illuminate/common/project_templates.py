@@ -45,7 +45,7 @@ class AdapterExample(Adapter):
         self, finding: FindingExample, *args, **kwargs
     ) -> AsyncGenerator[Union[ExporterExample, HTTPObservation], None]:
         yield ExporterExample(
-            model=ModelExample(title=finding.title, url=finding.url)
+            models=[ModelExample(title=finding.title, url=finding.url)]
         )
 
 """
@@ -164,6 +164,10 @@ _EMPTY = """
 """
 
 _EXPORTER_EXAMPLE = """
+from __future__ import annotations
+
+from typing import Union
+
 from illuminate.exporter import SQLExporter
 
 from models.example import ModelExample
@@ -171,7 +175,7 @@ from models.example import ModelExample
 
 class ExporterExample(SQLExporter):
     \"\"\"
-    SQLExporter class will commit a model to database using session. Model is
+    SQLExporter class will commit models to database using session. Models are
     passed at initialization, while database session is found by name attribute
     in the pool of existing sessions. Name must co-respond to DB section in
     {name}/settings.py. For more information how to initialize SQLExporter
@@ -180,8 +184,8 @@ class ExporterExample(SQLExporter):
 
     name: str = "main"
 
-    def __init__(self, model: ModelExample):
-        super().__init__(model)
+    def __init__(self, models: Union[list[ModelExample], tuple[ModelExample]]):
+        super().__init__(models)
 
 """
 
