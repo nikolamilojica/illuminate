@@ -46,7 +46,7 @@ class Manager(IManager):
         name: str,
         observers: list[Type[Observer]],
         path: str,
-        sessions: dict[str, dict[str, Type[AsyncSession]]],
+        sessions: dict[str, Type[AsyncSession]],
         settings: ModuleType,
         *args,
         **kwargs,
@@ -388,14 +388,11 @@ class Manager(IManager):
         :return: None
         """
         try:
-            session = self.sessions[item.type][item.name]
+            session = self.sessions[item.name]
             await item.export(session)
             self.__exported.add(item.model)
         except KeyError:
-            logger.critical(
-                f"Database {item.name} of a type {item.type} "
-                f"is not found in context"
-            )
+            logger.critical(f"Database {item.name} of is not found in context")
 
     @logger.catch
     async def _observe_start(self) -> None:

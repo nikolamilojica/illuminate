@@ -90,7 +90,7 @@ class TestAssistantClass(Test):
             assert len(context["adapters"]) == 1
             assert len(context["observers"]) == 1
             assert context["name"] == name
-            assert context["sessions"]["postgresql"]["main"]
+            assert context["sessions"]["main"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_provide_models_unsuccessfully(self):
@@ -178,7 +178,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            assert Assistant._provide_sessions()["postgresql"]
+            assert Assistant._provide_sessions()["main"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test__provide_settings_unsuccessfully(self):
