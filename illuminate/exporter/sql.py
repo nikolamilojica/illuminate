@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Union
 
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,13 +31,13 @@ class SQLExporter(Exporter):
     Manager.sessions attribute.
     """
 
-    def __init__(self, model: M):
+    def __init__(self, models: Union[list[M], tuple[M]]):
         """
         SQLExporter's __init__ method.
 
-        :param model: SQLAlchemy model object
+        :param models: SQLAlchemy model objects collection
         """
-        self.model = model
+        self.models = models
 
     async def export(
         self, session: Type[AsyncSession], *args, **kwargs
@@ -51,7 +51,7 @@ class SQLExporter(Exporter):
         """
         async with session() as session:  # type: ignore
             async with session.begin():  # type: ignore
-                session.add(self.model)  # type: ignore
+                session.add_all(self.models)  # type: ignore
                 try:
                     await session.commit()  # type: ignore
                 except Exception as exception:
@@ -67,4 +67,4 @@ class SQLExporter(Exporter):
 
         :return: String representation of an instance
         """
-        return f"SQLExporter(model={self.model})"
+        return f"SQLExporter(models={self.models})"
