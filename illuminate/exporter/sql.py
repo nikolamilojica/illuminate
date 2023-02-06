@@ -17,8 +17,8 @@ class SQLExporter(Exporter):
     Exporter class and implements export method.
 
     Each SQLExporter object is responsible for a single transaction with a
-    single database. Attributes name and type are used to acquire database
-    session object from Manager's sessions attribute.
+    single database. Attribute name is used to acquire database session object
+    from Manager's sessions attribute.
 
     Supported dialects:
         - Mysql
@@ -28,11 +28,6 @@ class SQLExporter(Exporter):
     name: str
     """
     SQL database name selector used to get database session object from
-    Manager.sessions attribute.
-    """
-    type: str
-    """
-    SQL database type selector used to get database session object from
     Manager.sessions attribute.
     """
 
