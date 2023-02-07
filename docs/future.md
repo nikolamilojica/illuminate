@@ -26,7 +26,7 @@ integration with cloud service providers, to include their services as
     * [ ] AWSS3Observation - AWS S3 cloud service integration observation
     * [ ] FileObservation - File observation
     * [ ] SplashObservation - Web 2.0 proxy js renderer observation
-    * [ ] SQLObservation - SQL observation
+    * [x] SQLObservation - SQL observation
 
 ## Future needs you!
 <p style="text-align: justify">Consider becoming a contributor.</p>
