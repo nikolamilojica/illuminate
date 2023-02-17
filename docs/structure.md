@@ -40,7 +40,7 @@ word "Observer" will be added into context and initialized.</p>
 ```python
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Generator
 from typing import Optional, Union
 from urllib.parse import urldefrag
 from urllib.parse import urljoin
@@ -55,15 +55,15 @@ from exporters.example import ExporterExample
 from findings.example import FindingExample
 
 
-async def _create_soup(response: HTTPResponse) -> BeautifulSoup:
+def _create_soup(response: HTTPResponse) -> BeautifulSoup:
     html = response.body.decode(errors="ignore")
     soup = BeautifulSoup(html, "html.parser")
     return soup
 
 
-async def _extract_hrefs(
+def _extract_hrefs(
     soup: BeautifulSoup, url: str
-) -> AsyncGenerator[str, None]:
+) -> Generator[str, None]:
     links = soup.find_all("a")
     for link in links:
         _url = link.get("href")
@@ -148,9 +148,9 @@ class ObserverExample(Observer):
         Observers, avoiding overlapping.
         """
 
-        soup = await _create_soup(response)
+        soup = _create_soup(response)
         hrefs = _extract_hrefs(soup, response.effective_url)
-        async for href in hrefs:
+        for href in hrefs:
             yield HTTPObservation(
                 href,
                 allowed=self.ALLOWED,
