@@ -1,4 +1,18 @@
 [[package]]
+name = "aiofile"
+version = "3.8.1"
+description = "Asynchronous file operations."
+category = "main"
+optional = false
+python-versions = ">=3.7, <4"
+
+[package.dependencies]
+caio = ">=0.9.0,<0.10.0"
+
+[package.extras]
+develop = ["aiomisc", "pytest", "pytest-cov"]
+
+[[package]]
 name = "aiosqlite"
 version = "0.17.0"
 description = "asyncio bridge to the standard sqlite3 module"
@@ -124,6 +138,17 @@ description = "Extensible memoizing collections and decorators"
 category = "dev"
 optional = false
 python-versions = "~=3.7"
+
+[[package]]
+name = "caio"
+version = "0.9.11"
+description = "Asynchronous file IO for Linux MacOS or Windows."
+category = "main"
+optional = false
+python-versions = ">=3.7, <4"
+
+[package.extras]
+develop = ["aiomisc", "pytest", "pytest-cov"]
 
 [[package]]
 name = "certifi"
@@ -1021,9 +1046,10 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "c8502034aae0df04b62261b3ba4484b40f1946254f9e065094acabe1996fa572"
+content-hash = "b9fb06ff04c4ebeca6cac8f101946448d6156eb53a8e35e097ba31105df7a42d"
 
 [metadata.files]
+aiofile = []
 aiosqlite = []
 alembic = []
 asyncmy = []
@@ -1039,6 +1065,7 @@ beautifulsoup4 = [
 ]
 black = []
 cachetools = []
+caio = []
 certifi = []
 cfgv = []
 chardet = []
