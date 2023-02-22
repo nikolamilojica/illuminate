@@ -44,6 +44,19 @@ class TestSQLObservationClass(Test):
             assert content[2] == "Base = declarative_base()"
 
     @pytest.mark.asyncio
+    async def test_observe_special_file_successfully(self):
+        """
+        Given: FileObservation is initialized with proper callback function and
+        URL pointing to Linux special file
+        When: Instance calls observe function
+        Expected: Callback returns object without exception raised
+        """
+
+        observation = FileObservation("/proc/cpuinfo", _observe)
+        async with observation.observe() as results:
+            assert results
+
+    @pytest.mark.asyncio
     async def test_observe_unsuccessfully(self):
         """
         Given: FileObservation is initialized with none existing URL
