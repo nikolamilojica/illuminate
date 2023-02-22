@@ -24,7 +24,7 @@ integration with cloud service providers, to include their services as
     * [ ] SplashExporter - Web 2.0 proxy js renderer exporter
 - [ ] `Observation` Classes
     * [ ] AWSS3Observation - AWS S3 cloud service integration observation
-    * [ ] FileObservation - File observation
+    * [x] FileObservation - File observation
     * [ ] SplashObservation - Web 2.0 proxy js renderer observation
     * [x] SQLObservation - SQL observation
 

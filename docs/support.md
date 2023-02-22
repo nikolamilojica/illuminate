@@ -1,4 +1,5 @@
 ::: illuminate.observation.observation.Observation
+::: illuminate.observation.http.FileObservation
 ::: illuminate.observation.http.HTTPObservation
 ::: illuminate.observation.sql.SQLObservation
 ::: illuminate.observer.finding.Finding
