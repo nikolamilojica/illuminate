@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from collections.abc import AsyncGenerator
 from collections.abc import AsyncIterator
+from contextlib import AsyncExitStack
 from contextlib import asynccontextmanager
 from typing import Callable, Optional, Union
 
 from aiofile import async_open
 from aiofile.utils import FileIOWrapperBase
+from caio import thread_aio_asyncio
 from loguru import logger
 
 from illuminate.exporter import Exporter
@@ -65,18 +67,24 @@ class FileObservation(Observation):
         """
         _file = None
         _items = None
-        try:
-            _file = await async_open(self.url, "r")
-            logger.info(f"{self}.observe() -> {_file}")
-            _items = self._callback(_file, *args, **kwargs)
-        except FileNotFoundError as exception:
-            logger.warning(f"{self}.observe() -> {exception}")
-        except Exception as exception:
-            logger.critical(f"{self}.observe() -> {exception}")
-        finally:
-            yield _items
-            if _file:
-                await _file.close()
+        async with AsyncExitStack() as stack:
+            context = await stack.enter_async_context(
+                thread_aio_asyncio.AsyncioContext()
+            )
+            try:
+                _file = await stack.enter_async_context(
+                    async_open(self.url, "r", context=context)
+                )
+                logger.info(f"{self}.observe() -> {_file}")
+                _items = self._callback(_file, *args, **kwargs)
+            except FileNotFoundError as exception:
+                logger.warning(f"{self}.observe() -> {exception}")
+            except Exception as exception:
+                logger.critical(f"{self}.observe() -> {exception}")
+            finally:
+                yield _items
+                if _file:
+                    await _file.close()
 
     def __repr__(self):
         """
