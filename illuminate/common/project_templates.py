@@ -301,6 +301,16 @@ OBSERVATION_CONFIGURATION = {{
         "request_timeout": 10.0,
         "user_agent": f"Illuminate-bot/{{__version__}}",
         "validate_cert": False,
+    }},
+    "splash": {{
+        "body": "",
+        "headers": "",
+        "host": "localhost",
+        "method": "GET",
+        "port": 8050,
+        "protocol": "http",
+        "render": "html",
+        "timeout": 30,
     }}
 }}
 
