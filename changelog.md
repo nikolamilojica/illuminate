@@ -2,6 +2,7 @@
 
 ## 0.2.0
 
+* SplashObservation
 * FileObservation
 * SQLObservation
 * Unyielding callbacks

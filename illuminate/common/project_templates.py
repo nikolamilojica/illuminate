@@ -154,6 +154,12 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=$ILLUMINATE_PGADMIN_PASSWORD
     ports:
       - "8080:80"
+  splash:
+    container_name: splash
+    image: scrapinghub/splash
+    restart: always
+    ports:
+      - "8050:8050"
 volumes:
   postgres:
     driver: local
@@ -301,6 +307,16 @@ OBSERVATION_CONFIGURATION = {{
         "request_timeout": 10.0,
         "user_agent": f"Illuminate-bot/{{__version__}}",
         "validate_cert": False,
+    }},
+    "splash": {{
+        "body": "",
+        "headers": "",
+        "host": "localhost",
+        "method": "GET",
+        "port": 8050,
+        "protocol": "http",
+        "render": "html",
+        "timeout": 30,
     }}
 }}
 
