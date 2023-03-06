@@ -10,7 +10,6 @@ from tornado import httpclient
 from tornado.httpclient import HTTPClientError
 from tornado.httpclient import HTTPResponse
 
-from illuminate.exceptions import BasicObservationException
 from illuminate.exporter import Exporter
 from illuminate.observation import Observation
 from illuminate.observer import Finding
@@ -80,7 +79,6 @@ class HTTPObservation(Observation):
 
         :return: Async Exporter, Finding, and Observation object generator or
         None
-        :raises BasicObservationException, Exception, HTTPClientError:
         """
         try:
             response = await httpclient.AsyncHTTPClient().fetch(
@@ -93,7 +91,7 @@ class HTTPObservation(Observation):
             return None
         except Exception as exception:
             logger.critical(f"{self}.observe() -> {exception}")
-            raise BasicObservationException
+            return None
 
     def __repr__(self):
         """
