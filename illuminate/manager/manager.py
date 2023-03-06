@@ -268,8 +268,9 @@ class Manager(IManager):
             _hash = hash(item)
             if _hash not in self.__observing:
                 self.__observing.add(_hash)
-                if isinstance(item, HTTPObservation) and item.allowed:
-                    await self.__observe_queue.put(item)
+                if isinstance(item, HTTPObservation) and not item.allowed:
+                    return
+                await self.__observe_queue.put(item)
         else:
             logger.warning(
                 f"Manager rejected item {item} due to unsupported "
