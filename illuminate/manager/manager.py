@@ -25,8 +25,11 @@ from illuminate.exceptions import BasicManagerException
 from illuminate.exporter import Exporter
 from illuminate.exporter import SQLExporter
 from illuminate.interface import IManager
+from illuminate.observation import FileObservation
 from illuminate.observation import HTTPObservation
 from illuminate.observation import Observation
+from illuminate.observation import SQLObservation
+from illuminate.observation import SplashObservation
 from illuminate.observer import Finding
 from illuminate.observer import Observer
 
@@ -302,8 +305,33 @@ class Manager(IManager):
         :param item: Observation object
         :return: None
         """
-        if isinstance(item, HTTPObservation):
+        if isinstance(item, SplashObservation):
+            await self.__observation_splash(item)
+        elif isinstance(item, HTTPObservation):
             await self.__observation_http(item)
+        elif isinstance(item, FileObservation):
+            await self.__observation_file(item)
+        elif isinstance(item, SQLObservation):
+            await self.__observation_sql(item)
+        else:
+            pass
+
+    async def __observation_file(self, item: FileObservation) -> None:
+        """
+        If URL (path) is not yet opened, Calls FileObservation's observe
+        method.
+
+        :param item: FileObservation object
+        :return: None
+        """
+        async with item.observe() as items:
+            if not items:
+                self.__not_observed.add(item.url)
+                return
+            self.__observed.add(item.url)
+            if hasattr(items, "__aiter__"):
+                async for _item in items:
+                    await self.__router(_item)
 
     async def __observation_http(self, item: HTTPObservation) -> None:
         """
@@ -318,6 +346,45 @@ class Manager(IManager):
             **item.configuration,
         }
         items = await item.observe()
+        if not items:
+            self.__not_observed.add(item.url)
+            return
+        self.__observed.add(item.url)
+        if hasattr(items, "__aiter__"):
+            async for _item in items:
+                await self.__router(_item)
+
+    async def __observation_sql(self, item: SQLObservation) -> None:
+        """
+        If query is not yet executed, calls SQLObservation's observe method.
+
+        :param item: SQLObservation object
+        :return: None
+        """
+        items = await item.observe(self.sessions[item.url])
+        if not items:
+            self.__not_observed.add(item.url)
+            return
+        self.__observed.add(item.url)
+        if hasattr(items, "__aiter__"):
+            async for _item in items:
+                await self.__router(_item)
+
+    async def __observation_splash(self, item: SplashObservation) -> None:
+        """
+        Prepares HTTP request kwargs and, if URL is not yet requested, calls
+        SplashObservation's observe method.
+
+        :param item: SplashObservation object
+        :return: None
+        """
+        item.configuration = {
+            **self.settings.OBSERVATION_CONFIGURATION["splash"],
+            **item.configuration,
+        }
+        items = await item.observe(
+            self.settings.OBSERVATION_CONFIGURATION["http"]
+        )
         if not items:
             self.__not_observed.add(item.url)
             return
