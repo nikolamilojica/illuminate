@@ -329,6 +329,8 @@ class Manager(IManager):
                 self.__not_observed.add(item.url)
                 return
             self.__observed.add(item.url)
+            if inspect.isawaitable(items):
+                await items
             if hasattr(items, "__aiter__"):
                 async for _item in items:
                     await self.__router(_item)
@@ -350,6 +352,8 @@ class Manager(IManager):
             self.__not_observed.add(item.url)
             return
         self.__observed.add(item.url)
+        if inspect.isawaitable(items):
+            await items
         if hasattr(items, "__aiter__"):
             async for _item in items:
                 await self.__router(_item)
@@ -366,6 +370,8 @@ class Manager(IManager):
             self.__not_observed.add(item.url)
             return
         self.__observed.add(item.url)
+        if inspect.isawaitable(items):
+            await items
         if hasattr(items, "__aiter__"):
             async for _item in items:
                 await self.__router(_item)
@@ -389,6 +395,8 @@ class Manager(IManager):
             self.__not_observed.add(item.url)
             return
         self.__observed.add(item.url)
+        if inspect.isawaitable(items):
+            await items
         if hasattr(items, "__aiter__"):
             async for _item in items:
                 await self.__router(_item)
