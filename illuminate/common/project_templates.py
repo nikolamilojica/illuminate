@@ -310,7 +310,6 @@ OBSERVATION_CONFIGURATION = {{
     }},
     "splash": {{
         "body": "",
-        "headers": "",
         "host": "localhost",
         "method": "GET",
         "port": 8050,
