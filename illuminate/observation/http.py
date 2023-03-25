@@ -129,16 +129,22 @@ class SplashObservation(HTTPObservation):
 
         :return: Splash URL string
         """
+        defaults: dict = {
+            "host": "localhost",
+            "port": 8050,
+            "protocol": "http",
+            "render": "html",
+        }
         parameters = copy(self.configuration)
-        host = parameters.pop("host")
-        port = parameters.pop("port")
-        protocol = parameters.pop("protocol")
+        for i in defaults:
+            if i in parameters:
+                defaults[i] = parameters[i]
+                del parameters[i]
         parameters["url"] = self.url
-        render = parameters.pop("render")
-        return (
-            f"{protocol}://{host}:{port}/render.{render}?"
-            f"{urllib.parse.urlencode(parameters)}"
-        )
+        endpoint = "{protocol}://{host}:{port}/render.{render}?"
+        endpoint = endpoint.format(**defaults)
+        parameters = urllib.parse.urlencode(parameters)
+        return f"{endpoint.format(**defaults)}{parameters}"
 
     async def observe(
         self, configuration: dict, *args, **kwargs
