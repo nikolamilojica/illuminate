@@ -4,6 +4,7 @@ import asyncio
 import inspect
 import json
 import os
+from collections.abc import AsyncGenerator, Coroutine
 from glob import glob
 from types import ModuleType
 from typing import Type, Union
@@ -293,52 +294,26 @@ class Manager(IManager):
             await asyncio.sleep(
                 self.settings.OBSERVATION_CONFIGURATION["delay"]
             )
-            await self.__observation(item)
+            await self.__observation_switch(item)
             logger.debug(f"Coroutine observed {item}")
             del item
             self.__observe_queue.task_done()
 
-    async def __observation(self, item: Observation) -> None:
+    async def __observe_file(self, item: FileObservation) -> None:
         """
-        Passes Observation object to proper method based on its class.
-
-        :param item: Observation object
-        :return: None
-        """
-        if isinstance(item, SplashObservation):
-            await self.__observation_splash(item)
-        elif isinstance(item, HTTPObservation):
-            await self.__observation_http(item)
-        elif isinstance(item, FileObservation):
-            await self.__observation_file(item)
-        elif isinstance(item, SQLObservation):
-            await self.__observation_sql(item)
-        else:
-            pass
-
-    async def __observation_file(self, item: FileObservation) -> None:
-        """
-        If URL (path) is not yet opened, Calls FileObservation's observe
-        method.
+        Calls FileObservation's observe method and pass result to resolve
+        function.
 
         :param item: FileObservation object
         :return: None
         """
-        async with item.observe() as items:
-            if not items:
-                self.__not_observed.add(item.url)
-                return
-            self.__observed.add(item.url)
-            if inspect.isawaitable(items):
-                await items
-            if inspect.isasyncgen(items):
-                async for _item in items:
-                    await self.__router(_item)
+        async with item.observe() as result:
+            await self.__observation_resolve(result, item.url)
 
-    async def __observation_http(self, item: HTTPObservation) -> None:
+    async def __observe_http(self, item: HTTPObservation) -> None:
         """
-        Prepares HTTP request kwargs and, if URL is not yet requested, calls
-        HTTPObservation's observe method.
+        Prepares HTTPObservation configuration, calls observe method and pass
+        result to resolve function.
 
         :param item: HTTPObservation object
         :return: None
@@ -347,39 +322,24 @@ class Manager(IManager):
             **self.settings.OBSERVATION_CONFIGURATION["http"],
             **item.configuration,
         }
-        items = await item.observe()
-        if not items:
-            self.__not_observed.add(item.url)
-            return
-        self.__observed.add(item.url)
-        if inspect.isawaitable(items):
-            await items
-        if inspect.isasyncgen(items):
-            async for _item in items:
-                await self.__router(_item)
+        result = await item.observe()
+        await self.__observation_resolve(result, item.url)
 
-    async def __observation_sql(self, item: SQLObservation) -> None:
+    async def __observe_sql(self, item: SQLObservation) -> None:
         """
-        If query is not yet executed, calls SQLObservation's observe method.
+        Calls SQLObservation's observe method and pass result to resolve
+        function.
 
         :param item: SQLObservation object
         :return: None
         """
-        items = await item.observe(self.sessions[item.url])
-        if not items:
-            self.__not_observed.add(item.url)
-            return
-        self.__observed.add(item.url)
-        if inspect.isawaitable(items):
-            await items
-        if inspect.isasyncgen(items):
-            async for _item in items:
-                await self.__router(_item)
+        result = await item.observe(self.sessions[item.url])
+        await self.__observation_resolve(result, f"{item.url}:{item.query}")
 
-    async def __observation_splash(self, item: SplashObservation) -> None:
+    async def __observe_splash(self, item: SplashObservation) -> None:
         """
-        Prepares HTTP request kwargs and, if URL is not yet requested, calls
-        SplashObservation's observe method.
+        Prepares SplashObservation configuration, calls observe method and pass
+        result to resolve function.
 
         :param item: SplashObservation object
         :return: None
@@ -388,18 +348,51 @@ class Manager(IManager):
             **self.settings.OBSERVATION_CONFIGURATION["splash"],
             **item.configuration,
         }
-        items = await item.observe(
+        result = await item.observe(
             self.settings.OBSERVATION_CONFIGURATION["http"]
         )
-        if not items:
-            self.__not_observed.add(item.url)
+        await self.__observation_resolve(result, item.url)
+
+    async def __observation_resolve(
+        self, result: Union[AsyncGenerator, Coroutine, None], url: str
+    ):
+        """
+        Resolves Observation result if any.
+
+        :param result: AsyncGenerator/Coroutine object or None
+        :param url: URL str
+        :return: None
+        """
+        if not result:
+            self.__not_observed.add(url)
             return
-        self.__observed.add(item.url)
-        if inspect.isawaitable(items):
-            await items
-        if inspect.isasyncgen(items):
-            async for _item in items:
+        self.__observed.add(url)
+        if inspect.isawaitable(result):
+            await result
+        if inspect.isasyncgen(result):
+            async for _item in result:
                 await self.__router(_item)
+
+    async def __observation_switch(self, item: Observation) -> None:
+        """
+        Passes Observation object to proper method based on its class.
+
+        :param item: Observation object
+        :return: None
+        """
+        if isinstance(item, HTTPObservation):
+            if isinstance(item, SplashObservation):
+                await self.__observe_splash(item)
+            else:
+                await self.__observe_http(item)
+        elif isinstance(item, FileObservation):
+            await self.__observe_file(item)
+        elif isinstance(item, SQLObservation):
+            await self.__observe_sql(item)
+        else:
+            logger.warning(
+                f"Observation of a type {type(item)} is not supported"
+            )
 
     async def __adapt(self) -> None:
         """
