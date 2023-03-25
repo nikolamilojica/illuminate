@@ -281,6 +281,7 @@ class Manager(IManager):
                 f"item type {type(item)}"
             )
 
+    @logger.catch
     async def __observe(self) -> None:
         """
         Takes Observation object from self.__observe_queue and, after delay,
@@ -394,6 +395,7 @@ class Manager(IManager):
                 f"Observation of a type {type(item)} is not supported"
             )
 
+    @logger.catch
     async def __adapt(self) -> None:
         """
         Takes Finding object from self.__adapt_queue and pass it to
@@ -423,6 +425,7 @@ class Manager(IManager):
                     async for _item in items:  # type: ignore
                         await self.__router(_item)
 
+    @logger.catch
     async def __export(self) -> None:
         """
         Takes Exporter object from self.__export_queue and pass it to
