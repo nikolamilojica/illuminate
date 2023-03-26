@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import urllib.parse
-from collections.abc import AsyncGenerator
 from copy import copy
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 
 from loguru import logger
 from tornado import httpclient
 from tornado.httpclient import HTTPClientError
 from tornado.httpclient import HTTPResponse
 
-from illuminate.exporter import Exporter
+from illuminate.meta.type import Result
 from illuminate.observation import Observation
-from illuminate.observer import Finding
 
 
 class HTTPObservation(Observation):
@@ -36,10 +34,7 @@ class HTTPObservation(Observation):
         url: str,
         /,
         allowed: Union[list[str], tuple[str]],
-        callback: Callable[
-            [HTTPResponse, tuple, dict],
-            AsyncGenerator[Union[Exporter, Finding, Observation], None],
-        ],
+        callback: Callable[[HTTPResponse, tuple, dict], Result],
         *args,
         **kwargs,
     ):
@@ -49,8 +44,8 @@ class HTTPObservation(Observation):
         :param url: Data's HTTP URL
         :param allowed: Collection of strings evaluated against self.url to
         determent if URL is allowed
-        :param callback: Async function/method that will manipulate response
-        object and yield Exporter, Finding and Observation objects
+        :param callback: Async function/method that manipulates HTTPResponse
+        object and returns Result.
         """
         super().__init__(url)
         self._allowed = allowed
@@ -69,16 +64,12 @@ class HTTPObservation(Observation):
                 return True
         return False
 
-    async def observe(
-        self, *args, **kwargs
-    ) -> Optional[AsyncGenerator[Union[Exporter, Finding, Observation], None]]:
+    async def observe(self, *args, **kwargs) -> Union[None, Result]:
         """
         Requests data from HTTP server, passes response object to a callback
-        and returns async Exporter, Finding, and Observation object generator
-        if request is successful.
+        and returns None or Result.
 
-        :return: Async Exporter, Finding, and Observation object generator or
-        None
+        :return: None or Result
         """
         try:
             response = await httpclient.AsyncHTTPClient().fetch(
@@ -148,15 +139,13 @@ class SplashObservation(HTTPObservation):
 
     async def observe(
         self, configuration: dict, *args, **kwargs
-    ) -> Optional[AsyncGenerator[Union[Exporter, Finding, Observation], None]]:
+    ) -> Union[None, Result]:
         """
         Requests data from HTTP server and renders response with Splash, passes
-        response object to a callback and returns async Exporter, Finding, and
-        Observation object generator if request is successful.
+        response object to a callback and returns None or Result.
 
         :param configuration: HTTP configuration dict from settings.py
-        :return: Async Exporter, Finding, and Observation object generator or
-        None
+        :return: None or Result
         """
         try:
             response = await httpclient.AsyncHTTPClient().fetch(

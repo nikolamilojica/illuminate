@@ -5,7 +5,6 @@ import inspect
 import json
 import os
 import traceback
-from collections.abc import AsyncGenerator, Coroutine
 from glob import glob
 from types import ModuleType
 from typing import Type, Union
@@ -27,6 +26,7 @@ from illuminate.exceptions import BasicManagerException
 from illuminate.exporter import Exporter
 from illuminate.exporter import SQLExporter
 from illuminate.interface import IManager
+from illuminate.meta.type import Result
 from illuminate.observation import FileObservation
 from illuminate.observation import HTTPObservation
 from illuminate.observation import Observation
@@ -356,12 +356,12 @@ class Manager(IManager):
         await self.__observation_resolve(result, item.url)
 
     async def __observation_resolve(
-        self, result: Union[AsyncGenerator, Coroutine, None], url: str
+        self, result: Union[None, Result], url: str
     ):
         """
-        Resolves Observation result if any.
+        Resolves Observation.
 
-        :param result: AsyncGenerator/Coroutine object or None
+        :param result: Result
         :param url: URL str
         :return: None
         """

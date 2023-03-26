@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
-from typing import Callable, Optional, Type, Union
+from typing import Callable, Type, Union
 
 from loguru import logger
-from sqlalchemy.engine.result import Result
+from sqlalchemy.engine.result import Result as AlchemyResult
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.elements import TextClause
 from sqlalchemy.sql.selectable import Select
 
-from illuminate.exporter import Exporter
+from illuminate.meta.type import Result
 from illuminate.observation import Observation
-from illuminate.observer import Finding
 
 
 class SQLObservation(Observation):
@@ -35,10 +33,7 @@ class SQLObservation(Observation):
         query: Union[Select, TextClause],
         url: str,
         /,
-        callback: Callable[
-            [Result, tuple, dict],
-            AsyncGenerator[Union[Exporter, Finding, Observation], None],
-        ],
+        callback: Callable[[AlchemyResult, tuple, dict], Result],
         *args,
         **kwargs,
     ):
@@ -47,8 +42,8 @@ class SQLObservation(Observation):
 
         :param query: SQLAlchemy query object.
         :param url: Database name in project settings.
-        :param callback: Async function/method that will manipulate response
-        object and yield Exporter, Finding and Observation objects
+        :param callback: Async function/method that manipulates AlchemyResult
+        object and returns Result.
         """
         super().__init__(url)
         self._callback = callback
@@ -56,14 +51,12 @@ class SQLObservation(Observation):
 
     async def observe(
         self, session: Type[AsyncSession], *args, **kwargs
-    ) -> Optional[AsyncGenerator[Union[Exporter, Finding, Observation], None]]:
+    ) -> Union[None, Result]:
         """
         Reads data from database, passes response object to a callback
-        and returns async Exporter, Finding, and Observation object generator
-        if request is successful.
+        and returns None or Result.
 
-        :return: Async Exporter, Finding, and Observation object generator or
-        None
+        :return: None or Result
         """
         try:
             async with session() as session:  # type: ignore
