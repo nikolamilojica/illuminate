@@ -4,6 +4,7 @@ import asyncio
 import inspect
 import json
 import os
+import traceback
 from collections.abc import AsyncGenerator, Coroutine
 from glob import glob
 from types import ModuleType
@@ -368,11 +369,17 @@ class Manager(IManager):
             self.__not_observed.add(url)
             return
         self.__observed.add(url)
-        if inspect.isawaitable(result):
-            await result
-        if inspect.isasyncgen(result):
-            async for _item in result:
-                await self.__router(_item)
+        try:
+            if inspect.isawaitable(result):
+                await result
+            if inspect.isasyncgen(result):
+                async for _item in result:
+                    await self.__router(_item)
+        except Exception:  # noqa
+            stack = f"<red>{traceback.format_exc().strip()}</red>"
+            logger.opt(colors=True).warning(
+                f"Observation callback throws the following exception\n{stack}"
+            )
 
     async def __observation_switch(self, item: Observation) -> None:
         """
