@@ -63,10 +63,13 @@ class SQLObservation(Observation):
                 async with session.begin():  # type: ignore
                     query = self.query
                     response = await session.execute(query)  # type: ignore
-            logger.success(f'{self}.observe(session="{session}")')
+            logger.info(f'{self}.observe(session="{session}")')
             return self._callback(response, *args, **kwargs)
         except SQLAlchemyError as exception:
             logger.warning(f"{self}.observe() -> {exception}")
+            return None
+        except Exception as exception:
+            logger.critical(f"{self}.observe() -> {exception}")
             return None
 
     def __repr__(self):
@@ -76,6 +79,6 @@ class SQLObservation(Observation):
         :return: String representation of an instance
         """
         return (
-            f'SQLObservation("{self.query}","{self.query}",'
+            f'SQLObservation("{self.query}","{self.url}",'
             f'callback="{self._callback}")'
         )
