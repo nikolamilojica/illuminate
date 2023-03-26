@@ -1,19 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
 from collections.abc import AsyncIterator
-from contextlib import AsyncExitStack
-from contextlib import asynccontextmanager
-from typing import Callable, Optional, Union
+from contextlib import AsyncExitStack, asynccontextmanager
+from typing import Callable, Union
 
 from aiofile import async_open
 from aiofile.utils import FileIOWrapperBase
 from caio import thread_aio_asyncio
 from loguru import logger
 
-from illuminate.exporter import Exporter
+from illuminate.meta.type import Result
 from illuminate.observation import Observation
-from illuminate.observer import Finding
 
 
 class FileObservation(Observation):
@@ -34,10 +31,7 @@ class FileObservation(Observation):
         self,
         url: str,
         /,
-        callback: Callable[
-            [FileIOWrapperBase, tuple, dict],
-            AsyncGenerator[Union[Exporter, Finding, Observation], None],
-        ],
+        callback: Callable[[FileIOWrapperBase, tuple, dict], Result],
         *args,
         **kwargs,
     ):
@@ -45,8 +39,8 @@ class FileObservation(Observation):
         FileObservation's __init__ method.
 
         :param url: File path
-        :param callback: Async function/method that will manipulate file
-        object and yield Exporter, Finding and Observation objects
+        :param callback: Async function/method that manipulates
+        FileIOWrapperBase object and returns Result
         """
         super().__init__(url)
         self._callback = callback
@@ -54,16 +48,12 @@ class FileObservation(Observation):
     @asynccontextmanager
     async def observe(
         self, *args, **kwargs
-    ) -> AsyncIterator[
-        Optional[AsyncGenerator[Union[Exporter, Finding, Observation], None]]
-    ]:
+    ) -> AsyncIterator[Union[None, Result]]:
         """
         Opens IO file stream asynchronously, pass stream object to a callback
-        and yields async Exporter, Finding, and Observation object generator
-        if read is successful.
+        and returns None or Result as a context manager.
 
-        :return: Async Exporter, Finding, and Observation object generator or
-        None
+        :return: AsyncIterator with None or Result
         """
         _file = None
         _items = None
