@@ -489,6 +489,15 @@ OBSERVATION_CONFIGURATION = {
         "request_timeout": 10.0,
         "user_agent": f"Illuminate-bot/{__version__}",
         "validate_cert": False,
+    },
+    "splash": {
+        "body": "",
+        "host": "localhost",
+        "method": "GET",
+        "port": 8050,
+        "protocol": "http",
+        "render": "html",
+        "timeout": 30,
     }
 }
 ```
@@ -511,7 +520,7 @@ services:
     environment:
       - POSTGRES_USER=illuminate
       - POSTGRES_PASSWORD=$ILLUMINATE_MAIN_DB_PASSWORD
-      - POSTGRES_DB=example_project
+      - POSTGRES_DB=tutorial
     ports:
       - '5432:5432'
     volumes:
@@ -525,6 +534,12 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=$ILLUMINATE_PGADMIN_PASSWORD
     ports:
       - "8080:80"
+  splash:
+    container_name: splash
+    image: scrapinghub/splash
+    restart: always
+    ports:
+      - "8050:8050"
 volumes:
   postgres:
     driver: local
