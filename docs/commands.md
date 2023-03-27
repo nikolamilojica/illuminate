@@ -22,7 +22,7 @@ illuminate --help
 illuminate version
 ```
 
-    illuminate, version 0.1.0
+    illuminate, version 0.2.0
 
 <p style="text-align: justify">There are two types of command groups.
 <code>manage</code> and <code>observe</code>.</p>
