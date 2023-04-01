@@ -1,10 +1,10 @@
 import pytest
 from alembic.operations import Operations
 
-from illuminate.exceptions import BasicManagerException
-from illuminate.manager import Assistant
-from illuminate.manager import Manager
-from tests.unit import Test
+from illuminate.exceptions.manager import BasicManagerException
+from illuminate.manager.assistant import Assistant
+from illuminate.manager.manager import Manager
+from tests.shared.unit import Test
 
 
 class TestAssistantClass(Test):
@@ -90,7 +90,7 @@ class TestAssistantClass(Test):
             assert len(context["adapters"]) == 1
             assert len(context["observers"]) == 1
             assert context["name"] == name
-            assert context["sessions"]["main"]
+            assert context["sessions"]["postgresql"]["main"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_provide_models_unsuccessfully(self):
@@ -178,7 +178,7 @@ class TestAssistantClass(Test):
         with self.path():
             name = "example"
             Manager.project_setup(name, ".")
-            assert Assistant._provide_sessions()["main"]
+            assert Assistant._provide_sessions()["postgresql"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test__provide_settings_unsuccessfully(self):

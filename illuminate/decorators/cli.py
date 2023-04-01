@@ -6,7 +6,7 @@ from typing import Callable
 
 from loguru import logger
 
-from illuminate.manager import Assistant
+from illuminate.manager.assistant import Assistant
 
 
 def adapt(func: Callable) -> Callable:

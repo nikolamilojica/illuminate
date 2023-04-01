@@ -1,7 +1,7 @@
 import pytest
 
-from illuminate.adapter import Adapter
-from illuminate.exceptions import BasicAdapterException
+from illuminate.adapter.adapter import Adapter
+from illuminate.exceptions.adapter import BasicAdapterException
 
 
 class TestAdapter:
