@@ -1,7 +1,7 @@
 import pytest
 
-from illuminate.exceptions import BasicObserverException
-from illuminate.observer import Observer
+from illuminate.exceptions.observer import BasicObserverException
+from illuminate.observer.observer import Observer
 
 
 class TestObserver:

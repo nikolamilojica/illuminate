@@ -4,7 +4,6 @@ import asyncio
 import inspect
 import json
 import os
-import traceback
 from glob import glob
 from types import ModuleType
 from typing import Type, Union
@@ -16,24 +15,19 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from tornado import gen, ioloop, queues
 
-from illuminate.adapter import Adapter
-from illuminate.common import FILES
-from illuminate.decorators import adapt
-from illuminate.decorators import show_info
-from illuminate.decorators import show_logo
-from illuminate.decorators import show_observer_catalogue
-from illuminate.exceptions import BasicManagerException
-from illuminate.exporter import Exporter
-from illuminate.exporter import SQLExporter
-from illuminate.interface import IManager
-from illuminate.meta.type import Result
-from illuminate.observation import FileObservation
-from illuminate.observation import HTTPObservation
-from illuminate.observation import Observation
-from illuminate.observation import SQLObservation
-from illuminate.observation import SplashObservation
-from illuminate.observer import Finding
-from illuminate.observer import Observer
+from illuminate.adapter.adapter import Adapter
+from illuminate.common.project_templates import FILES
+from illuminate.decorators.cli import adapt
+from illuminate.decorators.logging import show_info
+from illuminate.decorators.logging import show_logo
+from illuminate.exceptions.manager import BasicManagerException
+from illuminate.exporter.exporter import Exporter
+from illuminate.exporter.sql import SQLExporter
+from illuminate.interface.manager import IManager
+from illuminate.observation.http import HTTPObservation
+from illuminate.observation.http import Observation
+from illuminate.observer.finding import Finding
+from illuminate.observer.observer import Observer
 
 
 class Manager(IManager):
@@ -51,7 +45,7 @@ class Manager(IManager):
         name: str,
         observers: list[Type[Observer]],
         path: str,
-        sessions: dict[str, Type[AsyncSession]],
+        sessions: dict[str, dict[str, Type[AsyncSession]]],
         settings: ModuleType,
         *args,
         **kwargs,
@@ -79,21 +73,21 @@ class Manager(IManager):
         self.__adapt_queue: queues.Queue = queues.Queue()
         self.__export_queue: queues.Queue = queues.Queue()
         self.__exported: set = set()
-        self.__not_observed: set = set()
-        self.__observed: set = set()
-        self.__observing: set = set()
+        self.__failed: set = set()
+        self.__requested: set = set()
+        self.__requesting: set = set()
+
+    @property
+    def failed(self) -> set:
+        return self.__failed
 
     @property
     def exported(self) -> set:
         return self.__exported
 
     @property
-    def not_observed(self) -> set:
-        return self.__not_observed
-
-    @property
-    def observed(self) -> set:
-        return self.__observed
+    def requested(self) -> set:
+        return self.__requested
 
     @staticmethod
     @adapt
@@ -207,16 +201,6 @@ class Manager(IManager):
 
         logger.success(f"Project structure created for {name}")
 
-    @staticmethod
-    @show_observer_catalogue
-    def observe_catalogue(**context) -> dict:
-        """
-        Pass context dict to illuminate.decorators.cli.show_observe_catalogue.
-
-        :return: dict
-        """
-        return context
-
     @show_logo
     @show_info
     def observe_start(self) -> None:
@@ -270,11 +254,12 @@ class Manager(IManager):
                     f"thus rejecting item {item}"
                 )
         elif isinstance(item, Observation):
-            _hash = hash(item)
-            if _hash not in self.__observing:
-                self.__observing.add(_hash)
-                if isinstance(item, HTTPObservation) and not item.allowed:
-                    return
+            if (
+                isinstance(item, HTTPObservation)
+                and item.allowed
+                and item.url not in self.__requesting
+            ):
+                self.__requesting.add(item.url)
                 await self.__observe_queue.put(item)
         else:
             logger.warning(
@@ -282,7 +267,6 @@ class Manager(IManager):
                 f"item type {type(item)}"
             )
 
-    @logger.catch
     async def __observe(self) -> None:
         """
         Takes Observation object from self.__observe_queue and, after delay,
@@ -296,26 +280,25 @@ class Manager(IManager):
             await asyncio.sleep(
                 self.settings.OBSERVATION_CONFIGURATION["delay"]
             )
-            await self.__observation_switch(item)
+            await self.__observation(item)
             logger.debug(f"Coroutine observed {item}")
             del item
             self.__observe_queue.task_done()
 
-    async def __observe_file(self, item: FileObservation) -> None:
+    async def __observation(self, item: Observation) -> None:
         """
-        Calls FileObservation's observe method and pass result to resolve
-        function.
+        Passes Observation object to proper method based on its class.
 
-        :param item: FileObservation object
+        :param item: Observation object
         :return: None
         """
-        async with item.observe() as result:
-            await self.__observation_resolve(result, item.url)
+        if isinstance(item, HTTPObservation):
+            await self.__observation_http(item)
 
-    async def __observe_http(self, item: HTTPObservation) -> None:
+    async def __observation_http(self, item: HTTPObservation) -> None:
         """
-        Prepares HTTPObservation configuration, calls observe method and pass
-        result to resolve function.
+        Prepares HTTP request kwargs and, if URL is not yet requested, calls
+        HTTPObservation's observe method.
 
         :param item: HTTPObservation object
         :return: None
@@ -324,85 +307,14 @@ class Manager(IManager):
             **self.settings.OBSERVATION_CONFIGURATION["http"],
             **item.configuration,
         }
-        result = await item.observe()
-        await self.__observation_resolve(result, item.url)
-
-    async def __observe_sql(self, item: SQLObservation) -> None:
-        """
-        Calls SQLObservation's observe method and pass result to resolve
-        function.
-
-        :param item: SQLObservation object
-        :return: None
-        """
-        result = await item.observe(self.sessions[item.url])
-        await self.__observation_resolve(result, f"{item.url}:{item.query}")
-
-    async def __observe_splash(self, item: SplashObservation) -> None:
-        """
-        Prepares SplashObservation configuration, calls observe method and pass
-        result to resolve function.
-
-        :param item: SplashObservation object
-        :return: None
-        """
-        item.configuration = {
-            **self.settings.OBSERVATION_CONFIGURATION["splash"],
-            **item.configuration,
-        }
-        result = await item.observe(
-            self.settings.OBSERVATION_CONFIGURATION["http"]
-        )
-        await self.__observation_resolve(result, item.url)
-
-    async def __observation_resolve(
-        self, result: Union[None, Result], url: str
-    ):
-        """
-        Resolves Observation.
-
-        :param result: Result
-        :param url: URL str
-        :return: None
-        """
-        if not result:
-            self.__not_observed.add(url)
+        items = await item.observe()
+        if not items:
+            self.__failed.add(item.url)
             return
-        self.__observed.add(url)
-        try:
-            if inspect.isawaitable(result):
-                await result
-            if inspect.isasyncgen(result):
-                async for _item in result:
-                    await self.__router(_item)
-        except Exception:  # noqa
-            stack = f"<red>{traceback.format_exc().strip()}</red>"
-            logger.opt(colors=True).warning(
-                f"Observation callback throws the following exception\n{stack}"
-            )
+        self.__requested.add(item.url)
+        async for _item in items:
+            await self.__router(_item)
 
-    async def __observation_switch(self, item: Observation) -> None:
-        """
-        Passes Observation object to proper method based on its class.
-
-        :param item: Observation object
-        :return: None
-        """
-        if isinstance(item, HTTPObservation):
-            if isinstance(item, SplashObservation):
-                await self.__observe_splash(item)
-            else:
-                await self.__observe_http(item)
-        elif isinstance(item, FileObservation):
-            await self.__observe_file(item)
-        elif isinstance(item, SQLObservation):
-            await self.__observe_sql(item)
-        else:
-            logger.warning(
-                f"Observation of a type {type(item)} is not supported"
-            )
-
-    @logger.catch
     async def __adapt(self) -> None:
         """
         Takes Finding object from self.__adapt_queue and pass it to
@@ -432,7 +344,6 @@ class Manager(IManager):
                     async for _item in items:  # type: ignore
                         await self.__router(_item)
 
-    @logger.catch
     async def __export(self) -> None:
         """
         Takes Exporter object from self.__export_queue and pass it to
@@ -467,11 +378,14 @@ class Manager(IManager):
         :return: None
         """
         try:
-            session = self.sessions[item.name]
+            session = self.sessions[item.type][item.name]
             await item.export(session)
-            self.__exported.add(item)
+            self.__exported.add(item.model)
         except KeyError:
-            logger.critical(f"Database {item.name} of is not found in context")
+            logger.critical(
+                f"Database {item.name} of a type {item.type} "
+                f"is not found in context"
+            )
 
     @logger.catch
     async def _observe_start(self) -> None:

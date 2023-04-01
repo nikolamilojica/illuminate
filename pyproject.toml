@@ -24,11 +24,10 @@ packages = [
     { include = "illuminate" }
 ]
 repository = "https://github.com/nikolamilojica/illuminate"
-version = "0.2.0"
+version = "0.1.1"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-aiofile = "^3.8.1"
 alembic = "^1.7.7"
 asyncmy = "^0.2.5"
 asyncpg = "^0.26.0"
@@ -50,12 +49,12 @@ mkdocs-material = "^8.5.10"
 mkdocstrings = {extras = ["python"], version = "^0.19.0"}
 mypy = "^0.982"
 pre-commit = "^2.20.0"
-pytest = "^7.2.1"
+pytest = ">=5.2"
 pytest-asyncio = "^0.19.0"
-pytest-cov = "^4.0.0"
+pytest-cov = "^3.0.0"
 pytest-mock = "^3.8.2"
 sqlalchemy2-stubs = "^0.0.2-alpha.27"
-tox = "^4.3.5"
+tox = "^3.25.1"
 
 [tool.poetry.scripts]
 illuminate = "illuminate.cli:cli"

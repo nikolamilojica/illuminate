@@ -17,11 +17,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from illuminate.adapter import Adapter
-from illuminate.common import SUPPORTED_RELATIONAL_DATABASES
-from illuminate.exceptions import BasicManagerException
-from illuminate.interface import IAssistant
-from illuminate.observer import Observer
+from illuminate.adapter.adapter import Adapter
+from illuminate.exceptions.manager import BasicManagerException
+from illuminate.interface.assistant import IAssistant
+from illuminate.observer.observer import Observer
 
 
 class Assistant(IAssistant):
@@ -181,13 +180,16 @@ class Assistant(IAssistant):
         return "{type}://{user}:{pass}@{host}/{db}".format(**db)
 
     @staticmethod
-    def _provide_sessions() -> dict[str, Type[AsyncSession]]:
+    def _provide_sessions() -> dict[str, dict[str, Type[AsyncSession]]]:
         """
         Creates a dictionary of database sessions.
 
         :return: Database sessions
         """
-        _sessions: dict = {}
+        _sessions: dict[str, dict[str, Type[AsyncSession]]] = {
+            "mysql": {},
+            "postgresql": {},
+        }
         settings = Assistant._provide_settings()
         logger.opt(colors=True).info(
             f"Number of expected db connections: "
@@ -195,7 +197,7 @@ class Assistant(IAssistant):
         )
         for db in settings.DB:
             _type = settings.DB[db]["type"]
-            if _type in SUPPORTED_RELATIONAL_DATABASES:
+            if _type in ("mysql", "postgresql"):
                 url = Assistant._provide_db_url(db, _async=True)
                 engine = create_async_engine(url)
                 session = sessionmaker(
@@ -209,9 +211,7 @@ class Assistant(IAssistant):
                     f"Adding session with <yellow>{db}</yellow> at "
                     f"<magenta>{host}:{port}</magenta> to context"
                 )
-                _sessions.update({db: session})
-            else:
-                logger.warning(f"Database type {_type} is not supported")
+                _sessions[_type] = {db: session}  # type: ignore
 
         return _sessions
 

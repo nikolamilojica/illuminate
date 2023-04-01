@@ -4,9 +4,9 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 from typing import Type, Union
 
-from illuminate.adapter import Adapter
-from illuminate.observation import HTTPObservation
-from illuminate.observer import Finding
+from illuminate.adapter.adapter import Adapter
+from illuminate.observation.http import HTTPObservation
+from illuminate.observer.finding import Finding
 
 from exporters.example import ExporterExample
 from findings.example import FindingExample
@@ -45,7 +45,7 @@ class AdapterExample(Adapter):
         self, finding: FindingExample, *args, **kwargs
     ) -> AsyncGenerator[Union[ExporterExample, HTTPObservation], None]:
         yield ExporterExample(
-            models=[ModelExample(title=finding.title, url=finding.url)]
+            model=ModelExample(title=finding.title, url=finding.url)
         )
 
 """
@@ -154,12 +154,6 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=$ILLUMINATE_PGADMIN_PASSWORD
     ports:
       - "8080:80"
-  splash:
-    container_name: splash
-    image: scrapinghub/splash
-    restart: always
-    ports:
-      - "8050:8050"
 volumes:
   postgres:
     driver: local
@@ -170,28 +164,25 @@ _EMPTY = """
 """
 
 _EXPORTER_EXAMPLE = """
-from __future__ import annotations
-
-from typing import Union
-
-from illuminate.exporter import SQLExporter
+from illuminate.exporter.sql import SQLExporter
 
 from models.example import ModelExample
 
 
 class ExporterExample(SQLExporter):
     \"\"\"
-    SQLExporter class will commit models to database using session. Models are
-    passed at initialization, while database session is found by name attribute
-    in the pool of existing sessions. Name must co-respond to DB section in
-    {name}/settings.py. For more information how to initialize SQLExporter
-    class, check {name}/adapters/example.py
+    SQLExporter class will commit a model to database using session. Model is
+    passed at initialization, while database session is found by attributes
+    name and type in the pool of existing sessions. These attributes must
+    co-respond to DB section in {name}/settings.py. For more information how
+    to initialize SQLExporter class, check {name}/adapters/example.py
     \"\"\"
 
     name: str = "main"
+    type: str = "postgresql"
 
-    def __init__(self, models: Union[list[ModelExample], tuple[ModelExample]]):
-        super().__init__(models)
+    def __init__(self, model: ModelExample):
+        super().__init__(model)
 
 """
 
@@ -307,15 +298,6 @@ OBSERVATION_CONFIGURATION = {{
         "request_timeout": 10.0,
         "user_agent": f"Illuminate-bot/{{__version__}}",
         "validate_cert": False,
-    }},
-    "splash": {{
-        "body": "",
-        "host": "localhost",
-        "method": "GET",
-        "port": 8050,
-        "protocol": "http",
-        "render": "html",
-        "timeout": 30,
     }}
 }}
 
@@ -325,7 +307,7 @@ _FINDING_EXAMPLE = """
 from dataclasses import dataclass
 from dataclasses import field
 
-from illuminate.observer import Finding
+from illuminate.observer.finding import Finding
 
 
 @dataclass(frozen=True, order=True)
@@ -346,30 +328,30 @@ class FindingExample(Finding):
 _OBSERVER_EXAMPLE = """
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator
 from typing import Optional, Union
 from urllib.parse import urldefrag
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
-from illuminate.manager import Manager
-from illuminate.observation import HTTPObservation
-from illuminate.observer import Observer
+from illuminate.manager.manager import Manager
+from illuminate.observation.http import HTTPObservation
+from illuminate.observer.observer import Observer
 from tornado.httpclient import HTTPResponse
 
 from exporters.example import ExporterExample
 from findings.example import FindingExample
 
 
-def _create_soup(response: HTTPResponse) -> BeautifulSoup:
+async def _create_soup(response: HTTPResponse) -> BeautifulSoup:
     html = response.body.decode(errors="ignore")
     soup = BeautifulSoup(html, "html.parser")
     return soup
 
 
-def _extract_hrefs(
+async def _extract_hrefs(
     soup: BeautifulSoup, url: str
-) -> Generator[str, None]:
+) -> AsyncGenerator[str, None]:
     links = soup.find_all("a")
     for link in links:
         _url = link.get("href")
@@ -454,9 +436,9 @@ class ObserverExample(Observer):
         Observers, avoiding overlapping.
         \"\"\"
 
-        soup = _create_soup(response)
+        soup = await _create_soup(response)
         hrefs = _extract_hrefs(soup, response.effective_url)
-        for href in hrefs:
+        async for href in hrefs:
             yield HTTPObservation(
                 href,
                 allowed=self.ALLOWED,
