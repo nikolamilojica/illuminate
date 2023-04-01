@@ -1,9 +1,9 @@
 from alembic.config import Config
 from alembic.operations import Operations
 
-from illuminate.decorators.cli import adapt
-from illuminate.manager.manager import Manager
-from tests.shared.unit import Test
+from illuminate.decorators import adapt
+from illuminate.manager import Manager
+from tests.unit import Test
 
 
 class DummyManager:

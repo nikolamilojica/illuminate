@@ -30,7 +30,7 @@ jobs:
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Test Dependencies
-        run: poetry add tox@^3.25.1 tox-gh-actions
+        run: poetry add tox@^4.3.5 tox-gh-actions
       - name: Run Tests
         run: poetry run tox
 

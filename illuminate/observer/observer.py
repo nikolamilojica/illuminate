@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
 from typing import Optional, Union, TYPE_CHECKING
 
+from aiofile.utils import FileIOWrapperBase
+from sqlalchemy.engine.result import Result
 from tornado.httpclient import HTTPResponse
 
-from illuminate.exceptions.observer import BasicObserverException
-from illuminate.exporter.exporter import Exporter
-from illuminate.interface.observer import IObserver
-from illuminate.observation.observation import Observation
-from illuminate.observer.finding import Finding
+from illuminate.exceptions import BasicObserverException
+from illuminate.interface import IObserver
+from illuminate.observation import Observation
 
 if TYPE_CHECKING:
-    from illuminate.manager.manager import Manager
+    from illuminate.manager import Manager
 
 
 class Observer(IObserver):
@@ -35,8 +34,11 @@ class Observer(IObserver):
         self.manager = manager
 
     async def observe(
-        self, response: HTTPResponse, *args, **kwargs
-    ) -> AsyncGenerator[Union[Exporter, Finding, Observation], None]:
+        self,
+        response: Union[FileIOWrapperBase, HTTPResponse, Result],
+        *args,
+        **kwargs
+    ):
         """
         Manipulates response object and yields Exporter, Finding and
         Observation objects.

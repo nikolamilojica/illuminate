@@ -1,5 +1,8 @@
 ::: illuminate.observation.observation.Observation
+::: illuminate.observation.http.FileObservation
 ::: illuminate.observation.http.HTTPObservation
+::: illuminate.observation.sql.SQLObservation
+::: illuminate.observation.http.SplashObservation
 ::: illuminate.observer.finding.Finding
 ::: illuminate.adapter.adapter.Adapter
 ::: illuminate.exporter.exporter.Exporter

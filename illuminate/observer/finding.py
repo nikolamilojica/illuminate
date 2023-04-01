@@ -1,4 +1,4 @@
-from illuminate.interface.finding import IFinding
+from illuminate.interface import IFinding
 
 
 class Finding(IFinding):

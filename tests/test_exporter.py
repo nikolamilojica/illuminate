@@ -1,7 +1,7 @@
 import pytest
 
-from illuminate.exceptions.exporter import BasicExporterException
-from illuminate.exporter.exporter import Exporter
+from illuminate.exceptions import BasicExporterException
+from illuminate.exporter import Exporter
 
 
 class TestExporter:
