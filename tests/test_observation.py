@@ -1,7 +1,7 @@
 import pytest
 
-from illuminate.exceptions.observation import BasicObservationException
-from illuminate.observation.observation import Observation
+from illuminate.exceptions import BasicObservationException
+from illuminate.observation import Observation
 
 
 class TestObservation:
@@ -13,5 +13,5 @@ class TestObservation:
         When: calling observe method
         Expected: BasicObservationException is raised
         """
-        observer = Observation()
+        observer = Observation("https://www.example.com")
         observer.observe()

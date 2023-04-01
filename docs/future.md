@@ -21,12 +21,14 @@ integration with cloud service providers, to include their services as
     * [ ] AWSS3Exporter - AWS S3 cloud service integration exporter
     * [ ] FileExporter - File exporter
     * [ ] HTTPExporter - HTTP exporter
+    * [ ] KafkaExporter - Kafka producer exporter
     * [ ] SplashExporter - Web 2.0 proxy js renderer exporter
 - [ ] `Observation` Classes
     * [ ] AWSS3Observation - AWS S3 cloud service integration observation
-    * [ ] FileObservation - File observation
-    * [ ] SplashObservation - Web 2.0 proxy js renderer observation
-    * [ ] SQLObservation - SQL observation
+    * [x] FileObservation - File observation
+    * [ ] KafkaObservation - Kafka consumer observation
+    * [x] SplashObservation - Web 2.0 proxy js renderer observation
+    * [x] SQLObservation - SQL observation
 
 ## Future needs you!
 <p style="text-align: justify">Consider becoming a contributor.</p>

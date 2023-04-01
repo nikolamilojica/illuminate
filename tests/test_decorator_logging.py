@@ -5,12 +5,12 @@ from click.testing import CliRunner
 from loguru import logger
 
 from illuminate import __version__
-from illuminate.decorators.logging import show_info
-from illuminate.decorators.logging import show_logo
-from illuminate.decorators.logging import show_observer_catalogue
-from illuminate.manager.assistant import Assistant
-from illuminate.manager.manager import Manager
-from tests.shared.unit import Test
+from illuminate.decorators import show_info
+from illuminate.decorators import show_logo
+from illuminate.decorators import show_observer_catalogue
+from illuminate.manager import Assistant
+from illuminate.manager import Manager
+from tests.unit import Test
 
 
 def __get_context(name):

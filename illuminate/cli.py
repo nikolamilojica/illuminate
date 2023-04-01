@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import os
 import sys
+import warnings
 
 import click
 from loguru import logger
 
 from illuminate import __version__
-from illuminate.common.project_logging import LOGGING_LEVELS
-from illuminate.decorators.logging import show_observer_catalogue
-from illuminate.manager.assistant import Assistant
-from illuminate.manager.manager import Manager
+from illuminate.common import LOGGING_LEVELS
+from illuminate.manager import Assistant
+from illuminate.manager import Manager
 
 
 @click.group()
@@ -28,6 +28,8 @@ def cli(verbosity: str) -> None:
     logger.remove()
     logger.add(sys.stdout, level=verbosity)
     sys.path.insert(0, os.getcwd())
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
 
 
 @cli.group("manage")
@@ -167,10 +169,9 @@ def setup(name: str, path: str) -> None:
 
 
 @observe.command("catalogue")
-@show_observer_catalogue
-def catalogue() -> dict:
+def catalogue() -> None:
     """Lists observers found in project files."""
-    return Assistant.provide_context(sessions=False)
+    Manager.observe_catalogue(**Assistant.provide_context(sessions=False))
 
 
 @observe.command("start")

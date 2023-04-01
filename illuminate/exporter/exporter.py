@@ -1,5 +1,5 @@
-from illuminate.exceptions.exporter import BasicExporterException
-from illuminate.interface.exporter import IExporter
+from illuminate.exceptions import BasicExporterException
+from illuminate.interface import IExporter
 
 
 class Exporter(IExporter):

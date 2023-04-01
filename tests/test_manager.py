@@ -8,11 +8,11 @@ from sqlalchemy import inspect
 from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
-from illuminate.common.project_templates import FILES
-from illuminate.exceptions.manager import BasicManagerException
-from illuminate.manager.assistant import Assistant
-from illuminate.manager.manager import Manager
-from tests.shared.unit import Test
+from illuminate.common import FILES
+from illuminate.exceptions import BasicManagerException
+from illuminate.manager import Assistant
+from illuminate.manager import Manager
+from tests.unit import Test
 
 
 class TestManagerDBCommandGroup(Test):
@@ -191,12 +191,12 @@ class TestManagerObserveCommandGroup(Test):
             Manager.db_upgrade(path, "head", "main", self.url)
             context = Assistant.provide_context()
             manager = Manager(**context)
-            manager.sessions["postgresql"]["main"] = self.session_async
+            manager.sessions["main"] = self.session_async
             manager.observe_start()
 
             query = self.session.query(ModelExample).all()
             assert len(manager.exported) == 1
-            assert len(manager.requested) == 1
+            assert len(manager.observed) == 1
             assert len(query) == 1
             assert query[0].url == "https://example.com"
             assert query[0].title == "Example"

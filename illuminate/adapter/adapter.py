@@ -3,14 +3,14 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 from typing import Optional, Type, TYPE_CHECKING, Union
 
-from illuminate.exceptions.adapter import BasicAdapterException
-from illuminate.exporter.exporter import Exporter
-from illuminate.interface.adapter import IAdapter
-from illuminate.observation.observation import Observation
-from illuminate.observer.finding import Finding
+from illuminate.exceptions import BasicAdapterException
+from illuminate.exporter import Exporter
+from illuminate.interface import IAdapter
+from illuminate.observation import Observation
+from illuminate.observer import Finding
 
 if TYPE_CHECKING:
-    from illuminate.manager.manager import Manager
+    from illuminate.manager import Manager
 
 
 class Adapter(IAdapter):

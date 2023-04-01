@@ -2,10 +2,10 @@ import os
 
 import pytest
 
-from illuminate.exceptions.exporter import BasicExporterException
-from illuminate.exporter.sql import SQLExporter
-from illuminate.manager.manager import Manager
-from tests.shared.unit import Test
+from illuminate.exceptions import BasicExporterException
+from illuminate.exporter import SQLExporter
+from illuminate.manager import Manager
+from tests.unit import Test
 
 
 class TestExporterSQL(Test):
@@ -28,7 +28,7 @@ class TestExporterSQL(Test):
                 title = "Example"
                 url = "https//:example.com"
                 model = ModelExample(title=title, url=url)
-                exporter = SQLExporter(model=model)
+                exporter = SQLExporter(models=[model])
                 os.remove(os.path.join(path, f"{self.db}.db"))
                 await exporter.export(self.session_async)
 
@@ -49,7 +49,7 @@ class TestExporterSQL(Test):
             title = "Example"
             url = "https//:example.com"
             model = ModelExample(title=title, url=url)
-            exporter = SQLExporter(model=model)
+            exporter = SQLExporter(models=[model])
             await exporter.export(self.session_async)
             query = self.session.query(ModelExample).all()
             assert query[0].title == title
