@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack, asynccontextmanager
-from typing import Callable, Union
+from typing import Any, Callable, Optional, Union
 
 from aiofile import async_open
 from aiofile.utils import FileIOWrapperBase
@@ -32,6 +32,7 @@ class FileObservation(Observation):
         url: str,
         /,
         callback: Callable[[FileIOWrapperBase, tuple, dict], Result],
+        xcom: Optional[Any] = None,
         *args,
         **kwargs,
     ):
@@ -41,8 +42,9 @@ class FileObservation(Observation):
         :param url: File path
         :param callback: Async function/method that manipulates
         FileIOWrapperBase object and returns Result
+        :param xcom: Cross communication object
         """
-        super().__init__(url)
+        super().__init__(url, xcom=xcom)
         self._callback = callback
 
     @asynccontextmanager

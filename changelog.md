@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.0
+
+* Observation cross communication
+
 ## 0.2.0
 
 Features:

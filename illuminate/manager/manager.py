@@ -309,7 +309,7 @@ class Manager(IManager):
         :param item: FileObservation object
         :return: None
         """
-        async with item.observe() as result:
+        async with item.observe(xcom=item.xcom) as result:
             await self.__observation_resolve(result, item.url)
 
     async def __observe_http(self, item: HTTPObservation) -> None:
@@ -324,7 +324,7 @@ class Manager(IManager):
             **self.settings.OBSERVATION_CONFIGURATION["http"],
             **item.configuration,
         }
-        result = await item.observe()
+        result = await item.observe(xcom=item.xcom)
         await self.__observation_resolve(result, item.url)
 
     async def __observe_sql(self, item: SQLObservation) -> None:
@@ -335,7 +335,7 @@ class Manager(IManager):
         :param item: SQLObservation object
         :return: None
         """
-        result = await item.observe(self.sessions[item.url])
+        result = await item.observe(self.sessions[item.url], xcom=item.xcom)
         await self.__observation_resolve(result, f"{item.url}:{item.query}")
 
     async def __observe_splash(self, item: SplashObservation) -> None:
@@ -351,7 +351,7 @@ class Manager(IManager):
             **item.configuration,
         }
         result = await item.observe(
-            self.settings.OBSERVATION_CONFIGURATION["http"]
+            self.settings.OBSERVATION_CONFIGURATION["http"], xcom=item.xcom
         )
         await self.__observation_resolve(result, item.url)
 

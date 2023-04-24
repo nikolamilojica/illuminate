@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import urllib.parse
 from copy import copy
-from typing import Callable, Union
+from typing import Any, Callable, Optional, Union
 
 from loguru import logger
 from tornado import httpclient
@@ -35,6 +35,7 @@ class HTTPObservation(Observation):
         /,
         allowed: Union[list[str], tuple[str]],
         callback: Callable[[HTTPResponse, tuple, dict], Result],
+        xcom: Optional[Any] = None,
         *args,
         **kwargs,
     ):
@@ -46,8 +47,9 @@ class HTTPObservation(Observation):
         determent if URL is allowed
         :param callback: Async function/method that manipulates HTTPResponse
         object and returns Result.
+        :param xcom: Cross communication object
         """
-        super().__init__(url)
+        super().__init__(url, xcom=xcom)
         self._allowed = allowed
         self._callback = callback
         self.configuration = kwargs

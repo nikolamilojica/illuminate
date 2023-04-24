@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from illuminate.exceptions import BasicObservationException
 from illuminate.interface import IObservation
@@ -23,13 +23,15 @@ class Observation(IObservation):
             "Property hash must be implemented in child class"
         )
 
-    def __init__(self, url: Any):
+    def __init__(self, url: Any, xcom: Optional[Any] = None):
         """
         Observation's __init__ method.
 
         :param url: Data's URL
+        :param xcom: Cross communication object
         """
         self.url = url
+        self.xcom = xcom
 
     async def observe(self, *args, **kwargs):
         """
