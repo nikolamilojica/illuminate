@@ -709,7 +709,7 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pymdown-extensions"
-version = "9.9"
+version = "10.0.1"
 description = "Extension pack for Python Markdown."
 category = "dev"
 optional = false
@@ -717,6 +717,7 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 markdown = ">=3.2"
+pyyaml = "*"
 
 [[package]]
 name = "pyproject-api"
