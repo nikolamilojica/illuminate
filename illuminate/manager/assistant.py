@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from illuminate.adapter import Adapter
-from illuminate.common import SUPPORTED_RELATIONAL_DATABASES
+from illuminate.common import SUPPORTED_SQL_DATABASES
 from illuminate.exceptions import BasicManagerException
 from illuminate.interface import IAssistant
 from illuminate.observer import Observer
@@ -195,7 +195,7 @@ class Assistant(IAssistant):
         )
         for db in settings.DB:
             _type = settings.DB[db]["type"]
-            if _type in SUPPORTED_RELATIONAL_DATABASES:
+            if _type in SUPPORTED_SQL_DATABASES:
                 url = Assistant._provide_db_url(db, _async=True)
                 engine = create_async_engine(url)
                 session = sessionmaker(
