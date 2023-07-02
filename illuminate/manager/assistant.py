@@ -8,6 +8,7 @@ from pydoc import locate
 from types import ModuleType
 from typing import Optional, Type, Union
 
+from aioinflux import InfluxDBClient  # type: ignore
 from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
@@ -18,6 +19,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from illuminate.adapter import Adapter
+from illuminate.common import SUPPORTED_NOSQL_DATABASES
 from illuminate.common import SUPPORTED_SQL_DATABASES
 from illuminate.exceptions import BasicManagerException
 from illuminate.interface import IAssistant
@@ -195,7 +197,10 @@ class Assistant(IAssistant):
         )
         for db in settings.DB:
             _type = settings.DB[db]["type"]
-            if _type in SUPPORTED_SQL_DATABASES:
+            if _type in SUPPORTED_NOSQL_DATABASES:
+                session = Assistant.__provide_nosql_sessions(db, settings)
+                _sessions.update({db: session})
+            elif _type in SUPPORTED_SQL_DATABASES:
                 session = Assistant.__provide_sql_sessions(db, settings)
                 _sessions.update({db: session})
             else:
@@ -218,6 +223,32 @@ class Assistant(IAssistant):
         except ImportError:
             raise BasicManagerException(
                 "Framework did not found settings.py in the current directory"
+            )
+
+    @staticmethod
+    def __provide_nosql_sessions(
+        db: str, settings: ModuleType
+    ) -> InfluxDBClient:
+        """
+        Provides NoSQL database session.
+
+        :param db: database name from settings.py module
+        :param settings: settings.py module
+        :return: InfluxDBClient object
+        """
+        host = settings.DB[db]["host"]
+        port = settings.DB[db]["port"]
+        logger.opt(colors=True).info(
+            f"Adding session with <yellow>{db}</yellow> at "
+            f"<magenta>{host}:{port}</magenta> to context"
+        )
+        if settings.DB[db]["type"] == "influxdb":
+            return InfluxDBClient(
+                host=settings.DB[db]["host"],
+                port=settings.DB[db]["port"],
+                db=settings.NAME,
+                username=settings.DB[db]["user"],
+                password=settings.DB[db]["pass"],
             )
 
     @staticmethod
