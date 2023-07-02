@@ -196,19 +196,7 @@ class Assistant(IAssistant):
         for db in settings.DB:
             _type = settings.DB[db]["type"]
             if _type in SUPPORTED_SQL_DATABASES:
-                url = Assistant._provide_db_url(db, _async=True)
-                engine = create_async_engine(url)
-                session = sessionmaker(
-                    engine,
-                    class_=AsyncSession,
-                    expire_on_commit=False,
-                )
-                host = settings.DB[db]["host"]
-                port = settings.DB[db]["port"]
-                logger.opt(colors=True).info(
-                    f"Adding session with <yellow>{db}</yellow> at "
-                    f"<magenta>{host}:{port}</magenta> to context"
-                )
+                session = Assistant.__provide_sql_sessions(db, settings)
                 _sessions.update({db: session})
             else:
                 logger.warning(f"Database type {_type} is not supported")
@@ -231,3 +219,29 @@ class Assistant(IAssistant):
             raise BasicManagerException(
                 "Framework did not found settings.py in the current directory"
             )
+
+    @staticmethod
+    def __provide_sql_sessions(
+        db: str, settings: ModuleType
+    ) -> sessionmaker[AsyncSession]:
+        """
+        Provides SQL database session.
+
+        :param db: database name from settings.py module
+        :param settings: settings.py module
+        :return: AsyncSession created with session maker
+        """
+        url = Assistant._provide_db_url(db, _async=True)
+        engine = create_async_engine(url)
+        session = sessionmaker(
+            engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
+        )
+        host = settings.DB[db]["host"]
+        port = settings.DB[db]["port"]
+        logger.opt(colors=True).info(
+            f"Adding session with <yellow>{db}</yellow> at "
+            f"<magenta>{host}:{port}</magenta> to context"
+        )
+        return session
