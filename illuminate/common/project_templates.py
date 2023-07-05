@@ -286,7 +286,14 @@ DB = {{
         "port": "5432",
         "user": "illuminate",
         "type": "postgresql",
-    }}
+    }},
+    "measurements": {{
+        "host": "localhost",
+        "pass": os.environ.get("ILLUMINATE_MEASUREMENTS_DB_PASSWORD"),
+        "port": "8086",
+        "user": "illuminate",
+        "type": "influxdb",
+    }},
 }}
 
 MODELS = [
