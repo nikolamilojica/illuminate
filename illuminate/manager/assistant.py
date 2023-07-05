@@ -183,11 +183,13 @@ class Assistant(IAssistant):
         return "{type}://{user}:{pass}@{host}/{db}".format(**db)
 
     @staticmethod
-    def _provide_sessions() -> dict[str, Type[AsyncSession]]:
+    def _provide_sessions() -> dict[
+        str, Union[Type[AsyncSession], InfluxDBClient]
+    ]:
         """
         Creates a dictionary of database sessions.
 
-        :return: Database sessions
+        :return: Database sessions dictionary
         """
         _sessions: dict = {}
         settings = Assistant._provide_settings()
@@ -226,6 +228,22 @@ class Assistant(IAssistant):
             )
 
     @staticmethod
+    def __log_database_connection(db: str, settings: ModuleType) -> None:
+        """
+        Log database connection.
+
+        :param db: database name from settings.py module
+        :param settings: settings.py module
+        :return: None
+        """
+        host = settings.DB[db]["host"]
+        port = settings.DB[db]["port"]
+        logger.opt(colors=True).info(
+            f"Adding session with <yellow>{db}</yellow> at "
+            f"<magenta>{host}:{port}</magenta> to context"
+        )
+
+    @staticmethod
     def __provide_nosql_sessions(
         db: str, settings: ModuleType
     ) -> InfluxDBClient:
@@ -236,12 +254,7 @@ class Assistant(IAssistant):
         :param settings: settings.py module
         :return: InfluxDBClient object
         """
-        host = settings.DB[db]["host"]
-        port = settings.DB[db]["port"]
-        logger.opt(colors=True).info(
-            f"Adding session with <yellow>{db}</yellow> at "
-            f"<magenta>{host}:{port}</magenta> to context"
-        )
+        Assistant.__log_database_connection(db, settings)
         if settings.DB[db]["type"] == "influxdb":
             return InfluxDBClient(
                 host=settings.DB[db]["host"],
@@ -262,17 +275,9 @@ class Assistant(IAssistant):
         :param settings: settings.py module
         :return: AsyncSession created with session maker
         """
-        url = Assistant._provide_db_url(db, _async=True)
-        engine = create_async_engine(url)
-        session = sessionmaker(
-            engine,
+        Assistant.__log_database_connection(db, settings)
+        return sessionmaker(
+            create_async_engine(Assistant._provide_db_url(db, _async=True)),
             class_=AsyncSession,
             expire_on_commit=False,
         )
-        host = settings.DB[db]["host"]
-        port = settings.DB[db]["port"]
-        logger.opt(colors=True).info(
-            f"Adding session with <yellow>{db}</yellow> at "
-            f"<magenta>{host}:{port}</magenta> to context"
-        )
-        return session
