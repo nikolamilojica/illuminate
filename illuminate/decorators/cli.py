@@ -5,7 +5,9 @@ import inspect
 from typing import Callable
 
 from loguru import logger
+from sqlalchemy.exc import NoSuchModuleError
 
+from illuminate.exceptions import BasicManagerException
 from illuminate.manager import Assistant
 
 
@@ -34,9 +36,17 @@ def adapt(func: Callable) -> Callable:
             :param url: SQLAlchemy Database URL
             :return: None
             """
-            models = Assistant.provide_models()
-            operations = Assistant.provide_alembic_operations(selector, url)
-            func(fixtures, models, operations, selector, *args, **kwargs)
+            try:
+                models = Assistant.provide_models()
+                operations = Assistant.provide_alembic_operations(
+                    selector, url
+                )
+                func(fixtures, models, operations, selector, *args, **kwargs)
+            except NoSuchModuleError:
+                raise BasicManagerException(
+                    "Command populate can only be performed on SQL database,"
+                    f" {selector} is not supported SQL database"
+                )
 
     elif _callable == "db_revision":
 
@@ -53,8 +63,14 @@ def adapt(func: Callable) -> Callable:
             :param url: SQLAlchemy Database URL
             :return: None
             """
-            config = Assistant.provide_alembic_config(path, selector, url)
-            func(config, revision, *args, **kwargs)
+            try:
+                config = Assistant.provide_alembic_config(path, selector, url)
+                func(config, revision, *args, **kwargs)
+            except NoSuchModuleError:
+                raise BasicManagerException(
+                    "Command revision can only be performed on SQL database,"
+                    f" {selector} is not supported SQL database"
+                )
 
     elif _callable == "db_upgrade":
 
@@ -71,8 +87,14 @@ def adapt(func: Callable) -> Callable:
             :param url: SQLAlchemy Database URL
             :return: None
             """
-            config = Assistant.provide_alembic_config(path, selector, url)
-            func(config, revision, selector, *args, **kwargs)
+            try:
+                config = Assistant.provide_alembic_config(path, selector, url)
+                func(config, revision, selector, *args, **kwargs)
+            except NoSuchModuleError:
+                raise BasicManagerException(
+                    "Command upgrade can only be performed on SQL database,"
+                    f" {selector} is not supported SQL database"
+                )
 
     else:
         logger.warning(f"Decorated method {_callable} is not supported")
