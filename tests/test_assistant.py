@@ -91,6 +91,7 @@ class TestAssistantClass(Test):
             assert len(context["observers"]) == 1
             assert context["name"] == name
             assert context["sessions"]["main"]
+            assert context["sessions"]["measurements"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test_provide_models_unsuccessfully(self):
@@ -179,6 +180,7 @@ class TestAssistantClass(Test):
             name = "example"
             Manager.project_setup(name, ".")
             assert Assistant._provide_sessions()["main"]
+            assert Assistant._provide_sessions()["measurements"]
 
     @pytest.mark.xfail(raises=BasicManagerException)
     def test__provide_settings_unsuccessfully(self):
