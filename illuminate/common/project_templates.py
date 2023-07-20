@@ -133,6 +133,22 @@ def downgrade():
 _DOCKER_COMPOSE = """
 version: '3.8'
 services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    restart: always
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=illuminate
+      - DOCKER_INFLUXDB_INIT_PASSWORD=$ILLUMINATE_MEASUREMENTS_DB_PASSWORD
+      - DOCKER_INFLUXDB_INIT_ORG=illuminate
+      - DOCKER_INFLUXDB_INIT_BUCKET={name}
+      - DOCKER_INFLUXDB_INIT_RETENTION=30d
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$ILLUMINATE_MEASUREMENTS_DB_PASSWORD
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb:/var/lib/influxdb
   pg:
     container_name: pg
     image: postgres:latest
@@ -161,6 +177,8 @@ services:
     ports:
       - "8050:8050"
 volumes:
+  influxdb:
+    driver: local
   postgres:
     driver: local
 
