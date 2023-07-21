@@ -8,6 +8,7 @@ from illuminate.adapter import Adapter
 from illuminate.observation import HTTPObservation
 from illuminate.observer import Finding
 
+from exporters.example import ExporterInfluxDBExample
 from exporters.example import ExporterSQLExample
 from findings.example import FindingExample
 from models.example import ModelExample
@@ -43,7 +44,10 @@ class AdapterExample(Adapter):
 
     async def adapt(
         self, finding: FindingExample, *args, **kwargs
-    ) -> AsyncGenerator[Union[ExporterSQLExample, HTTPObservation], None]:
+    ) -> AsyncGenerator[
+        Union[ExporterInfluxDBExample, ExporterSQLExample, HTTPObservation],
+        None,
+    ]:
         yield ExporterSQLExample(
             models=[
                 ModelExample(
@@ -53,6 +57,14 @@ class AdapterExample(Adapter):
                 )
             ]
         )
+
+        # yield ExporterInfluxDBExample(
+        #     points={{
+        #         "measurement": "{name}",
+        #         "tags": {{"url": finding.url, "title": finding.title}},
+        #         "fields": {{"load_time": finding.load_time}},
+        #     }}
+        # )
 
 """
 
@@ -196,11 +208,34 @@ _EMPTY = """
 _EXPORTER_EXAMPLE = """
 from __future__ import annotations
 
-from typing import Union
+from typing import Iterable, Union
 
+from illuminate.exporter import InfluxDBExporter
 from illuminate.exporter import SQLExporter
+from pandas import DataFrame
 
 from models.example import ModelExample
+
+
+class ExporterInfluxDBExample(InfluxDBExporter):
+    \"\"\"
+    InfluxDBExporter class will write points to database using session. Points
+    are passed at initialization, while database session is found by name
+    attribute in the pool of existing sessions. Name must co-respond to DB
+    section in {name}/settings.py. For more information how to initialize
+    InfluxDBExporter class, check {name}/adapters/example.py
+    \"\"\"
+
+    name: str = "measurements"
+
+    def __init__(
+        self,
+        points: Union[
+            Union[DataFrame, dict, str, bytes],
+            Iterable[Union[DataFrame, dict, str, bytes]],
+        ],
+    ):
+        super().__init__(points)
 
 
 class ExporterSQLExample(SQLExporter):
