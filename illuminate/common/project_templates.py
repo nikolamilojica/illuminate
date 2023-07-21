@@ -152,17 +152,14 @@ _DOCKER_COMPOSE = """
 version: '3.8'
 services:
   influxdb:
-    image: influxdb:latest
+    image: influxdb:1.8
     container_name: influxdb
     restart: always
     environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=illuminate
-      - DOCKER_INFLUXDB_INIT_PASSWORD=$ILLUMINATE_MEASUREMENTS_DB_PASSWORD
-      - DOCKER_INFLUXDB_INIT_ORG=illuminate
-      - DOCKER_INFLUXDB_INIT_BUCKET={name}
-      - DOCKER_INFLUXDB_INIT_RETENTION=30d
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$ILLUMINATE_MEASUREMENTS_DB_PASSWORD
+      - INFLUXDB_ADMIN_USER=illuminate
+      - INFLUXDB_ADMIN_PASSWORD=$ILLUMINATE_MEASUREMENTS_DB_PASSWORD
+      - INFLUXDB_DB={name}
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
     ports:
       - '8086:8086'
     volumes:
