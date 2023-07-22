@@ -698,14 +698,6 @@ optional = false
 python-versions = ">=3.8"
 
 [[package]]
-name = "numpy"
-version = "1.25.1"
-description = "Fundamental package for array computing in Python"
-category = "main"
-optional = false
-python-versions = ">=3.9"
-
-[[package]]
 name = "packaging"
 version = "23.0"
 description = "Core utilities for Python packages"
@@ -1213,7 +1205,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2d888cde98cf6569a377a534d1ccf504af4717ad3b051ff41e9a28b762f13c4d"
+content-hash = "ab32c3d9204bdc70df0f176640e53cf949ec02fc22c4ff27befb569e81bc3885"
 
 [metadata.files]
 aiofile = []
