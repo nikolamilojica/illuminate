@@ -14,7 +14,7 @@ develop = ["aiomisc", "pytest", "pytest-cov"]
 
 [[package]]
 name = "aiohttp"
-version = "3.8.4"
+version = "3.8.5"
 description = "Async http client/server framework (asyncio)"
 category = "main"
 optional = false
