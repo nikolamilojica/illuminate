@@ -509,3 +509,7 @@ class Manager(IManager):
         await observers
         await adapters
         await exporters
+
+        for session in self.sessions:
+            if isinstance(self.sessions[session], InfluxDBClient):
+                await self.sessions[session].close()  # type: ignore
