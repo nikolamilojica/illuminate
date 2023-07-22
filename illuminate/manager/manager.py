@@ -23,6 +23,7 @@ from illuminate.decorators import adapt
 from illuminate.decorators import show_info
 from illuminate.decorators import show_logo
 from illuminate.decorators import show_observer_catalogue
+from illuminate.exceptions import BasicExporterException
 from illuminate.exceptions import BasicManagerException
 from illuminate.exporter import Exporter
 from illuminate.exporter import InfluxDBExporter
@@ -474,6 +475,8 @@ class Manager(IManager):
             session = self.sessions[item.name]
             await item.export(session)
             self.__exported.add(item)
+        except BasicExporterException:
+            pass
         except KeyError:
             logger.critical(f"Database {item.name} of is not found in context")
 

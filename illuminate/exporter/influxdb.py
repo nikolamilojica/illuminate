@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Iterable, Union
 
 from aioinflux import InfluxDBClient  # type: ignore
-from aioinflux import InfluxDBError
 from loguru import logger
 from pandas import DataFrame  # type: ignore
 
@@ -66,10 +65,6 @@ class InfluxDBExporter(Exporter):
         """
         try:
             await session.write(self.points, **self.params)
-        except InfluxDBError as exception:
-            logger.warning(
-                f'{self}.export(session="{session}") -> {exception}'
-            )
         except Exception as exception:
             logger.critical(
                 f'{self}.export(session="{session}") -> {exception}'
