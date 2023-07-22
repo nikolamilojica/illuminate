@@ -35,6 +35,7 @@ asyncmy = "^0.2.5"
 asyncpg = "^0.26.0"
 click = "^8.1.2"
 loguru = "^0.6.0"
+numpy = "1.24.4"
 pandas = "^2.0.3"
 psycopg2 = "^2.9.3"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.42"}
