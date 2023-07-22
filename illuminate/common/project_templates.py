@@ -427,6 +427,7 @@ from illuminate.observation import HTTPObservation
 from illuminate.observer import Observer
 from tornado.httpclient import HTTPResponse
 
+from exporters.example import ExporterInfluxDBExample
 from exporters.example import ExporterSQLExample
 from findings.example import FindingExample
 
@@ -495,7 +496,13 @@ class ObserverExample(Observer):
     async def observe(
         self, response: HTTPResponse, *args, **kwargs
     ) -> AsyncGenerator[
-        Union[ExporterSQLExample, FindingExample, HTTPObservation], None
+        Union[
+            ExporterInfluxDBExample,
+            ExporterSQLExample,
+            FindingExample,
+            HTTPObservation,
+        ],
+        None,
     ]:
         \"\"\"
         ETL flow is regulated by a yielded object type of Observation's
