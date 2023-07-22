@@ -58,13 +58,13 @@ class AdapterExample(Adapter):
             ]
         )
 
-        # yield ExporterInfluxDBExample(
-        #     points={{
-        #         "measurement": "{name}",
-        #         "tags": {{"url": finding.url, "title": finding.title}},
-        #         "fields": {{"load_time": finding.load_time}},
-        #     }}
-        # )
+        yield ExporterInfluxDBExample(
+            points={{
+                "measurement": "{name}",
+                "tags": {{"url": finding.url, "title": finding.title}},
+                "fields": {{"load_time": finding.load_time}},
+            }}
+        )
 
 """
 
