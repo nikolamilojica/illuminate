@@ -20,12 +20,14 @@ integration with cloud service providers, to include their services as
 - [ ] `Exporter` Classes
     * [ ] AWSS3Exporter - AWS S3 cloud service integration exporter
     * [ ] FileExporter - File exporter
+    * [x] InfluxDBExporter - InfluxDB exporter
     * [ ] HTTPExporter - HTTP exporter
     * [ ] KafkaExporter - Kafka producer exporter
     * [ ] SplashExporter - Web 2.0 proxy js renderer exporter
 - [ ] `Observation` Classes
     * [ ] AWSS3Observation - AWS S3 cloud service integration observation
     * [x] FileObservation - File observation
+    * [ ] InfluxDBObservation - InfluxDB observation
     * [ ] KafkaObservation - Kafka consumer observation
     * [x] SplashObservation - Web 2.0 proxy js renderer observation
     * [x] SQLObservation - SQL observation

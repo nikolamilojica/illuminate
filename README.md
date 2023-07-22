@@ -61,6 +61,7 @@ structure in the current directory, type the following:</p>
 ```shell
 export ILLUMINATE_PGADMIN_PASSWORD=<PGADMIN_PASSWORD>
 export ILLUMINATE_MAIN_DB_PASSWORD=<DB_PASSWORD>
+export ILLUMINATE_MEASUREMENTS_DB_PASSWORD=<ILLUMINATE_MEASUREMENTS_DB_PASSWORD>
 illuminate manage project setup tutorial .
 ```
 <p style="text-align: justify">This will create a complete project structure with all the files
@@ -105,6 +106,7 @@ project directory, type the following:</p>
 ```shell
 docker run -it --rm --network=host \
    -e ILLUMINATE_MAIN_DB_PASSWORD=<DB_PASSWORD> \
+   -e ILLUMINATE_MEASUREMENTS_DB_PASSWORD=<ILLUMINATE_MEASUREMENTS_DB_PASSWORD> \
    -v $(pwd):/root/illuminate \
    nikolamilojica/illuminate illuminate observe start
 ```

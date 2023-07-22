@@ -57,6 +57,7 @@ jobs:
       - name: Run Tests
         env:
           ILLUMINATE_MAIN_DB_PASSWORD: password
+          ILLUMINATE_MEASUREMENTS_DB_PASSWORD: password
         run: |
           poetry run coverage run -m pytest tests/
       - name: Collect Coverage

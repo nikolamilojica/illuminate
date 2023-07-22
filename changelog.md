@@ -3,6 +3,7 @@
 ## 0.3.0
 
 * Observation cross communication
+* InfluxDBExporter
 
 ## 0.2.0
 

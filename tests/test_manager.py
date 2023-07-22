@@ -97,6 +97,8 @@ class TestManagerDBCommandGroup(Test):
             Manager.db_populate(["fixtures/example.json"], "main", self.url)
             query = self.session.query(ModelExample).all()
             assert len(query) == 2
+            assert query[0].load_time == 1.0
+            assert query[1].load_time == 1.0
             assert query[0].url == "https://webscraper.io/"
             assert query[1].url == "https://webscraper.io/tutorials"
             assert (
