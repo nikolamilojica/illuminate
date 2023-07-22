@@ -34,3 +34,14 @@ def async_http_response_not_ok(mocker):
     future = asyncio.Future()
     future.set_result(_side_effect)
     mocker.patch(FETCH, side_effect=_side_effect)
+
+
+@pytest.fixture(scope="function")
+def async_influxdb_write(mocker):
+    """
+    Patch write function to return True.
+    """
+
+    future = asyncio.Future()
+    future.set_result(True)
+    mocker.patch("aioinflux.InfluxDBClient.write", return_value=future)
