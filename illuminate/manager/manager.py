@@ -9,6 +9,7 @@ from glob import glob
 from types import ModuleType
 from typing import Type, Union
 
+from aioinflux import InfluxDBClient  # type: ignore
 from alembic import command
 from alembic.config import Config
 from alembic.operations import Operations
@@ -24,6 +25,7 @@ from illuminate.decorators import show_logo
 from illuminate.decorators import show_observer_catalogue
 from illuminate.exceptions import BasicManagerException
 from illuminate.exporter import Exporter
+from illuminate.exporter import InfluxDBExporter
 from illuminate.exporter import SQLExporter
 from illuminate.interface import IManager
 from illuminate.meta.type import Result
@@ -51,7 +53,7 @@ class Manager(IManager):
         name: str,
         observers: list[Type[Observer]],
         path: str,
-        sessions: dict[str, Type[AsyncSession]],
+        sessions: dict[str, Union[Type[AsyncSession], InfluxDBClient]],
         settings: ModuleType,
         *args,
         **kwargs,
@@ -443,27 +445,29 @@ class Manager(IManager):
         async for item in self.__export_queue:
             if not item:
                 return
-            await self.__exportation(item)
+            await self.__export_to(item)
             logger.debug(f"Coroutine exported {item}")
             del item
             self.__export_queue.task_done()
 
-    async def __exportation(self, item: Exporter) -> None:
+    async def __export_to(self, item: Exporter) -> None:
         """
         Passes Exporter object to proper method based on its class.
 
         :param item: Exporter object
         :return: None
         """
-        if isinstance(item, SQLExporter):
-            await self.__exportation_sql(item)
+        if isinstance(item, (InfluxDBExporter, SQLExporter)):
+            await self.__export_to_database(item)
 
-    async def __exportation_sql(self, item: SQLExporter) -> None:
+    async def __export_to_database(
+        self, item: Union[InfluxDBExporter, SQLExporter]
+    ) -> None:
         """
         Acquires database session based on Exporter's attributes and pass it to
-        SQLExporter's export method.
+        Exporter's export method.
 
-        :param item: SQLExporter object
+        :param item: InfluxDBExporter or SQLExporter object
         :return: None
         """
         try:
