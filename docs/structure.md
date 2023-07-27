@@ -579,6 +579,22 @@ pgadmin containers to monitor your flow on your localhost.</p>
 ```yaml
 version: '3.8'
 services:
+  grafana:
+   image: grafana/grafana
+   container_name: grafana
+   restart: always
+   depends_on:
+     - influxdb
+   environment:
+     - GF_SECURITY_ADMIN_USER=illuminate
+     - GF_SECURITY_ADMIN_PASSWORD=$ILLUMINATE_GRAFANA_PASSWORD
+     - GF_INSTALL_PLUGINS=
+   links:
+     - influxdb
+   ports:
+     - '3000:3000'
+   volumes:
+     - grafana:/var/lib/grafana
   influxdb:
     image: influxdb:1.8
     container_name: influxdb
@@ -620,6 +636,8 @@ services:
     ports:
       - "8050:8050"
 volumes:
+  grafana:
+    driver: local
   influxdb:
     driver: local
   postgres:
