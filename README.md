@@ -60,6 +60,7 @@ structure in the current directory, type the following:</p>
 
 ```shell
 export ILLUMINATE_PGADMIN_PASSWORD=<PGADMIN_PASSWORD>
+export ILLUMINATE_GRAFANA_PASSWORD=<GRAFANA_PASSWORD>
 export ILLUMINATE_MAIN_DB_PASSWORD=<DB_PASSWORD>
 export ILLUMINATE_MEASUREMENTS_DB_PASSWORD=<ILLUMINATE_MEASUREMENTS_DB_PASSWORD>
 illuminate manage project setup tutorial .
