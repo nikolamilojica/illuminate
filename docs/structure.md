@@ -320,7 +320,10 @@ from collections.abc import AsyncGenerator
 from typing import Type, Union
 
 from illuminate.adapter import Adapter
+from illuminate.observation import FileObservation
 from illuminate.observation import HTTPObservation
+from illuminate.observation import SQLObservation
+from illuminate.observation import SplashObservation
 from illuminate.observer import Finding
 
 from exporters.example import ExporterInfluxDBExample
@@ -360,7 +363,14 @@ class AdapterExample(Adapter):
     async def adapt(
         self, finding: FindingExample, *args, **kwargs
     ) -> AsyncGenerator[
-        Union[ExporterInfluxDBExample, ExporterSQLExample, HTTPObservation],
+        Union[
+            ExporterInfluxDBExample,
+            ExporterSQLExample,
+            FileObservation,
+            HTTPObservation,
+            SQLObservation,
+            SplashObservation,
+        ],
         None,
     ]:
         yield ExporterSQLExample(
