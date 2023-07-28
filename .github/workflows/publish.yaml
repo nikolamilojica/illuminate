@@ -38,6 +38,8 @@ jobs:
         poetry-version: [ "1.1.15" ]
         os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -76,8 +78,11 @@ jobs:
             ${{ steps.info.outputs.repository }}:${{ steps.info.outputs.tag }}
             ${{ steps.info.outputs.repository }}:latest
       - name: Publish Package on GitHub
-        run: >
-          gh release create ${{ steps.info.outputs.tag }}
-           ./dist/*.whl -F changelog.md --target master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: changelog.md
+          files: |
+            ./dist/*.whl
+          name: ${{ steps.info.outputs.tag }}
+          tag_name: ${{ steps.info.outputs.tag }}
+          target_commitish: master
