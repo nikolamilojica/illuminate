@@ -681,10 +681,14 @@ distribution as well:</p>
 <p style="text-align: justify">To use docker distribution while inside a
 project directory, type the following:</p>
 
-<p>```shell
-docker run -it --rm --network=host \
-   -e ILLUMINATE_MAIN_DB_PASSWORD=<DB_PASSWORD> \
-   -e ILLUMINATE_MEASUREMENTS_DB_PASSWORD=<MEASUREMENTS_DB_PASSWORD> \</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>--network<span class="o">=</span>host<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">   </span>-e<span class="w"> </span><span class="nv">ILLUMINATE_MAIN_DB_PASSWORD</span><span class="o">=</span>&lt;DB_PASSWORD&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">   </span>-e<span class="w"> </span><span class="nv">ILLUMINATE_MEASUREMENTS_DB_PASSWORD</span><span class="o">=</span>&lt;MEASUREMENTS_DB_PASSWORD&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">   </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/root/illuminate<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">   </span>nikolamilojica/illuminate<span class="w"> </span>illuminate<span class="w"> </span>observe<span class="w"> </span>start
+</code></pre></div>
+<p style="text-align: justify">The rest of framework documentation can be
+found <a href="https://nikolamilojica.github.io/illuminate/">here</a>!</p>
 
 
 
