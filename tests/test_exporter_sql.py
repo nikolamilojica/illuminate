@@ -46,11 +46,13 @@ class TestExporterSQL(Test):
 
             Manager.db_revision(path, "head", "main", self.url)
             Manager.db_upgrade(path, "head", "main", self.url)
+            load_time = 1.0
             title = "Example"
             url = "https//:example.com"
-            model = ModelExample(title=title, url=url)
+            model = ModelExample(load_time=load_time, title=title, url=url)
             exporter = SQLExporter(models=[model])
             await exporter.export(self.session_async)
             query = self.session.query(ModelExample).all()
+            assert query[0].load_time == load_time
             assert query[0].title == title
             assert query[0].url == url

@@ -8,6 +8,7 @@ from pydoc import locate
 from types import ModuleType
 from typing import Optional, Type, Union
 
+from aioinflux import InfluxDBClient  # type: ignore
 from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
@@ -18,7 +19,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from illuminate.adapter import Adapter
-from illuminate.common import SUPPORTED_RELATIONAL_DATABASES
+from illuminate.common import SUPPORTED_NOSQL_DATABASES
+from illuminate.common import SUPPORTED_SQL_DATABASES
 from illuminate.exceptions import BasicManagerException
 from illuminate.interface import IAssistant
 from illuminate.observer import Observer
@@ -181,11 +183,13 @@ class Assistant(IAssistant):
         return "{type}://{user}:{pass}@{host}/{db}".format(**db)
 
     @staticmethod
-    def _provide_sessions() -> dict[str, Type[AsyncSession]]:
+    def _provide_sessions() -> dict[
+        str, Union[Type[AsyncSession], InfluxDBClient]
+    ]:
         """
         Creates a dictionary of database sessions.
 
-        :return: Database sessions
+        :return: Database sessions dictionary
         """
         _sessions: dict = {}
         settings = Assistant._provide_settings()
@@ -195,20 +199,11 @@ class Assistant(IAssistant):
         )
         for db in settings.DB:
             _type = settings.DB[db]["type"]
-            if _type in SUPPORTED_RELATIONAL_DATABASES:
-                url = Assistant._provide_db_url(db, _async=True)
-                engine = create_async_engine(url)
-                session = sessionmaker(
-                    engine,
-                    class_=AsyncSession,
-                    expire_on_commit=False,
-                )
-                host = settings.DB[db]["host"]
-                port = settings.DB[db]["port"]
-                logger.opt(colors=True).info(
-                    f"Adding session with <yellow>{db}</yellow> at "
-                    f"<magenta>{host}:{port}</magenta> to context"
-                )
+            if _type in SUPPORTED_NOSQL_DATABASES:
+                session = Assistant.__provide_nosql_sessions(db, settings)
+                _sessions.update({db: session})
+            elif _type in SUPPORTED_SQL_DATABASES:
+                session = Assistant.__provide_sql_sessions(db, settings)
                 _sessions.update({db: session})
             else:
                 logger.warning(f"Database type {_type} is not supported")
@@ -231,3 +226,58 @@ class Assistant(IAssistant):
             raise BasicManagerException(
                 "Framework did not found settings.py in the current directory"
             )
+
+    @staticmethod
+    def __log_database_connection(db: str, settings: ModuleType) -> None:
+        """
+        Log database connection.
+
+        :param db: database name from settings.py module
+        :param settings: settings.py module
+        :return: None
+        """
+        host = settings.DB[db]["host"]
+        port = settings.DB[db]["port"]
+        logger.opt(colors=True).info(
+            f"Adding session with <yellow>{db}</yellow> at "
+            f"<magenta>{host}:{port}</magenta> to context"
+        )
+
+    @staticmethod
+    def __provide_nosql_sessions(
+        db: str, settings: ModuleType
+    ) -> InfluxDBClient:
+        """
+        Provides NoSQL database session.
+
+        :param db: database name from settings.py module
+        :param settings: settings.py module
+        :return: InfluxDBClient object
+        """
+        Assistant.__log_database_connection(db, settings)
+        if settings.DB[db]["type"] == "influxdb":
+            return InfluxDBClient(
+                host=settings.DB[db]["host"],
+                port=settings.DB[db]["port"],
+                db=settings.NAME,
+                username=settings.DB[db]["user"],
+                password=settings.DB[db]["pass"],
+            )
+
+    @staticmethod
+    def __provide_sql_sessions(
+        db: str, settings: ModuleType
+    ) -> sessionmaker[AsyncSession]:
+        """
+        Provides SQL database session.
+
+        :param db: database name from settings.py module
+        :param settings: settings.py module
+        :return: AsyncSession created with session maker
+        """
+        Assistant.__log_database_connection(db, settings)
+        return sessionmaker(
+            create_async_engine(Assistant._provide_db_url(db, _async=True)),
+            class_=AsyncSession,
+            expire_on_commit=False,
+        )

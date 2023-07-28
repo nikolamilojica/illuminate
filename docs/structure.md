@@ -51,7 +51,8 @@ from illuminate.observation import HTTPObservation
 from illuminate.observer import Observer
 from tornado.httpclient import HTTPResponse
 
-from exporters.example import ExporterExample
+from exporters.example import ExporterInfluxDBExample
+from exporters.example import ExporterSQLExample
 from findings.example import FindingExample
 
 
@@ -119,7 +120,13 @@ class ObserverExample(Observer):
     async def observe(
         self, response: HTTPResponse, *args, **kwargs
     ) -> AsyncGenerator[
-        Union[ExporterExample, FindingExample, HTTPObservation], None
+        Union[
+            ExporterInfluxDBExample,
+            ExporterSQLExample,
+            FindingExample,
+            HTTPObservation,
+        ],
+        None,
     ]:
         """
         ETL flow is regulated by a yielded object type of Observation's
@@ -156,7 +163,11 @@ class ObserverExample(Observer):
                 allowed=self.ALLOWED,
                 callback=self.observe,
             )
-        yield FindingExample(soup.title.text, response.effective_url)
+        yield FindingExample(
+            response.request_time,
+            soup.title.text,
+            response.effective_url
+        )
 ```
 
 ### `Observer` vs `Observation`
@@ -228,6 +239,7 @@ class FindingExample(Finding):
     Check tutorial/adapters/example.py to learn more about subscription.
     """
 
+    load_time: float = field()
     title: str = field()
     url: str = field()
 ```
@@ -243,7 +255,7 @@ database.</p>
 > **NOTE**: `SQLObservation` class is not yet introduced to the framework.
 
 ```python
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Float, Integer, String
 
 from models import Base
 
@@ -256,12 +268,16 @@ class ModelExample(Base):
 
     __tablename__ = "tutorial"
     id: int = Column(Integer, primary_key=True)
+    load_time: float = Column(Float)
     title: str = Column(String)
     url: str = Column(String)
 
     def __repr__(self):
         """ModelExample's __repr__ method."""
-        return f'ModelExample(title="{self.title}",url="{self.url}")'
+        return (
+            f'ModelExample(load_time={self.load_time},'
+            f'title="{self.title}",url="{self.url}")'
+        )
 ```
 
 
@@ -304,10 +320,14 @@ from collections.abc import AsyncGenerator
 from typing import Type, Union
 
 from illuminate.adapter import Adapter
+from illuminate.observation import FileObservation
 from illuminate.observation import HTTPObservation
+from illuminate.observation import SQLObservation
+from illuminate.observation import SplashObservation
 from illuminate.observer import Finding
 
-from exporters.example import ExporterExample
+from exporters.example import ExporterInfluxDBExample
+from exporters.example import ExporterSQLExample
 from findings.example import FindingExample
 from models.example import ModelExample
 
@@ -342,9 +362,33 @@ class AdapterExample(Adapter):
 
     async def adapt(
         self, finding: FindingExample, *args, **kwargs
-    ) -> AsyncGenerator[Union[ExporterExample, HTTPObservation], None]:
-        yield ExporterExample(
-            models=[ModelExample(title=finding.title, url=finding.url)]
+    ) -> AsyncGenerator[
+        Union[
+            ExporterInfluxDBExample,
+            ExporterSQLExample,
+            FileObservation,
+            HTTPObservation,
+            SQLObservation,
+            SplashObservation,
+        ],
+        None,
+    ]:
+        yield ExporterSQLExample(
+            models=[
+                ModelExample(
+                    load_time=finding.load_time,
+                    title=finding.title,
+                    url=finding.url
+                )
+            ]
+        )
+
+        yield ExporterInfluxDBExample(
+            points={
+                "measurement": "tutorial",
+                "tags": {"url": finding.url, "title": finding.title},
+                "fields": {"load_time": finding.load_time},
+            }
         )
 ```
 
@@ -356,14 +400,37 @@ you write your dump classes.</p>
 ```python
 from __future__ import annotations
 
-from typing import Union
+from typing import Iterable, Union
 
+from illuminate.exporter import InfluxDBExporter
 from illuminate.exporter import SQLExporter
+from pandas import DataFrame
 
 from models.example import ModelExample
 
 
-class ExporterExample(SQLExporter):
+class ExporterInfluxDBExample(InfluxDBExporter):
+    """
+    InfluxDBExporter class will write points to database using session. Points
+    are passed at initialization, while database session is found by name
+    attribute in the pool of existing sessions. Name must co-respond to DB
+    section in tutorial/settings.py. For more information how to initialize
+    InfluxDBExporter class, check tutorial/adapters/example.py
+    """
+
+    name: str = "measurements"
+
+    def __init__(
+        self,
+        points: Union[
+            Union[DataFrame, dict, str, bytes],
+            Iterable[Union[DataFrame, dict, str, bytes]],
+        ],
+    ):
+        super().__init__(points)
+
+
+class ExporterSQLExample(SQLExporter):
     """
     SQLExporter class will commit models to database using session. Models are
     passed at initialization, while database session is found by name attribute
@@ -409,10 +476,12 @@ list of rows to be inserted with CLI command.</p>
     "name": "tutorial",
     "data": [
         {
+            "load_time": "1.0",
             "url": "https://webscraper.io/",
             "title": "Web Scraper - The #1 web scraping extension"
         },
         {
+            "load_time": "1.0",
             "url": "https://webscraper.io/tutorials",
             "title": "Web Scraper Tutorials"
         }
@@ -468,7 +537,14 @@ DB = {
         "port": "5432",
         "user": "illuminate",
         "type": "postgresql",
-    }
+    },
+    "measurements": {
+        "host": "localhost",
+        "pass": os.environ.get("ILLUMINATE_MEASUREMENTS_DB_PASSWORD"),
+        "port": "8086",
+        "user": "illuminate",
+        "type": "influxdb",
+    },
 }
 
 MODELS = [
@@ -513,6 +589,35 @@ pgadmin containers to monitor your flow on your localhost.</p>
 ```yaml
 version: '3.8'
 services:
+  grafana:
+   image: grafana/grafana
+   container_name: grafana
+   restart: always
+   depends_on:
+     - influxdb
+   environment:
+     - GF_SECURITY_ADMIN_USER=illuminate
+     - GF_SECURITY_ADMIN_PASSWORD=$ILLUMINATE_GRAFANA_PASSWORD
+     - GF_INSTALL_PLUGINS=
+   links:
+     - influxdb
+   ports:
+     - '3000:3000'
+   volumes:
+     - grafana:/var/lib/grafana
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_ADMIN_USER=illuminate
+      - INFLUXDB_ADMIN_PASSWORD=$ILLUMINATE_MEASUREMENTS_DB_PASSWORD
+      - INFLUXDB_DB=tutorial
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb:/var/lib/influxdb
   pg:
     container_name: pg
     image: postgres:latest
@@ -541,6 +646,10 @@ services:
     ports:
       - "8050:8050"
 volumes:
+  grafana:
+    driver: local
+  influxdb:
+    driver: local
   postgres:
     driver: local
 ```

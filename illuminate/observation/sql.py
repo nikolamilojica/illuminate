@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Type, Union
+from typing import Any, Callable, Optional, Type, Union
 
 from loguru import logger
 from sqlalchemy.engine.result import Result as AlchemyResult
@@ -34,6 +34,7 @@ class SQLObservation(Observation):
         url: str,
         /,
         callback: Callable[[AlchemyResult, tuple, dict], Result],
+        xcom: Optional[Any] = None,
         *args,
         **kwargs,
     ):
@@ -44,8 +45,9 @@ class SQLObservation(Observation):
         :param url: Database name in project settings.
         :param callback: Async function/method that manipulates AlchemyResult
         object and returns Result.
+        :param xcom: Cross communication object
         """
-        super().__init__(url)
+        super().__init__(url, xcom=xcom)
         self._callback = callback
         self.query = query
 

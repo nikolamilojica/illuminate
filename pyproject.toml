@@ -24,16 +24,19 @@ packages = [
     { include = "illuminate" }
 ]
 repository = "https://github.com/nikolamilojica/illuminate"
-version = "0.2.0"
+version = "0.3.0"
 
 [tool.poetry.dependencies]
 python = "^3.8"
 aiofile = "^3.8.1"
+aioinflux = "^0.9.0"
 alembic = "^1.7.7"
 asyncmy = "^0.2.5"
 asyncpg = "^0.26.0"
 click = "^8.1.2"
 loguru = "^0.6.0"
+numpy = "1.24.4"
+pandas = "^2.0.3"
 psycopg2 = "^2.9.3"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.42"}
 tornado = "^6.1"

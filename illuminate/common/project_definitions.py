@@ -1,1 +1,2 @@
-SUPPORTED_RELATIONAL_DATABASES = ("mysql", "postgresql")
+SUPPORTED_NOSQL_DATABASES = ("influxdb",)
+SUPPORTED_SQL_DATABASES = ("mysql", "postgresql")

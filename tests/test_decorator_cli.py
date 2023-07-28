@@ -1,7 +1,9 @@
+import pytest
 from alembic.config import Config
 from alembic.operations import Operations
 
 from illuminate.decorators import adapt
+from illuminate.exceptions import BasicManagerException
 from illuminate.manager import Manager
 from tests.unit import Test
 
@@ -66,3 +68,57 @@ class TestAdapt(Test):
         with self.path() as path:
             Manager.project_setup("example", ".")
             DummyManager.db_upgrade(path, "head", "main", self.url)
+
+
+class TestAdaptExceptions(Test):
+
+    influxdb_url = "influxdb://son:son@localhost/example"
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_db_populate_type_exception(self):
+        """
+        Given: Current directory is a project directory, revision file is
+        created and upgrade is executed
+        When: Populating database referencing wrong database type
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                Manager.project_setup("example", ".")
+                Manager.db_revision(path, "head", "main", self.url)
+                Manager.db_upgrade(path, "head", "main", self.url)
+                Manager.db_populate(
+                    ("fixtures/example.json",),
+                    "measurements",
+                    self.influxdb_url,
+                )
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_db_revision_type_exception(self):
+        """
+        Given: Current directory is a project directory
+        When: Creating revision file referencing wrong database type
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                Manager.project_setup("example", ".")
+                Manager.db_revision(
+                    path, "head", "measurements", self.influxdb_url
+                )
+
+    @pytest.mark.xfail(raises=BasicManagerException)
+    def test_db_upgrade_type_exception(self):
+        """
+        Given: Current directory is a project directory and revision file is
+        created
+        When: Upgrading database referencing wrong database type
+        Expected: BasicManagerException is raised
+        """
+        with pytest.raises(BasicManagerException):
+            with self.path() as path:
+                Manager.project_setup("example", ".")
+                Manager.db_revision(path, "head", "main", self.url)
+                Manager.db_upgrade(
+                    path, "head", "measurements", self.influxdb_url
+                )
