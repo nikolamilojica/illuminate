@@ -179,7 +179,15 @@ class TestCLI(Test):
                 )
                 result = runner.invoke(
                     cli,
-                    ["manage", "db", "populate", "--selector", "measurements"],
+                    [
+                        "manage",
+                        "db",
+                        "populate",
+                        "--selector",
+                        "measurements",
+                        "--fixtures",
+                        f"{tmp}/fixtures/example.json",
+                    ],
                 )
                 assert (
                     "Command populate can only be performed on SQL "
@@ -195,8 +203,17 @@ class TestCLI(Test):
         with self.path() as path:
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path):
-                result = runner.invoke(cli, ["manage", "db", "populate"])
-                assert not result.output
+                result = runner.invoke(
+                    cli,
+                    [
+                        "manage",
+                        "db",
+                        "populate",
+                        "--fixtures",
+                        f"{path}/fixtures/example.json",
+                    ],
+                )
+                assert "example.json' does not exist" in result.output
 
     def test_manage_db_populate_successfully(self):
         """
@@ -216,7 +233,16 @@ class TestCLI(Test):
                     cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
                 )
                 result = runner.invoke(
-                    cli, ["manage", "db", "populate", "--url", self.url]
+                    cli,
+                    [
+                        "manage",
+                        "db",
+                        "populate",
+                        "--url",
+                        self.url,
+                        "--fixtures",
+                        f"{tmp}/fixtures/example.json",
+                    ],
                 )
                 assert "Database main populated" in result.output
 
