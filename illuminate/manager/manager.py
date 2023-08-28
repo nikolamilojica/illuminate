@@ -5,7 +5,6 @@ import inspect
 import json
 import os
 import traceback
-from glob import glob
 from types import ModuleType
 from typing import Type, Union
 
@@ -117,12 +116,7 @@ class Manager(IManager):
         """
 
         table_data = {}
-        files = (
-            fixtures if fixtures else glob("fixtures/*.json", recursive=True)
-        )
-        for file in files:
-            logger.info(f"Database fixtures file discovered {file}")
-        for _file in files:
+        for _file in fixtures:
             with open(_file, "r") as file:  # type: ignore
                 content = json.load(file)  # type: ignore
                 for table in content:
