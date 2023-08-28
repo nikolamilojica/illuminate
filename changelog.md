@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.1
+
+* Critical update for GitPython (CVE-2023-40267)
+
 ## 0.3.0
 
 * Observation cross communication
