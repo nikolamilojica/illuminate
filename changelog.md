@@ -2,6 +2,9 @@
 
 ## 0.3.1
 
+* Fix the bug in the project template where the migration script file
+is incorrectly importing the Base model from the example.py file,
+instead of importing it from the models package, as intended.
 * Critical update for GitPython (CVE-2023-40267)
 
 ## 0.3.0
