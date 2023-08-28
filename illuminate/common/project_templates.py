@@ -85,7 +85,7 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from models.example import Base
+from models import Base
 from settings import MODELS
 
 for model in MODELS:
