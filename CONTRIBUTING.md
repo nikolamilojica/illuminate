@@ -1,6 +1,8 @@
 ## Branching
-This project uses [GitFlow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
-branching model. This will be changed to trunk-based workflow in the future.
+~~This project uses [GitFlow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+branching model. This will be changed to trunk-based workflow in the future.~~
+
+This project uses [Trunk-based development](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development).
 In this light, every branch must contain a prefix based up on its purpose.
 Prefixes are:
 - feat
