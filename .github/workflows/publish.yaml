@@ -79,12 +79,3 @@ jobs:
           tags: |
             ${{ steps.info.outputs.repository }}:${{ steps.info.outputs.tag }}
             ${{ steps.info.outputs.repository }}:latest
-      - name: Publish Package on GitHub
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: changelog.md
-          files: |
-            ./dist/*.whl
-          name: ${{ steps.info.outputs.tag }}
-          tag_name: ${{ steps.info.outputs.tag }}
-          target_commitish: master
