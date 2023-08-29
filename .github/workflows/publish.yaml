@@ -36,7 +36,7 @@ jobs:
       - name: Publish Package on PyPI
         env:
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI }}
-          POETRY_HTTP_BASIC_PYPI_USERNAME: nikolamilojica
+          POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
         run: poetry publish --build
       - name: Login to DockerHub
         uses: docker/login-action@v2
