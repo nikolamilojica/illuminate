@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.3.1
+
+* Fix the bug where the logic assumes that all fixture files contain
+non-relational data and tries to populate the database with malformed
+JSON. Option --fixtures is now mandatory.
+* Fix the bug in the project template where the migration script file
+is incorrectly importing the Base model from the example.py file,
+instead of importing it from the models package, as intended.
+* Critical update for GitPython (CVE-2023-40267).
+
 ## 0.3.0
 
 * Observation cross communication

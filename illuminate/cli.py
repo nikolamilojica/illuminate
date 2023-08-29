@@ -61,7 +61,7 @@ def project() -> None:
     "--fixtures",
     help="Fixture files paths.",
     multiple=True,
-    required=False,
+    required=True,
     type=click.Path(exists=True),
 )
 @click.option(

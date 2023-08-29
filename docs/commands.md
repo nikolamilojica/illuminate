@@ -145,7 +145,7 @@ illuminate manage db populate --help
       Populates database with fixtures.
 
     Options:
-      --fixtures PATH  Fixture files paths.
+      --fixtures PATH  Fixture files paths.  [required]
       --selector TEXT  Database connection selector.  [default: main]
       --url TEXT       Optional URL for databases not included in settings module.
       --help           Show this message and exit.
