@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.2
+
+* Update for GitPython (CVE-2023-41040).
+* Update for GitPython (CVE-2023-40590).
+* Update Tornado to version 6.3.3 to fix improper integer parsing.
+
 ## 0.3.1
 
 * Fix the bug where the logic assumes that all fixture files contain
