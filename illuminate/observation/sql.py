@@ -4,7 +4,6 @@ from typing import Any, Callable, Optional, Type, Union
 
 from loguru import logger
 from sqlalchemy.engine.result import Result as AlchemyResult
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.elements import TextClause
 from sqlalchemy.sql.selectable import Select
@@ -67,11 +66,8 @@ class SQLObservation(Observation):
                     response = await session.execute(query)  # type: ignore
             logger.info(f'{self}.observe(session="{session}")')
             return self._callback(response, *args, **kwargs)
-        except SQLAlchemyError as exception:
-            logger.warning(f"{self}.observe() -> {exception}")
-            return None
         except Exception as exception:
-            logger.critical(f"{self}.observe() -> {exception}")
+            logger.warning(f"{self}.observe() -> {exception}")
             return None
 
     def __repr__(self):

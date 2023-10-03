@@ -6,7 +6,6 @@ from typing import Any, Callable, Optional, Union
 
 from loguru import logger
 from tornado import httpclient
-from tornado.httpclient import HTTPClientError
 from tornado.httpclient import HTTPResponse
 
 from illuminate.meta.type import Result
@@ -79,11 +78,8 @@ class HTTPObservation(Observation):
             )
             logger.info(f"{self}.observe() -> {response}")
             return self._callback(response, *args, **kwargs)
-        except HTTPClientError as exception:
-            logger.warning(f"{self}.observe() -> {exception}")
-            return None
         except Exception as exception:
-            logger.critical(f"{self}.observe() -> {exception}")
+            logger.warning(f"{self}.observe() -> {exception}")
             return None
 
     def __repr__(self):
@@ -155,11 +151,8 @@ class SplashObservation(HTTPObservation):
             )
             logger.info(f"{self}.observe() -> {response}")
             return self._callback(response, *args, **kwargs)
-        except HTTPClientError as exception:
-            logger.warning(f"{self}.observe() -> {exception}")
-            return None
         except Exception as exception:
-            logger.critical(f"{self}.observe() -> {exception}")
+            logger.warning(f"{self}.observe() -> {exception}")
             return None
 
     def __repr__(self):
