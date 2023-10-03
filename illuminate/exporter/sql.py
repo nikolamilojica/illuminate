@@ -55,7 +55,7 @@ class SQLExporter(Exporter):
                 try:
                     await session.commit()  # type: ignore
                 except Exception as exception:
-                    logger.critical(
+                    logger.warning(
                         f'{self}.export(session="{session}") -> {exception}'
                     )
                     raise BasicExporterException

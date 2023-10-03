@@ -66,7 +66,7 @@ class InfluxDBExporter(Exporter):
         try:
             await session.write(self.points, **self.params)
         except Exception as exception:
-            logger.critical(
+            logger.warning(
                 f'{self}.export(session="{session}") -> {exception}'
             )
             raise BasicExporterException
