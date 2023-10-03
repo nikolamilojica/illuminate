@@ -69,10 +69,8 @@ class FileObservation(Observation):
                 )
                 logger.info(f"{self}.observe() -> {_file}")
                 _items = self._callback(_file, *args, **kwargs)
-            except FileNotFoundError as exception:
-                logger.warning(f"{self}.observe() -> {exception}")
             except Exception as exception:
-                logger.critical(f"{self}.observe() -> {exception}")
+                logger.warning(f"{self}.observe() -> {exception}")
             finally:
                 yield _items
                 if _file:

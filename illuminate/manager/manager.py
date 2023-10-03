@@ -425,9 +425,12 @@ class Manager(IManager):
         for adapter in self._adapters:
             for subscriber in adapter.subscribers:
                 if isinstance(item, subscriber):
-                    items = adapter.adapt(item)
-                    async for _item in items:  # type: ignore
-                        await self.__router(_item)
+                    try:
+                        items = adapter.adapt(item)
+                        async for _item in items:  # type: ignore
+                            await self.__router(_item)
+                    except Exception as exception:
+                        logger.warning(f"{self}.adapt() -> {exception}")
 
     @logger.catch
     async def __export(self) -> None:
@@ -472,7 +475,7 @@ class Manager(IManager):
         except BasicExporterException:
             pass
         except KeyError:
-            logger.critical(f"Database {item.name} of is not found in context")
+            logger.warning(f"Database {item.name} of is not found in context")
 
     @logger.catch
     async def _observe_start(self) -> None:
