@@ -472,7 +472,7 @@ class Manager(IManager):
         except BasicExporterException:
             pass
         except KeyError:
-            logger.critical(f"Database {item.name} of is not found in context")
+            logger.warning(f"Database {item.name} of is not found in context")
 
     @logger.catch
     async def _observe_start(self) -> None:
