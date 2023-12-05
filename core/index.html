@@ -2939,7 +2939,10 @@ provided by Assistant class.</p>
 <span class="normal"><a href="#__codelineno-0-509">509</a></span>
 <span class="normal"><a href="#__codelineno-0-510">510</a></span>
 <span class="normal"><a href="#__codelineno-0-511">511</a></span>
-<span class="normal"><a href="#__codelineno-0-512">512</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">IManager</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-512">512</a></span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span>
+<span class="normal"><a href="#__codelineno-0-515">515</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">IManager</span><span class="p">):</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    Manager class, executes framework&#39;s cli commands.</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a>
@@ -3326,91 +3329,94 @@ provided by Assistant class.</p>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="k">for</span> <span class="n">adapter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adapters</span><span class="p">:</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>            <span class="k">for</span> <span class="n">subscriber</span> <span class="ow">in</span> <span class="n">adapter</span><span class="o">.</span><span class="n">subscribers</span><span class="p">:</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a>                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">subscriber</span><span class="p">):</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                    <span class="n">items</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">adapt</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                    <span class="k">async</span> <span class="k">for</span> <span class="n">_item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__router</span><span class="p">(</span><span class="n">_item</span><span class="p">)</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="nd">@logger</span><span class="o">.</span><span class="n">catch</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">__export</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Takes Exporter object from self.__export_queue and pass it to</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        self.__exportation method.</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        :return: None</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">async</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                <span class="k">return</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coroutine exported </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="k">del</span> <span class="n">item</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Exporter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Passes Exporter object to proper method based on its class.</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        :param item: Exporter object</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        :return: None</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">)):</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to_database</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to_database</span><span class="p">(</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">]</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">        Acquires database session based on Exporter&#39;s attributes and pass it to</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Exporter&#39;s export method.</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">        :param item: InfluxDBExporter or SQLExporter object</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        :return: None</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>            <span class="k">await</span> <span class="n">item</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exported</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="k">except</span> <span class="n">BasicExporterException</span><span class="p">:</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="k">pass</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> of is not found in context&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>    <span class="nd">@logger</span><span class="o">.</span><span class="n">catch</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">_observe_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        Starts producer/consumer ETL process.</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        :return: None</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">priority</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="n">_observers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">CONCURRENCY</span><span class="p">[</span><span class="s2">&quot;observers&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">_adapters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">CONCURRENCY</span><span class="p">[</span><span class="s2">&quot;adapters&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">_exporters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">CONCURRENCY</span><span class="p">[</span><span class="s2">&quot;exporters&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="n">observers</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">multi</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__observe</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_observers</span><span class="p">)])</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">adapters</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">multi</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__adapt</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_adapters</span><span class="p">)])</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">exporters</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">multi</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__export</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_exporters</span><span class="p">)])</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span><span class="p">()</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__observe_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__adapt_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_observers</span><span class="p">):</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__observe_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_adapters</span><span class="p">):</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__adapt_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_exporters</span><span class="p">):</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>        <span class="k">await</span> <span class="n">observers</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>        <span class="k">await</span> <span class="n">adapters</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>        <span class="k">await</span> <span class="n">exporters</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">session</span><span class="p">],</span> <span class="n">InfluxDBClient</span><span class="p">):</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">session</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                        <span class="n">items</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">adapt</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                        <span class="k">async</span> <span class="k">for</span> <span class="n">_item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__router</span><span class="p">(</span><span class="n">_item</span><span class="p">)</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">.adapt() -&gt; </span><span class="si">{</span><span class="n">exception</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="nd">@logger</span><span class="o">.</span><span class="n">catch</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">__export</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        Takes Exporter object from self.__export_queue and pass it to</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        self.__exportation method.</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        :return: None</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="k">async</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="p">:</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>                <span class="k">return</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coroutine exported </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>            <span class="k">del</span> <span class="n">item</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Exporter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Passes Exporter object to proper method based on its class.</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        :param item: Exporter object</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        :return: None</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">)):</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to_database</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to_database</span><span class="p">(</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">]</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">        Acquires database session based on Exporter&#39;s attributes and pass it to</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        Exporter&#39;s export method.</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        :param item: InfluxDBExporter or SQLExporter object</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">        :return: None</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="k">await</span> <span class="n">item</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">__exported</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="k">except</span> <span class="n">BasicExporterException</span><span class="p">:</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="k">pass</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> of is not found in context&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="nd">@logger</span><span class="o">.</span><span class="n">catch</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">_observe_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        Starts producer/consumer ETL process.</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        :return: None</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">priority</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="n">_observers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">CONCURRENCY</span><span class="p">[</span><span class="s2">&quot;observers&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="n">_adapters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">CONCURRENCY</span><span class="p">[</span><span class="s2">&quot;adapters&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">_exporters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">CONCURRENCY</span><span class="p">[</span><span class="s2">&quot;exporters&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">observers</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">multi</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__observe</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_observers</span><span class="p">)])</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="n">adapters</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">multi</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__adapt</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_adapters</span><span class="p">)])</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="n">exporters</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">multi</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__export</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_exporters</span><span class="p">)])</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span><span class="p">()</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__observe_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__adapt_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_observers</span><span class="p">):</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__observe_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_adapters</span><span class="p">):</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__adapt_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_exporters</span><span class="p">):</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">await</span> <span class="n">observers</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="k">await</span> <span class="n">adapters</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">await</span> <span class="n">exporters</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">session</span><span class="p">],</span> <span class="n">InfluxDBClient</span><span class="p">):</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">session</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
 </code></pre></div></td></tr></table></div>
         </details>
 
@@ -3579,7 +3585,10 @@ self.__adaptation method.</p>
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
 <span class="normal"><a href="#__codelineno-0-428">428</a></span>
 <span class="normal"><a href="#__codelineno-0-429">429</a></span>
-<span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__adaptation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Finding</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__adaptation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Finding</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    Passes Finding object to Adapter&#39;s instance adapt method.</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a>
@@ -3589,9 +3598,12 @@ self.__adaptation method.</p>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="k">for</span> <span class="n">adapter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adapters</span><span class="p">:</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">for</span> <span class="n">subscriber</span> <span class="ow">in</span> <span class="n">adapter</span><span class="o">.</span><span class="n">subscribers</span><span class="p">:</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">subscriber</span><span class="p">):</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="n">items</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">adapt</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="k">async</span> <span class="k">for</span> <span class="n">_item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__router</span><span class="p">(</span><span class="n">_item</span><span class="p">)</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                    <span class="n">items</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">adapt</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                    <span class="k">async</span> <span class="k">for</span> <span class="n">_item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__router</span><span class="p">(</span><span class="n">_item</span><span class="p">)</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">.adapt() -&gt; </span><span class="si">{</span><span class="n">exception</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -3640,10 +3652,7 @@ self.__exportation method.</p>
 
       <details class="quote">
         <summary>Source code in <code>illuminate/manager/manager.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-432">432</a></span>
-<span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span>
-<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-435">435</a></span>
 <span class="normal"><a href="#__codelineno-0-436">436</a></span>
 <span class="normal"><a href="#__codelineno-0-437">437</a></span>
 <span class="normal"><a href="#__codelineno-0-438">438</a></span>
@@ -3654,21 +3663,24 @@ self.__exportation method.</p>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
 <span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="nd">@logger</span><span class="o">.</span><span class="n">catch</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__export</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Takes Exporter object from self.__export_queue and pass it to</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">    self.__exportation method.</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    :return: None</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">async</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="k">return</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coroutine exported </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">del</span> <span class="n">item</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-446">446</a></span>
+<span class="normal"><a href="#__codelineno-0-447">447</a></span>
+<span class="normal"><a href="#__codelineno-0-448">448</a></span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="nd">@logger</span><span class="o">.</span><span class="n">catch</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__export</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    Takes Exporter object from self.__export_queue and pass it to</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    self.__exportation method.</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    :return: None</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>    <span class="k">async</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="p">:</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="k">return</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coroutine exported </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="k">del</span> <span class="n">item</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__export_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -3739,23 +3751,23 @@ self.__exportation method.</p>
 
       <details class="quote">
         <summary>Source code in <code>illuminate/manager/manager.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span>
-<span class="normal"><a href="#__codelineno-0-450">450</a></span>
-<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-451">451</a></span>
 <span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
 <span class="normal"><a href="#__codelineno-0-454">454</a></span>
 <span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Exporter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">    Passes Exporter object to proper method based on its class.</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">    :param item: Exporter object</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    :return: None</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">)):</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to_database</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Exporter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Passes Exporter object to proper method based on its class.</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    :param item: Exporter object</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    :return: None</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">)):</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__export_to_database</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -3827,10 +3839,7 @@ Exporter's export method.</p>
 
       <details class="quote">
         <summary>Source code in <code>illuminate/manager/manager.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-461">461</a></span>
 <span class="normal"><a href="#__codelineno-0-462">462</a></span>
 <span class="normal"><a href="#__codelineno-0-463">463</a></span>
 <span class="normal"><a href="#__codelineno-0-464">464</a></span>
@@ -3844,24 +3853,27 @@ Exporter's export method.</p>
 <span class="normal"><a href="#__codelineno-0-472">472</a></span>
 <span class="normal"><a href="#__codelineno-0-473">473</a></span>
 <span class="normal"><a href="#__codelineno-0-474">474</a></span>
-<span class="normal"><a href="#__codelineno-0-475">475</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to_database</span><span class="p">(</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">]</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">    Acquires database session based on Exporter&#39;s attributes and pass it to</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Exporter&#39;s export method.</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    :param item: InfluxDBExporter or SQLExporter object</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    :return: None</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>        <span class="k">await</span> <span class="n">item</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__exported</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>    <span class="k">except</span> <span class="n">BasicExporterException</span><span class="p">:</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">pass</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> of is not found in context&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span>
+<span class="normal"><a href="#__codelineno-0-477">477</a></span>
+<span class="normal"><a href="#__codelineno-0-478">478</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">__export_to_database</span><span class="p">(</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InfluxDBExporter</span><span class="p">,</span> <span class="n">SQLExporter</span><span class="p">]</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    Acquires database session based on Exporter&#39;s attributes and pass it to</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    Exporter&#39;s export method.</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    :param item: InfluxDBExporter or SQLExporter object</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    :return: None</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">await</span> <span class="n">item</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__exported</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>    <span class="k">except</span> <span class="n">BasicExporterException</span><span class="p">:</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">pass</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> of is not found in context&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
