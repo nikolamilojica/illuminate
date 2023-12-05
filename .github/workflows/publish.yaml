@@ -39,12 +39,6 @@ jobs:
         with:
           username: nikolamilojica
           password: ${{ secrets.DOCKER }}
-      - name: Install Documentation Dependencies
-        run: poetry install
-      - name: Build and Deploy Documentation
-        run: poetry run mkdocs gh-deploy --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
@@ -54,3 +48,9 @@ jobs:
           tags: |
             nikolamilojica/illuminate:v${{ steps.version.outputs.version }}
             nikolamilojica/illuminate:latest
+      - name: Install Documentation Dependencies
+        run: poetry install
+      - name: Build and Deploy Documentation
+        run: poetry run mkdocs gh-deploy --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
