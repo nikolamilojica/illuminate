@@ -26,6 +26,9 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - name: Get Version
+        id: version
+        run: echo "::set-output name=version::$(poetry version -s)"
       - name: Publish Package on PyPI
         env:
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI }}
@@ -43,7 +46,7 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            nikolamilojica/illuminate:v$(poetry version -s)
+            nikolamilojica/illuminate:v${{ steps.version.outputs.version }}
             nikolamilojica/illuminate:latest
       - name: Build and Deploy Documentation
         run: poetry run mkdocs gh-deploy --force
