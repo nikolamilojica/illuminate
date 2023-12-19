@@ -169,18 +169,19 @@ class Assistant(IAssistant):
             raise BasicManagerException(
                 f"Database {selector} is not defined in settings.py"
             )
-        db["db"] = settings.NAME
+        if not db.get("name"):
+            db["name"] = settings.NAME
         if _async:
             async_drivers = {
                 "mysql": "asyncmy",
                 "postgresql": "asyncpg",
             }
             driver = async_drivers[db["type"]]
-            return "{type}+{driver}://{user}:{pass}@{host}/{db}".format(
+            return "{type}+{driver}://{user}:{pass}@{host}/{name}".format(
                 driver=driver, **db
             )
 
-        return "{type}://{user}:{pass}@{host}/{db}".format(**db)
+        return "{type}://{user}:{pass}@{host}/{name}".format(**db)
 
     @staticmethod
     def _provide_sessions() -> dict[
@@ -259,7 +260,7 @@ class Assistant(IAssistant):
             return InfluxDBClient(
                 host=settings.DB[db]["host"],
                 port=settings.DB[db]["port"],
-                db=settings.NAME,
+                db=settings.DB[db].get("name", settings.NAME),
                 username=settings.DB[db]["user"],
                 password=settings.DB[db]["pass"],
             )
