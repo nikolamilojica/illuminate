@@ -533,6 +533,7 @@ CONCURRENCY = {
 DB = {
     "main": {
         "host": "localhost",
+        "name": "tutorial",
         "pass": os.environ.get("ILLUMINATE_MAIN_DB_PASSWORD"),
         "port": "5432",
         "user": "illuminate",
@@ -540,6 +541,7 @@ DB = {
     },
     "measurements": {
         "host": "localhost",
+        "name": "tutorial",
         "pass": os.environ.get("ILLUMINATE_MEASUREMENTS_DB_PASSWORD"),
         "port": "8086",
         "user": "illuminate",
