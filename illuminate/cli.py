@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 import warnings
+from unittest.mock import patch
 
 import click
 from loguru import logger
@@ -118,7 +119,8 @@ def db_revision(
     url: str,
 ) -> None:
     """Creates Alembic's revision file in migration directory."""
-    Manager.db_revision(path, revision, selector, url)
+    with patch("alembic.util.messaging.write_outstream"):
+        Manager.db_revision(path, revision, selector, url)
 
 
 @db.command("upgrade")
