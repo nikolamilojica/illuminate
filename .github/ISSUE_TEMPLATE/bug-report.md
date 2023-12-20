@@ -9,13 +9,11 @@ Thanks for submitting an issue!
 Quick check-list while reporting bugs:
 -->
 
-- [ ] make sure that bug hasn't been already submitted by checking
-[issues](https://github.com/nikolamilojica/illuminate/issues) page
+- [ ] make sure that bug hasn't been already submitted by checking [issues](https://github.com/nikolamilojica/illuminate/issues) page
 - [ ] a detailed description of the bug or problem you are having
 - [ ] project dependencies
 - [ ] Illuminate and operating system versions
-- [ ] minimal example if possible, usually `Observer` or `Adapter` classes from
-project files
+- [ ] minimal example if possible, usually `Observer` or `Adapter` classes from project files
 - [ ] logs with `--verbosity DEBUG` if possible
 
 ___
