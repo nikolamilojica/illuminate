@@ -63,4 +63,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          poetry run coveralls --service=github
+          poetry run coveralls -i --service=github
