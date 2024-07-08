@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import functools
-import traceback
 from typing import Callable
 
 from loguru import logger
@@ -11,113 +10,124 @@ from illuminate.exceptions import BasicManagerException
 from illuminate.manager import Assistant
 
 
-def adapt(func: Callable) -> Callable:
+def adapt(command: str) -> Callable:
     """
     Adapts Manager's static methods to accept cli arguments.
 
-    :param func: Manager's static method
+    :param command: Command string
     :return: Manager's static method wrapper
     """
 
-    stack = traceback.extract_stack(limit=2)
-    if stack is not None and stack:
-        frame_info = stack[0]
-        if frame_info.line is not None:
-            _callable = frame_info.line.strip().split(" ")[1].split("(")[0]
+    def decorator(func: Callable) -> Callable:
+        """
+        Outer wrapper responsible for control flow.
+
+        :param func: The function to be adapted
+        :return: The wrapped function with adapted arguments
+        """
+
+        if command == "populate":
+
+            @functools.wraps(func)
+            def wrapper(
+                fixtures: tuple[str], selector: str, url: str, *args, **kwargs
+            ) -> None:
+                """
+                Adapts Manager's db_populate method to accept cli arguments.
+
+                :param fixtures: Tuple of fixture files
+                :param selector: Database name in settings.py module
+                :param url: SQLAlchemy Database URL
+                :return: None
+                """
+                try:
+                    models = Assistant.provide_models()
+                    operations = Assistant.provide_alembic_operations(
+                        selector, url
+                    )
+                    func(
+                        fixtures, models, operations, selector, *args, **kwargs
+                    )
+                except NoSuchModuleError:
+                    raise BasicManagerException(
+                        "Command populate can only be performed on SQL "
+                        f"database, {selector} is not supported SQL database"
+                    )
+
+        elif command == "revision":
+
+            @functools.wraps(func)
+            def wrapper(
+                path: str,
+                revision: str,
+                selector: str,
+                url: str,
+                *args,
+                **kwargs,
+            ) -> None:
+                """
+                Adapts Manager's db_revision method to accept cli arguments.
+
+                :param path: Migration directory path
+                :param revision: Parent revision
+                :param selector: Database name in settings.py module
+                :param url: SQLAlchemy Database URL
+                :return: None
+                """
+                try:
+                    config = Assistant.provide_alembic_config(
+                        path, selector, url
+                    )
+                    func(config, revision, *args, **kwargs)
+                except NoSuchModuleError:
+                    raise BasicManagerException(
+                        "Command revision can only be performed on SQL "
+                        f"database, {selector} is not supported SQL database"
+                    )
+
+        elif command == "upgrade":
+
+            @functools.wraps(func)
+            def wrapper(
+                path: str,
+                revision: str,
+                selector: str,
+                url: str,
+                *args,
+                **kwargs,
+            ) -> None:
+                """
+                Adapts Manager's db_upgrade method to accept cli arguments.
+
+                :param path: Migration directory path
+                :param revision: Parent revision
+                :param selector: Database name in settings.py module
+                :param url: SQLAlchemy Database URL
+                :return: None
+                """
+                try:
+                    config = Assistant.provide_alembic_config(
+                        path, selector, url
+                    )
+                    func(config, revision, selector, *args, **kwargs)
+                except NoSuchModuleError:
+                    raise BasicManagerException(
+                        "Command upgrade can only be performed on SQL "
+                        f"database, {selector} is not supported SQL database"
+                    )
+
         else:
-            raise BasicManagerException(
-                "Frame line information is None, "
-                "unable to determine the callable"
-            )
-    else:
-        raise BasicManagerException(
-            "Code context is None or empty, unable to determine the callable"
-        )
+            logger.warning(f"Decorated command {command} is not supported")
 
-    if _callable == "db_populate":
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs) -> None:
+                """
+                Does nothing.
 
-        @functools.wraps(func)
-        def wrapper(
-            fixtures: tuple[str], selector: str, url: str, *args, **kwargs
-        ) -> None:
-            """
-            Adapts Manager's db_populate method to accept cli arguments.
+                :return: None
+                """
+                func(*args, **kwargs)
 
-            :param fixtures: Tuple of fixture files
-            :param selector: Database name in settings.py module
-            :param url: SQLAlchemy Database URL
-            :return: None
-            """
-            try:
-                models = Assistant.provide_models()
-                operations = Assistant.provide_alembic_operations(
-                    selector, url
-                )
-                func(fixtures, models, operations, selector, *args, **kwargs)
-            except NoSuchModuleError:
-                raise BasicManagerException(
-                    "Command populate can only be performed on SQL database,"
-                    f" {selector} is not supported SQL database"
-                )
+        return wrapper
 
-    elif _callable == "db_revision":
-
-        @functools.wraps(func)
-        def wrapper(
-            path: str, revision: str, selector: str, url: str, *args, **kwargs
-        ) -> None:
-            """
-            Adapts Manager's db_revision method to accept cli arguments.
-
-            :param path: Migration directory path
-            :param revision: Parent revision
-            :param selector: Database name in settings.py module
-            :param url: SQLAlchemy Database URL
-            :return: None
-            """
-            try:
-                config = Assistant.provide_alembic_config(path, selector, url)
-                func(config, revision, *args, **kwargs)
-            except NoSuchModuleError:
-                raise BasicManagerException(
-                    "Command revision can only be performed on SQL database,"
-                    f" {selector} is not supported SQL database"
-                )
-
-    elif _callable == "db_upgrade":
-
-        @functools.wraps(func)
-        def wrapper(
-            path: str, revision: str, selector: str, url: str, *args, **kwargs
-        ) -> None:
-            """
-            Adapts Manager's db_upgrade method to accept cli arguments.
-
-            :param path: Migration directory path
-            :param revision: Parent revision
-            :param selector: Database name in settings.py module
-            :param url: SQLAlchemy Database URL
-            :return: None
-            """
-            try:
-                config = Assistant.provide_alembic_config(path, selector, url)
-                func(config, revision, selector, *args, **kwargs)
-            except NoSuchModuleError:
-                raise BasicManagerException(
-                    "Command upgrade can only be performed on SQL database,"
-                    f" {selector} is not supported SQL database"
-                )
-
-    else:
-        logger.warning(f"Decorated method {_callable} is not supported")
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> None:
-            """
-            Does nothing.
-
-            :return: None
-            """
-            func(*args, **kwargs)
-
-    return wrapper
+    return decorator
