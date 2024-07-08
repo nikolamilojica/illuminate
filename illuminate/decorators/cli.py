@@ -19,8 +19,16 @@ def adapt(func: Callable) -> Callable:
     :return: Manager's static method wrapper
     """
 
-    _callable = inspect.stack()[1][4][0]  # type: ignore
-    _callable = _callable.strip().split(" ")[1].split("(")[0]
+    frame_info = inspect.stack()[1]
+
+    if frame_info.code_context is not None and frame_info.code_context:
+        _callable = (
+            frame_info.code_context[0].strip().split(" ")[1].split("(")[0]
+        )
+    else:
+        raise BasicManagerException(
+            "Code context is None or empty, unable to determine the callable"
+        )
 
     if _callable == "db_populate":
 
