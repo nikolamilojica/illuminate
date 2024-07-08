@@ -38,7 +38,7 @@ click = "^8.1.2"
 loguru = "^0.6.0"
 numpy = "1.26.4"
 pandas = "^2.0.3"
-psycopg2 = "^2.9.3"
+psycopg2 = "2.9.9"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.42"}
 tornado = "^6.4.1"
 
