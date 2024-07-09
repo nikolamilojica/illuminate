@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Present Bugs and Errors
+about: Report Bugs and Errors
 ---
 
 <!--

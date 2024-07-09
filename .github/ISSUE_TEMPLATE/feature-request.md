@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Future Improvements
+about: Request New Futures
 ---
 
 <!--
