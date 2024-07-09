@@ -31,6 +31,8 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - name: Clear Poetry Cache
+        run: poetry cache clear --all pypi
       - name: Install Test Dependencies
         run: poetry add tox@^4.3.5 tox-gh-actions
       - name: Run Tests
@@ -54,6 +56,8 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - name: Clear Poetry Cache
+        run: poetry cache clear --all pypi
       - name: Install Coverage Dependencies
         run: poetry add coveralls
       - name: Run Tests
