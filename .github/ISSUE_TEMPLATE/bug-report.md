@@ -22,29 +22,34 @@ ___
 <!--
 Add your description here.
 -->
+
 ___
 ### Dependencies
 <!--
 Add dependencies here. Please use some kind of code style
 to separate dependencies from the rest of the text.
 -->
+
 ___
 ### Versions
 <!--
 Add versions here. Please use some kind of code style
 to separate versions from the rest of the text.
 -->
+
 ___
 ### Minimal Example
 <!--
 Add minimal example here if possible. Remove if not.Please use some kind of
 code style to separate minimal example from the rest of the text.
 -->
+
 ___
 ### Other Notes
 <!--
 Add notes here. Remove if none.
 -->
+
 ___
 ### Logs
 <!--
