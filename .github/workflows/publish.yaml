@@ -26,8 +26,6 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - name: Clear Poetry Cache
-        run: poetry cache clear --all pypi
       - name: Get Version
         id: version
         run: echo "::set-output name=version::$(poetry version -s)"
@@ -51,7 +49,7 @@ jobs:
             nikolamilojica/illuminate:v${{ steps.version.outputs.version }}
             nikolamilojica/illuminate:latest
       - name: Install Documentation Dependencies
-        run: poetry install -vvv
+        run: poetry install
       - name: Build and Deploy Documentation
         run: poetry run mkdocs gh-deploy --force
         env:
