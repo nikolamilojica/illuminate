@@ -34,7 +34,7 @@ jobs:
       - name: Clear Poetry Cache
         run: poetry cache clear --all pypi
       - name: Install Test Dependencies
-        run: poetry add tox@^4.3.5 tox-gh-actions
+        run: poetry add tox@^4.3.5 tox-gh-actions -vvv
       - name: Run Tests
         run: poetry run tox
 
@@ -59,7 +59,7 @@ jobs:
       - name: Clear Poetry Cache
         run: poetry cache clear --all pypi
       - name: Install Coverage Dependencies
-        run: poetry add coveralls
+        run: poetry add coveralls -vvv
       - name: Run Tests
         env:
           ILLUMINATE_MAIN_DB_PASSWORD: password

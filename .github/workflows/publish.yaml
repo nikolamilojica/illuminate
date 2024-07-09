@@ -51,7 +51,7 @@ jobs:
             nikolamilojica/illuminate:v${{ steps.version.outputs.version }}
             nikolamilojica/illuminate:latest
       - name: Install Documentation Dependencies
-        run: poetry install
+        run: poetry install -vvv
       - name: Build and Deploy Documentation
         run: poetry run mkdocs gh-deploy --force
         env:
