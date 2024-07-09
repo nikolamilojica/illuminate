@@ -1,6 +1,6 @@
 ---
 name: SonarCloud Issue
-about: Report a CVE/CWE issue
+about: Report a SonarCloud issue
 ---
 
 <!--
