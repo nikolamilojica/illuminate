@@ -1,26 +1,27 @@
 # Illuminate
 
-[![Bugs](
-https://sonarcloud.io/api/project_badges/measure?project=nikolamilojica_illuminate&metric=bugs)](
-https://sonarcloud.io/summary/new_code?id=nikolamilojica_illuminate)
-[![Code Smells](
-https://sonarcloud.io/api/project_badges/measure?project=nikolamilojica_illuminate&metric=code_smells)](
-https://sonarcloud.io/summary/new_code?id=nikolamilojica_illuminate)
 [![Code Style: Black](
 https://img.shields.io/badge/code%20style-black-000000.svg)](
 https://github.com/psf/black)
 [![Coveralls Coverage](
 https://coveralls.io/repos/github/nikolamilojica/illuminate/badge.svg?branch=master&t=YU1NaL)](
 https://coveralls.io/github/nikolamilojica/illuminate?branch=master)
+[![GitHub Actions - Tests Workflow](
+https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml/badge.svg?branch=master)](
+https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml)
+<br>
+[![Bugs](
+https://sonarcloud.io/api/project_badges/measure?project=nikolamilojica_illuminate&metric=bugs)](
+https://sonarcloud.io/summary/new_code?id=nikolamilojica_illuminate)
+[![Code Smells](
+https://sonarcloud.io/api/project_badges/measure?project=nikolamilojica_illuminate&metric=code_smells)](
+https://sonarcloud.io/summary/new_code?id=nikolamilojica_illuminate)
 [![Duplicated Lines (%)](
 https://sonarcloud.io/api/project_badges/measure?project=nikolamilojica_illuminate&metric=duplicated_lines_density)](
 https://sonarcloud.io/summary/new_code?id=nikolamilojica_illuminate)
 [![Quality Gate Status](
 https://sonarcloud.io/api/project_badges/measure?project=nikolamilojica_illuminate&metric=alert_status)](
 https://sonarcloud.io/summary/new_code?id=nikolamilojica_illuminate)
-[![GitHub Actions - Tests Workflow](
-https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml/badge.svg?branch=master)](
-https://github.com/nikolamilojica/illuminate/actions/workflows/tests.yaml)
 ___
 <img align="left" style="margin:6px" width="200" height="200" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Accueil_scribe_invert.png/241px-Accueil_scribe_invert.png">
 
