@@ -8,7 +8,8 @@ Thanks for suggesting a feature!
 Quick check-list while suggesting features:
 -->
 
-### Describe the feature you'd like to be implemented:
+## Details:
+
 <!--
 A clear and concise description of what you want to be implemented
 in the future releases. Common requirements would include new types of

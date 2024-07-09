@@ -8,6 +8,8 @@ Thanks for submitting an issue!
 Quick check-list while reporting bugs:
 -->
 
+## Details:
+
 - [ ] make sure that bug hasn't been already submitted by checking [issues](https://github.com/nikolamilojica/illuminate/issues) page
 - [ ] a detailed description of the bug or problem you are having
 - [ ] project dependencies
