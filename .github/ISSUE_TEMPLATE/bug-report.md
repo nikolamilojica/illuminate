@@ -5,7 +5,6 @@ about: Present Bugs and Errors
 
 <!--
 Thanks for submitting an issue!
-
 Quick check-list while reporting bugs:
 -->
 

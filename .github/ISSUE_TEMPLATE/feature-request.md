@@ -5,7 +5,6 @@ about: Future Improvements
 
 <!--
 Thanks for suggesting a feature!
-
 Quick check-list while suggesting features:
 -->
 
