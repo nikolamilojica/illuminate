@@ -86,7 +86,7 @@ class TestAssistantClass(Test):
             name = "example"
             Manager.project_setup(name, ".")
             context = Assistant.provide_context()
-            assert type(context) == dict
+            assert isinstance(context, dict)
             assert len(context["adapters"]) == 1
             assert len(context["observers"]) == 1
             assert context["name"] == name
