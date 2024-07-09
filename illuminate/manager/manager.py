@@ -98,7 +98,7 @@ class Manager(IManager):
         return self.__observed
 
     @staticmethod
-    @adapt
+    @adapt("populate")
     def db_populate(
         fixtures: tuple[str],
         models: list[object],
@@ -133,7 +133,7 @@ class Manager(IManager):
         logger.success(f"Database {selector} populated")
 
     @staticmethod
-    @adapt
+    @adapt("revision")
     def db_revision(
         config: Config,
         revision: str,
@@ -154,7 +154,7 @@ class Manager(IManager):
         logger.success("Revision created")
 
     @staticmethod
-    @adapt
+    @adapt("upgrade")
     def db_upgrade(
         config: Config,
         revision: str,

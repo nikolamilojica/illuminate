@@ -12,7 +12,7 @@ class DummyManager:
     """Dummy Manager class."""
 
     @staticmethod
-    @adapt
+    @adapt("populate")
     def db_populate(fixtures, models, operations, selector):
         """Dummy db_populate."""
         assert len(models) == 1
@@ -21,14 +21,14 @@ class DummyManager:
         assert selector == "main"
 
     @staticmethod
-    @adapt
+    @adapt("revision")
     def db_revision(config, revision):
         """Dummy db_revision."""
         assert isinstance(config, Config)
         assert revision == "head"
 
     @staticmethod
-    @adapt
+    @adapt("upgrade")
     def db_upgrade(config, revision, selector):
         """Dummy db_upgrade."""
         assert isinstance(config, Config)
