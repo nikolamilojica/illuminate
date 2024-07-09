@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.9", "3.10", "3.11", "3.12" ]
-        poetry-version: [ "1.6.1" ]
+        poetry-version: [ "1.8.3" ]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.9" ]
-        poetry-version: [ "1.6.1" ]
+        poetry-version: [ "1.8.3" ]
         os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
