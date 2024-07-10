@@ -1,3 +1,4 @@
+import math
 import os
 
 import pytest
@@ -53,6 +54,11 @@ class TestExporterSQL(Test):
             exporter = SQLExporter(models=[model])
             await exporter.export(self.session_async)
             query = self.session.query(ModelExample).all()
-            assert query[0].load_time == load_time
+            assert math.isclose(
+                query[0].load_time,
+                load_time,
+                rel_tol=1e-09,
+                abs_tol=1e-09,
+            )
             assert query[0].title == title
             assert query[0].url == url

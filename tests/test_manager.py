@@ -1,5 +1,6 @@
 import asyncio
 import io
+import math
 import os
 from os import walk
 
@@ -95,10 +96,21 @@ class TestManagerDBCommandGroup(Test):
             Manager.db_revision(path, "head", "main", self.url)
             Manager.db_upgrade(path, "head", "main", self.url)
             Manager.db_populate(["fixtures/example.json"], "main", self.url)
+            load_time = 1.0
             query = self.session.query(ModelExample).all()
             assert len(query) == 2
-            assert query[0].load_time == 1.0
-            assert query[1].load_time == 1.0
+            assert math.isclose(
+                query[0].load_time,
+                load_time,
+                rel_tol=1e-09,
+                abs_tol=1e-09,
+            )
+            assert math.isclose(
+                query[0].load_time,
+                load_time,
+                rel_tol=1e-09,
+                abs_tol=1e-09,
+            )
             assert query[0].url == "https://webscraper.io/"
             assert query[1].url == "https://webscraper.io/tutorials"
             assert (
