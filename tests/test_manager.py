@@ -64,7 +64,6 @@ class TestManagerDBCommandGroup(Test):
             assert os.path.isdir(versions)
             for file in next(walk(versions), (None, None, []))[2]:
                 if file.endswith(".py"):
-                    assert True
                     return
             assert False
 
