@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.3.4
+* Update for zipp (CVE-2024-5569).
+* Support added for Python 3.11 and 3.12.
+* Support dropped for Python 3.8.
+* Update for tornado (CWE-93).
+* Update for black (CVE-2024-21503).
+* Update for idna (CVE-2024-3651).
+* Update for Jinja2 (CVE-2024-34064).
+* Update for requests (CVE-2024-35195).
+* Update for urllib3 (CVE-2024-37891).
+* Update for GitPython (CVE-2024-22190).
+* Update for aiohttp (CVE-2024-30251).
+* Update for certifi (CVE-2024-39689).
+* Decouple database name from the project name with
+an option. Project name will be used if no name is provided.
+
 ## 0.3.3
 
 * Update for GitPython (CVE-2023-41040).
