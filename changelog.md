@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.5
+* Switch to SQLAlchemy 2.0.
+* Update for setuptools (CVE-2024-6345).
+
 ## 0.3.4
 * Update for zipp (CVE-2024-5569).
 * Support added for Python 3.11 and 3.12.
