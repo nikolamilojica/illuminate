@@ -31,7 +31,7 @@ version = "0.3.4"
 python = "^3.9,<3.13"
 aiofile = "^3.8.1"
 aioinflux = "^0.9.0"
-alembic = "^1.7.7"
+alembic = "1.13.2"
 asyncmy = "^0.2.5"
 asyncpg = "0.29.0"
 click = "^8.1.2"
@@ -39,7 +39,7 @@ loguru = "^0.6.0"
 numpy = "1.26.4"
 pandas = "^2.0.3"
 psycopg2 = "2.9.9"
-SQLAlchemy = {extras = ["asyncio"], version = "^1.4.42"}
+SQLAlchemy = {extras = ["asyncio"], version = "^2.0.31"}
 tornado = "^6.4.1"
 
 [tool.poetry.group.dev.dependencies]

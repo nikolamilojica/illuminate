@@ -61,6 +61,10 @@ class Assistant(IAssistant):
     ) -> Operations:
         """
         Creates Alembic's operations object.
+        NOTE: Currently unused after switching to SQLAlchemy 2.0.31. Alembic's
+        Operations.bulk_insert is not working at the time of this note
+        creation. Still, bulk_insert is considered the proper way to populate
+        tables and should be used again when this issue is resolved.
 
         :param selector: Database name in settings.py module DB attribute
         :param url: SQLAlchemy Database URL

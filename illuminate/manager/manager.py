@@ -11,9 +11,10 @@ from typing import Type, Union
 from aioinflux import InfluxDBClient  # type: ignore
 from alembic import command
 from alembic.config import Config
-from alembic.operations import Operations
 from loguru import logger
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from tornado import gen, ioloop, queues
 
 from illuminate.adapter import Adapter
@@ -28,6 +29,7 @@ from illuminate.exporter import Exporter
 from illuminate.exporter import InfluxDBExporter
 from illuminate.exporter import SQLExporter
 from illuminate.interface import IManager
+from illuminate.manager import Assistant
 from illuminate.meta.type import Result
 from illuminate.observation import FileObservation
 from illuminate.observation import HTTPObservation
@@ -101,35 +103,35 @@ class Manager(IManager):
     @adapt("populate")
     def db_populate(
         fixtures: tuple[str],
-        models: list[object],
-        operations: Operations,
         selector: str,
+        url: str,
     ) -> None:
         """
         Populates database with fixtures.
 
         :param fixtures: Tuple of fixture files
-        :param models: Models list
-        :param operations: Alembic's operations object
         :param selector: Database name in settings.py module
+        :param url: SQLAlchemy Database URL
         :return: None
         """
-
+        models = Assistant.provide_models()
         table_data = {}
         for _file in fixtures:
             with open(_file, "r") as file:  # type: ignore
                 content = json.load(file)  # type: ignore
                 for table in content:
                     table_data.update({table["name"]: table["data"]})
-        for model in models:
-            if model.__tablename__ in table_data:  # type: ignore
-                data = table_data[model.__tablename__]  # type: ignore
-                operations.bulk_insert(model.__table__, data)  # type: ignore
-                for record in data:
-                    logger.debug(
-                        f"Row {record} added to "  # type: ignore
-                        f"table {model.__tablename__}"
-                    )
+        with Session(create_engine(url)) as session:
+            for model in models:
+                if model.__tablename__ in table_data:  # type: ignore
+                    data = table_data[model.__tablename__]  # type: ignore
+                    for record in data:
+                        session.add(model(**record))  # type: ignore
+                        logger.debug(
+                            f"Row {record} added to "  # type: ignore
+                            f"table buffer {model.__tablename__}"
+                        )
+                    session.commit()
         logger.success(f"Database {selector} populated")
 
     @staticmethod
@@ -181,7 +183,6 @@ class Manager(IManager):
         :return: None
         :raises BasicManagerException:
         """
-
         if path != ".":
             path = os.path.join(path, name)
             if os.path.exists(path):
