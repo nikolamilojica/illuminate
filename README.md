@@ -67,6 +67,9 @@ by typing:</p>
 ```shell
 illuminate --version
 ```
+> **NOTE**: From version `0.3.5` on, the required SQLAlchemy version is `2.0.37`
+and above.
+
 ## Project Setup
 <p style="text-align: justify">Once you have CLI ready to create a project
 structure in the current directory, type the following:</p>
