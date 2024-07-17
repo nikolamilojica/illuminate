@@ -1,6 +1,5 @@
 import pytest
 from alembic.config import Config
-from alembic.operations import Operations
 
 from illuminate.decorators import adapt
 from illuminate.exceptions import BasicManagerException
@@ -13,11 +12,9 @@ class DummyManager:
 
     @staticmethod
     @adapt("populate")
-    def db_populate(fixtures, models, operations, selector):
+    def db_populate(fixtures, selector, url):
         """Dummy db_populate."""
-        assert len(models) == 1
         assert len(fixtures) == 1
-        assert isinstance(operations, Operations)
         assert selector == "main"
 
     @staticmethod
