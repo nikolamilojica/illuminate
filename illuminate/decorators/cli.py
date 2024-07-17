@@ -40,13 +40,14 @@ def adapt(command: str) -> Callable:
                 :param url: SQLAlchemy Database URL
                 :return: None
                 """
+
                 try:
-                    models = Assistant.provide_models()
-                    operations = Assistant.provide_alembic_operations(
-                        selector, url
-                    )
                     func(
-                        fixtures, models, operations, selector, *args, **kwargs
+                        fixtures,
+                        selector,
+                        url or Assistant._provide_db_url(selector),
+                        *args,
+                        **kwargs,
                     )
                 except NoSuchModuleError:
                     raise BasicManagerException(
