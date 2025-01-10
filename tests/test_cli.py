@@ -1,14 +1,25 @@
+import pytest
 from click.testing import CliRunner
 
 from illuminate import __version__
 from illuminate.cli import cli
 from illuminate.manager import Manager
+from tests.exception import TestANSIException
 from tests.unit import Test
 
 
 class TestCLI(Test):
 
+    function = "tornado.httpclient.AsyncHTTPClient.fetch"
     influxdb_url = "influxdb://son:son@localhost/example"
+
+    @staticmethod
+    @pytest.fixture(scope="function")
+    def raise_exception_with_ansi_tag_look_alike_message(mocker):
+        """
+        Patch fetch function to raise TestANSIException.
+        """
+        mocker.patch(TestCLI.function, side_effect=TestANSIException())
 
     def test_manage_project_setup_unsuccessfully(self):
         """
@@ -277,6 +288,33 @@ class TestCLI(Test):
                 assert (
                     "[('https://webscraper.io/', 'observe')]" in result.output
                 )
+
+    def test_observe_start_not_blocking_with_ansi_quasi_tag_exc_successfully(
+        self, raise_exception_with_ansi_tag_look_alike_message
+    ):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate observe start' with forced exception that
+        has a message with quasi ANSI tag message
+        Expected: Async loop is not broken and the process comes to an end with
+        a message displayed after escaping quasi ANSI tags
+        """
+        with self.path() as path:
+            name = "example"
+            runner = CliRunner()
+            with runner.isolated_filesystem(temp_dir=path) as tmp:
+                runner.invoke(cli, ["manage", "project", "setup", name, "."])
+                runner.invoke(
+                    cli, ["manage", "db", "revision", "--url", self.url, tmp]
+                )
+                runner.invoke(
+                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
+                )
+                runner.invoke(
+                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
+                )
+                result = runner.invoke(cli, ["observe", "start"])
+                assert "\n<string>\n" in result.output
 
     def test_version(self):
         """
