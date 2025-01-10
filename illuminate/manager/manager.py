@@ -374,9 +374,10 @@ class Manager(IManager):
                 async for _item in result:
                     await self.__router(_item)
         except Exception:  # noqa
-            stack = f"<red>{traceback.format_exc().strip()}</red>"
+            stack = traceback.format_exc().strip().replace("<", "\\<")
             logger.opt(colors=True).warning(
-                f"Observation callback throws the following exception\n{stack}"
+                "Observation callback throws the following exception\n"
+                f"<red>{stack}</red>"
             )
 
     async def __observation_switch(self, item: Observation) -> None:
