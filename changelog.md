@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.3.6
+* Fix the bug where exception message could contain what would be
+interpreted as ANSI tag, raising loguru exception in the process
+and blocking async loop.
+* Update for tornado (CVE-2024-52804).
+* Update for aiohttp (CVE-2024-52304).
+* Update for jinja2 (CVE-2024-56201).
+
 ## 0.3.5
 * Switch to SQLAlchemy 2.0.
 * Update for setuptools (CVE-2024-6345).
