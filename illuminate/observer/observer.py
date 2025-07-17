@@ -21,6 +21,9 @@ class Observer(IObserver):
     observe method.
     """
 
+    LABELS: dict
+    """Observer labels."""
+
     NAME: str
     """Observer name."""
 

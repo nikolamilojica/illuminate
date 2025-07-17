@@ -236,26 +236,28 @@ class TestCLI(Test):
             name = "example"
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
-                runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                runner.invoke(
-                    cli, ["manage", "db", "revision", "--url", self.url, tmp]
-                )
-                runner.invoke(
-                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
-                )
-                result = runner.invoke(
-                    cli,
-                    [
-                        "manage",
-                        "db",
-                        "populate",
-                        "--url",
-                        self.url,
-                        "--fixtures",
-                        f"{tmp}/fixtures/example.json",
-                    ],
-                )
+                result = self.setup_project_with_cli(name, runner, tmp)
                 assert "Database main populated" in result.output
+
+    def test_observe_catalogue_label_successfully(self):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate observe catalogue --label none=existing'
+        Expected: BasicManagerException is raised since all Observers are
+        filtered out.
+        """
+        with self.path() as path:
+            name = "example"
+            runner = CliRunner()
+            with runner.isolated_filesystem(temp_dir=path) as tmp:
+                self.setup_project_with_cli(name, runner, tmp)
+                result = runner.invoke(
+                    cli, ["observe", "catalogue", "--label", "none=existing"]
+                )
+                assert (
+                    result.exception.__str__()
+                    == "No observers found or left after filtering"
+                )
 
     def test_observe_catalogue_unsuccessfully(self):
         """
@@ -287,6 +289,28 @@ class TestCLI(Test):
                 )
                 assert (
                     "[('https://webscraper.io/', 'observe')]" in result.output
+                )
+
+    def test_observe_start_label_successfully(
+        self, raise_exception_with_ansi_tag_look_alike_message
+    ):
+        """
+        Given: Current directory is a project directory
+        When: Running 'illuminate observe start --label none=existent'
+        Expected: BasicManagerException is raised since all Observers are
+        filtered out.
+        """
+        with self.path() as path:
+            name = "example"
+            runner = CliRunner()
+            with runner.isolated_filesystem(temp_dir=path) as tmp:
+                self.setup_project_with_cli(name, runner, tmp)
+                result = runner.invoke(
+                    cli, ["observe", "start", "--label", "none=existing"]
+                )
+                assert (
+                    result.exception.__str__()
+                    == "No observers found or left after filtering"
                 )
 
     def test_observe_start_not_blocking_with_ansi_quasi_tag_exc_successfully(
