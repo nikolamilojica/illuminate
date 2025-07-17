@@ -190,9 +190,18 @@ def setup(name: str, path: str) -> None:
 
 
 @observe.command("catalogue")
-def catalogue() -> None:
+@click.option(
+    "--label",
+    help="Label selector in key=value format.",
+    multiple=True,
+    required=False,
+    callback=_parse_label,
+)
+def catalogue(label: tuple[dict[str, str]]) -> None:
     """Lists observers found in project files."""
-    Manager.observe_catalogue(**Assistant.provide_context(sessions=False))
+    Manager.observe_catalogue(
+        **Assistant.provide_context(sessions=False, _labels=label),
+    )
 
 
 @observe.command("start")
