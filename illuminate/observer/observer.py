@@ -37,7 +37,7 @@ class Observer(IObserver):
         self,
         response: Union[FileIOWrapperBase, HTTPResponse, Result],
         *args,
-        **kwargs
+        **kwargs,
     ):
         """
         Manipulates response object and yields Exporter, Finding and

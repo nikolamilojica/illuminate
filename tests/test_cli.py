@@ -282,7 +282,7 @@ class TestCLI(Test):
                 runner.invoke(cli, ["manage", "project", "setup", name, "."])
                 result = runner.invoke(cli, ["observe", "catalogue"])
                 assert (
-                    "<class 'observers.example.py.ObserverExample'>"
+                    "<class 'observers.example.ObserverExample'>"
                     in result.output
                 )
                 assert (

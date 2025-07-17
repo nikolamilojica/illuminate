@@ -45,7 +45,7 @@ tornado = "^6.5.1"
 [tool.poetry.group.dev.dependencies]
 aiosqlite = "^0.17.0"
 bandit = "^1.7.4"
-black = "^24.3.0,<25"
+black = "^25.1.0"
 beautifulsoup4 = "^4.11.1"
 flake8 = "^5.0.4"
 markdown-include = "^0.8.0"
