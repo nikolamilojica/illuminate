@@ -83,9 +83,9 @@ class Assistant(IAssistant):
     ) -> dict[
         str,
         Union[
-            dict[str, dict[str, Type[AsyncSession]]],
+            dict[str, Union[sessionmaker[AsyncSession], InfluxDBClient]],
             str,
-            list[Union[Type[Observer], Type[Adapter]]],
+            list[Union[Type[Adapter], Type[Observer]]],
             ModuleType,
         ],
     ]:
@@ -99,36 +99,15 @@ class Assistant(IAssistant):
         """
         settings = Assistant._provide_settings()
         context = {
-            "adapters": [],
+            "adapters": Assistant._collect_classes("adapters"),
             "name": settings.NAME,
-            "observers": [],
+            "observers": Assistant._collect_classes("observers"),
             "path": os.getcwd(),
             "settings": settings,
         }
+
         if sessions:
             context["sessions"] = Assistant._provide_sessions()
-
-        for folder in ("adapters", "observers"):
-            directory = os.path.join(os.getcwd(), folder)
-            files = [
-                f
-                for f in next(os.walk(directory))[2]
-                if f.endswith(".py") and not f.startswith("__init__")
-            ]
-            for file in files:
-                _module = f"{folder}.{file}"
-                spec = importlib.util.spec_from_file_location(
-                    _module, os.path.join(directory, file)
-                )
-                module = importlib.util.module_from_spec(spec)  # type: ignore
-                sys.modules[_module] = module
-                spec.loader.exec_module(module)  # type: ignore
-
-                for name, cls in inspect.getmembers(module, inspect.isclass):
-                    proper_class = name.startswith(folder.capitalize()[:-1])
-                    basic_import = len(name) == len(folder[:-1])
-                    if proper_class and not basic_import:
-                        context[folder].append(cls)
 
         if _filter:
             context["observers"] = list(
@@ -155,6 +134,51 @@ class Assistant(IAssistant):
         """
         settings = Assistant._provide_settings()
         return [locate(i) for i in settings.MODELS]
+
+    @staticmethod
+    def _collect_classes(
+        directory: str,
+    ) -> list[Union[Type[Adapter], Type[Observer]]]:
+        """
+        Recursively collects all classes from a given directory matching its
+        prefix (Adapter/Observer).
+
+        :param directory: Either "adapters" or "observers"
+        :return: List of matching class types
+        """
+        classes = []
+        prefix = directory.capitalize()[:-1]
+        base_dir = os.path.join(os.getcwd(), directory)
+
+        for dirpath, _, filenames in os.walk(base_dir):
+            for filename in filenames:
+                if not filename.endswith(".py") or filename.startswith(
+                    "__init__"
+                ):
+                    continue
+
+                full_path = os.path.join(dirpath, filename)
+                rel_path = os.path.relpath(full_path, os.getcwd())
+
+                module_name = rel_path.replace(os.sep, ".")[:-3]
+                spec = importlib.util.spec_from_file_location(
+                    module_name, full_path
+                )
+
+                if not spec or not spec.loader:
+                    continue
+
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[module_name] = module
+                spec.loader.exec_module(module)
+
+                for name, cls in inspect.getmembers(module, inspect.isclass):
+                    if cls.__module__ != module_name:
+                        continue
+                    if name.startswith(prefix) and len(name) > len(prefix):
+                        classes.append(cls)
+
+        return classes
 
     @staticmethod
     def _provide_db_url(selector: str, _async: bool = False) -> str:
@@ -188,9 +212,9 @@ class Assistant(IAssistant):
         return "{type}://{user}:{pass}@{host}/{name}".format(**db)
 
     @staticmethod
-    def _provide_sessions() -> dict[
-        str, Union[Type[AsyncSession], InfluxDBClient]
-    ]:
+    def _provide_sessions() -> (
+        dict[str, Union[sessionmaker[AsyncSession], InfluxDBClient]]
+    ):
         """
         Creates a dictionary of database sessions.
 
@@ -268,6 +292,7 @@ class Assistant(IAssistant):
                 username=settings.DB[db]["user"],
                 password=settings.DB[db]["pass"],
             )
+        return None
 
     @staticmethod
     def __provide_sql_sessions(
