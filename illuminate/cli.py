@@ -186,7 +186,7 @@ def catalogue() -> None:
 )
 def start(observer: tuple[str]) -> None:
     """Starts producer/consumer ETL process."""
-    context = Assistant.provide_context(_filter=observer)
+    context = Assistant.provide_context(_observers=observer)
     manager = Manager(**context)  # type: ignore
     manager.observe_start()
 
