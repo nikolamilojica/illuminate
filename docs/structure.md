@@ -593,22 +593,6 @@ pgadmin containers to monitor your flow on your localhost.</p>
 ```yaml
 version: '3.8'
 services:
-  grafana:
-   image: grafana/grafana
-   container_name: grafana
-   restart: always
-   depends_on:
-     - influxdb
-   environment:
-     - GF_SECURITY_ADMIN_USER=illuminate
-     - GF_SECURITY_ADMIN_PASSWORD=$ILLUMINATE_GRAFANA_PASSWORD
-     - GF_INSTALL_PLUGINS=
-   links:
-     - influxdb
-   ports:
-     - '3000:3000'
-   volumes:
-     - grafana:/var/lib/grafana
   influxdb:
     image: influxdb:1.8
     container_name: influxdb
@@ -634,15 +618,6 @@ services:
       - '5432:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=root@example.com
-      - PGADMIN_DEFAULT_PASSWORD=$ILLUMINATE_PGADMIN_PASSWORD
-    ports:
-      - "8080:80"
   splash:
     container_name: splash
     image: scrapinghub/splash
