@@ -9,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from illuminate.cli import cli
+
 
 class Test:
     """
@@ -37,6 +39,34 @@ class Test:
             assert os.path.exists(test_file_path)
             with open(test_file_path, "r") as file:
                 assert content.format(name=name).strip() == file.read().strip()
+
+    def setup_project_with_cli(self, name, runner, tmp):
+        """
+        Default project setup done with CLI.
+
+        :param name: str
+        :param runner: click.testing.CliRunner
+        :param tmp: str
+        :return: click.testing.Result
+        """
+        runner.invoke(cli, ["manage", "project", "setup", name, "."])
+        runner.invoke(
+            cli, ["manage", "db", "revision", "--url", self.url, tmp]
+        )
+        runner.invoke(cli, ["manage", "db", "upgrade", "--url", self.url, tmp])
+        result = runner.invoke(
+            cli,
+            [
+                "manage",
+                "db",
+                "populate",
+                "--url",
+                self.url,
+                "--fixtures",
+                f"{tmp}/fixtures/example.json",
+            ],
+        )
+        return result
 
     @property
     def engine(self):

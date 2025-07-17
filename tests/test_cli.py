@@ -236,25 +236,7 @@ class TestCLI(Test):
             name = "example"
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
-                runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                runner.invoke(
-                    cli, ["manage", "db", "revision", "--url", self.url, tmp]
-                )
-                runner.invoke(
-                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
-                )
-                result = runner.invoke(
-                    cli,
-                    [
-                        "manage",
-                        "db",
-                        "populate",
-                        "--url",
-                        self.url,
-                        "--fixtures",
-                        f"{tmp}/fixtures/example.json",
-                    ],
-                )
+                result = self.setup_project_with_cli(name, runner, tmp)
                 assert "Database main populated" in result.output
 
     def test_observe_catalogue_label_successfully(self):
@@ -267,8 +249,8 @@ class TestCLI(Test):
         with self.path() as path:
             name = "example"
             runner = CliRunner()
-            with runner.isolated_filesystem(temp_dir=path):
-                runner.invoke(cli, ["manage", "project", "setup", name, "."])
+            with runner.isolated_filesystem(temp_dir=path) as tmp:
+                self.setup_project_with_cli(name, runner, tmp)
                 result = runner.invoke(
                     cli, ["observe", "catalogue", "--label", "none=existing"]
                 )
@@ -322,16 +304,7 @@ class TestCLI(Test):
             name = "example"
             runner = CliRunner()
             with runner.isolated_filesystem(temp_dir=path) as tmp:
-                runner.invoke(cli, ["manage", "project", "setup", name, "."])
-                runner.invoke(
-                    cli, ["manage", "db", "revision", "--url", self.url, tmp]
-                )
-                runner.invoke(
-                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
-                )
-                runner.invoke(
-                    cli, ["manage", "db", "upgrade", "--url", self.url, tmp]
-                )
+                self.setup_project_with_cli(name, runner, tmp)
                 result = runner.invoke(
                     cli, ["observe", "start", "--label", "none=existing"]
                 )
