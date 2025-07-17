@@ -79,6 +79,7 @@ class Assistant(IAssistant):
     @staticmethod
     def provide_context(
         sessions: bool = True,
+        _labels: Optional[tuple[dict]] = None,
         _observers: Optional[tuple[str]] = None,
     ) -> dict[
         str,
@@ -93,6 +94,7 @@ class Assistant(IAssistant):
         Creates Manager's constructor kwargs.
 
         :param sessions: Sessions option
+        :param _labels: Optional tuple of Observer's names or class names
         :param _observers: Optional tuple of Observer's names or class names
         :return: Manager's constractor parameters
         :raises BasicManagerException:
@@ -108,6 +110,18 @@ class Assistant(IAssistant):
 
         if sessions:
             context["sessions"] = Assistant._provide_sessions()
+
+        if _labels:
+            required_labels = {k: v for d in _labels for k, v in d.items()}
+            context["observers"] = list(
+                filter(
+                    lambda x: all(
+                        x.LABELS.get(k) == v
+                        for k, v in required_labels.items()
+                    ),
+                    context["observers"],
+                )
+            )
 
         if _observers:
             context["observers"] = list(

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 import warnings
+from typing import Optional
 from unittest.mock import patch
 
 import click
@@ -12,6 +13,24 @@ from illuminate import __version__
 from illuminate.common import LOGGING_LEVELS
 from illuminate.manager import Assistant
 from illuminate.manager import Manager
+
+
+def _parse_label(
+    ctx: Optional[click.Context],
+    param: Optional[click.Parameter],
+    values: tuple[str, ...],
+) -> tuple[dict[str, str], ...]:
+    """Parse label options"""
+    result: list[dict[str, str]] = []
+    for item in values:
+        if "=" not in item:
+            logger.warning(
+                f"Invalid label format: '{item}'. Expected key=value."
+            )
+            continue
+        key, value = item.split("=", 1)
+        result.append({key: value})
+    return tuple(result)
 
 
 @click.group()
@@ -178,15 +197,22 @@ def catalogue() -> None:
 
 @observe.command("start")
 @click.option(
+    "--label",
+    help="Label selector in key=value format.",
+    multiple=True,
+    required=False,
+    callback=_parse_label,
+)
+@click.option(
     "--observer",
     help="Observer selector. Leave empty to include all observers.",
     multiple=True,
     required=False,
     type=str,
 )
-def start(observer: tuple[str]) -> None:
+def start(label: tuple[dict[str, str]], observer: tuple[str]) -> None:
     """Starts producer/consumer ETL process."""
-    context = Assistant.provide_context(_observers=observer)
+    context = Assistant.provide_context(_labels=label, _observers=observer)
     manager = Manager(**context)  # type: ignore
     manager.observe_start()
 
