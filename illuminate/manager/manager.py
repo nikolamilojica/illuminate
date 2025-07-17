@@ -488,29 +488,29 @@ class Manager(IManager):
         """
         self.adapters.sort(key=lambda x: x.priority, reverse=True)
 
-        _observers = self.settings.CONCURRENCY["observers"]
         _adapters = self.settings.CONCURRENCY["adapters"]
         _exporters = self.settings.CONCURRENCY["exporters"]
+        _obs = self.settings.CONCURRENCY["observations"]
 
-        observers = gen.multi([self.__observe() for _ in range(_observers)])
         adapters = gen.multi([self.__adapt() for _ in range(_adapters)])
         exporters = gen.multi([self.__export() for _ in range(_exporters)])
+        observations = gen.multi([self.__observe() for _ in range(_obs)])
 
         await self.__start()
         await self.__observe_queue.join()
         await self.__adapt_queue.join()
         await self.__export_queue.join()
 
-        for _ in range(_observers):
+        for _ in range(_obs):
             await self.__observe_queue.put(None)
         for _ in range(_adapters):
             await self.__adapt_queue.put(None)
         for _ in range(_exporters):
             await self.__export_queue.put(None)
 
-        await observers
         await adapters
         await exporters
+        await observations
 
         for session in self.sessions:
             if isinstance(self.sessions[session], InfluxDBClient):

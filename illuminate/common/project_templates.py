@@ -364,9 +364,9 @@ import os
 from illuminate import __version__
 
 CONCURRENCY = {{
-    "observers": 8,
     "adapters": 2,
     "exporters": 8,
+    "observations": 8,
 }}
 
 DB = {{
