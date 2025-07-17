@@ -89,6 +89,8 @@ class ObserverExample(Observer):
     Collection of strings evaluated against URL to determent if URL is allowed
     to be observed. If empty, no Observation wide restrictions are forced.
     """
+    LABELS: dict = {"tag": "example"}
+    """Observer's labels."""
     NAME: str = "example"
     """Observer's name."""
 
@@ -525,9 +527,9 @@ import os
 from illuminate import __version__
 
 CONCURRENCY = {
-    "observers": 8,
     "adapters": 2,
     "exporters": 8,
+    "observations": 8,
 }
 
 DB = {
