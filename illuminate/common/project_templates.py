@@ -495,6 +495,8 @@ class ObserverExample(Observer):
     Collection of strings evaluated against URL to determent if URL is allowed
     to be observed. If empty, no Observation wide restrictions are forced.
     \"\"\"
+    LABELS: dict = {{"tag": "example"}}
+    \"\"\"Observer's labels.\"\"\"
     NAME: str = "example"
     \"\"\"Observer's name.\"\"\"
 
