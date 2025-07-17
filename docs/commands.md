@@ -173,12 +173,13 @@ illuminate observe --help
 illuminate observe catalogue --help
 ```
 
-    Usag[e: illuminate observe catalogue [OPTIONS]
+    Usage: illuminate observe catalogue [OPTIONS]
 
-      Lists observers found in project files.
+    Lists observers found in project files.
 
     Options:
-      --help  Show this message and exit
+      --label TEXT  Label selector in key=value format.
+      --help        Show this message and exit.
 
 ### `start`
 ```shell
@@ -190,5 +191,6 @@ illuminate observe start --help
       Starts producer/consumer ETL process.
 
     Options:
+      --label TEXT     Label selector in key=value format.
       --observer TEXT  Observer selector. Leave empty to include all observers.
       --help           Show this message and exit.
