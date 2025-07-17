@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import pytest
 from alembic.operations import Operations
 
@@ -82,13 +85,18 @@ class TestAssistantClass(Test):
         When: Calling Assistant.provide_context
         Expected: Returns context dict
         """
-        with self.path():
+        with self.path() as path:
             name = "example"
             Manager.project_setup(name, ".")
+            source = os.path.join(path, "observers", "example.py")
+            destination = os.path.join(path, "observers", "test")
+            destination = os.path.join(destination, ".example.py")
+            os.makedirs(destination, exist_ok=True)
+            shutil.copy2(source, destination)
             context = Assistant.provide_context()
             assert isinstance(context, dict)
             assert len(context["adapters"]) == 1
-            assert len(context["observers"]) == 1
+            assert len(context["observers"]) == 2
             assert context["name"] == name
             assert context["sessions"]["main"]
             assert context["sessions"]["measurements"]

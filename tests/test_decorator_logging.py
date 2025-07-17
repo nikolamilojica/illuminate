@@ -70,9 +70,7 @@ class TestLogging:
         """
         runner = CliRunner()
         result = runner.invoke(_cli_observe_catalogue)
-        assert (
-            "<class 'observers.example.py.ObserverExample'>" in result.output
-        )
+        assert "<class 'observers.example.ObserverExample'>" in result.output
         assert "[('https://webscraper.io/', 'observe')]" in result.output
 
     def test_observe_start(self):
