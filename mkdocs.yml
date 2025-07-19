@@ -17,7 +17,6 @@ plugins:
         python:
           options:
             docstring_section_style: spacy
-            docstring_style: sphinx
             heading_level: 3
             show_signature_annotations: true
             show_root_heading: true
