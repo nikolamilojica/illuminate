@@ -25,7 +25,7 @@ packages = [
     { include = "illuminate" }
 ]
 repository = "https://github.com/nikolamilojica/illuminate"
-version = "0.3.6"
+version = "0.4.0"
 
 [tool.poetry.dependencies]
 python = "^3.9,<3.13"

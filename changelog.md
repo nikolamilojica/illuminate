@@ -1,5 +1,19 @@
 # Change Log
 
+## 0.4.0
+* Update Docker image to use Python 3.12.
+* Recursive Observer discovery.
+* Observer labels and label selector.
+* In settings.py, under CONCURRENCY section,
+changed key "observers" to "observations".
+* Update for tornado (CVE-2025-47287).
+* Update for setuptools (CVE-2025-47273).
+* Update for virtualenv (CVE-2024-53899).
+* Update for urllib3 (CVE-2025-50182).
+* Update for jinja2 (CVE-2025-27516).
+* Update for requests (CVE-2024-47081).
+* Update for aiohttp (CVE-2025-53643).
+
 ## 0.3.6
 * Fix the bug where exception message could contain what would be
 interpreted as ANSI tag, raising loguru exception in the process
@@ -46,7 +60,7 @@ WARNING messages.
 
 * Fix the bug where the logic assumes that all fixture files contain
 non-relational data and tries to populate the database with malformed
-JSON. Option --fixtures is now mandatory.
+JSON. Option `--fixtures` is now mandatory.
 * Fix the bug in the project template where the migration script file
 is incorrectly importing the Base model from the example.py file,
 instead of importing it from the models package, as intended.
@@ -59,20 +73,16 @@ instead of importing it from the models package, as intended.
 
 ## 0.2.0
 
-Features:
 * SplashObservation
 * FileObservation
 * SQLObservation
 * Callbacks are no loner required to return async generators. Now they can
 return coroutine that will be awaited. Coroutine return object is ignored.
-
-Fixes:
 * Consumer/producer observation queue was hanging if exception was raised in
-Observation callback method. [#95](https://github.com/nikolamilojica/illuminate/pull/95)
+Observation callback method.
 
 ## 0.1.1
 
-Features:
 * Core functionalities
 * HTTPObservation
 * SQLExporter
