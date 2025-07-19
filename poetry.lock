@@ -1092,21 +1092,6 @@ docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil"]
 
 [[package]]
-name = "griffe"
-version = "1.7.3"
-description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
-optional = false
-python-versions = ">=3.9"
-groups = ["dev"]
-files = [
-    {file = "griffe-1.7.3-py3-none-any.whl", hash = "sha256:c6b3ee30c2f0f17f30bcdef5068d6ab7a2a4f1b8bf1a3e74b56fffd21e1c5f75"},
-    {file = "griffe-1.7.3.tar.gz", hash = "sha256:52ee893c6a3a968b639ace8015bec9d36594961e156e23315c8e8e51401fa50b"},
-]
-
-[package.dependencies]
-colorama = ">=0.4"
-
-[[package]]
 name = "identify"
 version = "2.6.12"
 description = "File identification library for Python"
@@ -1501,45 +1486,47 @@ files = [
 
 [[package]]
 name = "mkdocstrings"
-version = "0.19.1"
+version = "0.29.1"
 description = "Automatic documentation from sources, for MkDocs."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "mkdocstrings-0.19.1-py3-none-any.whl", hash = "sha256:32a38d88f67f65b264184ea71290f9332db750d189dea4200cbbe408d304c261"},
-    {file = "mkdocstrings-0.19.1.tar.gz", hash = "sha256:d1037cacb4b522c1e8c164ed5d00d724a82e49dcee0af80db8fb67b384faeef9"},
+    {file = "mkdocstrings-0.29.1-py3-none-any.whl", hash = "sha256:37a9736134934eea89cbd055a513d40a020d87dfcae9e3052c2a6b8cd4af09b6"},
+    {file = "mkdocstrings-0.29.1.tar.gz", hash = "sha256:8722f8f8c5cd75da56671e0a0c1bbed1df9946c0cef74794d6141b34011abd42"},
 ]
 
 [package.dependencies]
+importlib-metadata = {version = ">=4.6", markers = "python_version < \"3.10\""}
 Jinja2 = ">=2.11.1"
-Markdown = ">=3.3"
+Markdown = ">=3.6"
 MarkupSafe = ">=1.1"
-mkdocs = ">=1.2"
-mkdocs-autorefs = ">=0.3.1"
-mkdocstrings-python = {version = ">=0.5.2", optional = true, markers = "extra == \"python\""}
+mkdocs = ">=1.6"
+mkdocs-autorefs = ">=1.4"
+mkdocstrings-python-legacy = {version = ">=0.2.1", optional = true, markers = "extra == \"python-legacy\""}
 pymdown-extensions = ">=6.3"
 
 [package.extras]
 crystal = ["mkdocstrings-crystal (>=0.3.4)"]
-python = ["mkdocstrings-python (>=0.5.2)"]
+python = ["mkdocstrings-python (>=1.16.2)"]
 python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
 
 [[package]]
-name = "mkdocstrings-python"
-version = "0.8.3"
-description = "A Python handler for mkdocstrings."
+name = "mkdocstrings-python-legacy"
+version = "0.2.7"
+description = "A legacy Python handler for mkdocstrings."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "mkdocstrings-python-0.8.3.tar.gz", hash = "sha256:9ae473f6dc599339b09eee17e4d2b05d6ac0ec29860f3fc9b7512d940fc61adf"},
-    {file = "mkdocstrings_python-0.8.3-py3-none-any.whl", hash = "sha256:4e6e1cd6f37a785de0946ced6eb846eb2f5d891ac1cc2c7b832943d3529087a7"},
+    {file = "mkdocstrings_python_legacy-0.2.7-py3-none-any.whl", hash = "sha256:c24a0a5867749fd826dfa190e10afcbd4c415cbcb2f805fc4791472b4bf221e9"},
+    {file = "mkdocstrings_python_legacy-0.2.7.tar.gz", hash = "sha256:1aa8a277a332fb0d49be3786de3fa18af7d8792e8d611f6ba8d550dc3a1ff8a1"},
 ]
 
 [package.dependencies]
-griffe = ">=0.24"
-mkdocstrings = ">=0.19"
+mkdocs-autorefs = ">=1.1"
+mkdocstrings = ">=0.28.3"
+pytkdocs = ">=0.14"
 
 [[package]]
 name = "multidict"
@@ -2259,6 +2246,21 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "pytkdocs"
+version = "0.16.5"
+description = "Load Python objects documentation."
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "pytkdocs-0.16.5-py3-none-any.whl", hash = "sha256:7feb2535a8582d891fa5353cf2f4ecc7840915e631d322dbcbc1c8cc605da23a"},
+    {file = "pytkdocs-0.16.5.tar.gz", hash = "sha256:103cdb3f0298c392bc340ae9aa7cd8685b163ae2aec65660dd0018978ddf4fa7"},
+]
+
+[package.extras]
+numpy-style = ["docstring_parser (>=0.7)"]
+
+[[package]]
 name = "pytz"
 version = "2025.2"
 description = "World timezone definitions, modern and historical"
@@ -2919,4 +2921,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9,<3.13"
-content-hash = "b659136589b899b167db12b9991e479a5525cce17428940e91d8c7e66c33cd55"
+content-hash = "ddf76f247b9ae4e04488d979face3a243769f6804acb3f70999334386408c87b"

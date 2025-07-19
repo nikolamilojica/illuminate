@@ -51,7 +51,7 @@ flake8 = "^5.0.4"
 markdown-include = "^0.8.0"
 mkdocs = "^1.4.2"
 mkdocs-material = "^8.5.10"
-mkdocstrings = {extras = ["python"], version = "^0.19.0"}
+mkdocstrings = {version = ">=0.18", extras = ["python-legacy"]}
 mypy = "^0.982"
 pre-commit = "^2.20.0"
 pytest = "^7.2.1"
